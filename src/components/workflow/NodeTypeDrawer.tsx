@@ -97,6 +97,34 @@ const nodeTemplates: NodeTypeOption[] = [
     name: "Condition",
     description: "Conditional branching",
   },
+  {
+    id: "11",
+    mainType: "condition",
+    type: "condition",
+    name: "Condition Node",
+    description: "Advanced conditional logic with multiple rules",
+  },
+  {
+    id: "12",
+    mainType: "api",
+    type: "api",
+    name: "API Call",
+    description: "Make external API requests with custom configuration",
+  },
+  {
+    id: "13",
+    mainType: "loop",
+    type: "loop",
+    name: "Loop",
+    description: "Iterate over data with format or create operations",
+  },
+  {
+    id: "14",
+    mainType: "csv",
+    type: "csv",
+    name: "Read CSV",
+    description: "Read and parse CSV files",
+  },
 ];
 
 export const NodeTypeDrawer = ({

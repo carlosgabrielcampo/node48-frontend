@@ -17,9 +17,10 @@ import { CustomNode } from "./CustomNode";
 import { Button } from "@/components/ui/button";
 import { Download, Upload, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { WorkflowData } from "@/types/workflow";
+import { WorkflowData, WorkflowNode } from "@/types/workflow";
 import { v4 as uuidv4 } from 'uuid'
 import { NodeType } from "@/types/workflow";
+import { NodeConfigPanel } from "./NodeConfigPanel";
 const nodeTypes = {
   custom: CustomNode,
   action: CustomNode,
@@ -37,6 +38,8 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
   const [pendingNode, setPendingNode] = useState<{ mainType: string; name: string } | null>(null);
+  const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
+  const [configPanelOpen, setConfigPanelOpen] = useState(false);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   // Expose addNode through callback
@@ -103,13 +106,56 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
           type,
           name,
           onDelete: handleDeleteNode,
+          onClick: (id: string) => {
+            const node = nodes.find(n => n.id === id);
+            if (node) {
+              const workflowNode: WorkflowNode = {
+                id: node.id,
+                type: node.data.type,
+                name: node.data.name,
+                position: node.position,
+                ...node.data
+              };
+              setSelectedNode(workflowNode);
+              setConfigPanelOpen(true);
+            }
+          }
         }
       };
       setNodes((nds) => [...nds, newNode]);
       toast.success(`Added ${name}`);
     },
-    [setNodes, handleDeleteNode]
+    [setNodes, handleDeleteNode, nodes]
   );
+
+  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    const workflowNode: WorkflowNode = {
+      id: node.id,
+      type: node.data.type,
+      name: node.data.name,
+      position: node.position,
+      ...node.data
+    };
+    setSelectedNode(workflowNode);
+    setConfigPanelOpen(true);
+  }, []);
+
+  const handleUpdateNode = useCallback((nodeId: string, updates: Partial<WorkflowNode>) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, ...updates }, position: updates.position || node.position }
+          : node
+      )
+    );
+    
+    // Update selected node
+    if (selectedNode?.id === nodeId) {
+      setSelectedNode((prev) => prev ? { ...prev, ...updates } : null);
+    }
+    
+    toast.success("Node updated");
+  }, [setNodes, selectedNode]);
 
   // Handle pending node addition
   useEffect(() => {
@@ -269,6 +315,7 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onSelectionChange={onSelectionChange}
+          onNodeClick={handleNodeClick}
           nodeTypes={nodeTypes}
           connectionMode={ConnectionMode.Strict}
           fitView
@@ -279,6 +326,13 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
           <MiniMap nodeColor="hsl(var(--primary))"/>
         </ReactFlow>
       </div>
+
+      <NodeConfigPanel
+        node={selectedNode}
+        open={configPanelOpen}
+        onOpenChange={setConfigPanelOpen}
+        onUpdate={handleUpdateNode}
+      />
     </div>
   );
 };

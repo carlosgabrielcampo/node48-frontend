@@ -7,6 +7,7 @@ interface CustomNodeData {
   name: string;
   type: NodeType;
   onDelete: (id: string) => void;
+  onClick?: (id: string) => void;
 }
 
 export const CustomNode = memo(({ id, type, data, selected }: NodeProps<CustomNodeData>) => {
@@ -29,7 +30,8 @@ export const CustomNode = memo(({ id, type, data, selected }: NodeProps<CustomNo
 
   return (
     <div
-      className={`rounded-lg border-2 bg-card shadow-lg transition-all h-[120px] min-w-[180px] ${
+      onClick={() => data.onClick?.(id)}
+      className={`rounded-lg border-2 bg-card shadow-lg transition-all h-[120px] min-w-[180px] cursor-pointer ${
         selected 
           ? "border-primary shadow-xl ring-2 ring-primary/20" 
           : "border-border hover:border-primary/50"
