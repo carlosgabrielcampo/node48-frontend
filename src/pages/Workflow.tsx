@@ -4,6 +4,7 @@ import { WorkflowSidebar } from "@/components/workflow/WorkflowSidebar";
 import { WorkflowTopBar } from "@/components/workflow/WorkflowTopBar";
 import { FlowEditor } from "@/components/workflow/FlowEditor";
 import { NodeTypeDrawer } from "@/components/workflow/NodeTypeDrawer";
+import { NodeType } from "@/types/workflow";
 
 const Workflow = () => {
   const [isActive, setIsActive] = useState(false);
@@ -14,10 +15,11 @@ const Workflow = () => {
     setIsDrawerOpen(true);
   }, []);
 
-  const handleNodeAdded = useCallback((type: "action" | "operation", name: string) => {
+  const handleNodeAdded = useCallback((mainType: NodeType, name: string) => {
+    console.log({handleNodeAdded: mainType})
     // Trigger node addition in FlowEditor
     if ((window as any).__addWorkflowNode) {
-      (window as any).__addWorkflowNode(type, name);
+      (window as any).__addWorkflowNode(mainType, name);
     }
     setIsDrawerOpen(false);
   }, []);
@@ -55,12 +57,10 @@ const Workflow = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <WorkflowSidebar />
-        
         <div className="flex-1 flex flex-col">
           <div className="flex items-center h-14 border-b px-4">
             <SidebarTrigger aria-label="Toggle sidebar" />
           </div>
-
           <WorkflowTopBar
             workflowId={workflowId}
             onSave={handleSave}
@@ -68,9 +68,7 @@ const Workflow = () => {
             isActive={isActive}
             onToggleActive={handleToggleActive}
           />
-
           <FlowEditor onAddNode={handleAddNode} onNodeAdded={handleNodeAdded} />
-
           <NodeTypeDrawer
             open={isDrawerOpen}
             onOpenChange={setIsDrawerOpen}

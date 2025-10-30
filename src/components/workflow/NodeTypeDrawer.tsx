@@ -8,11 +8,14 @@ import {
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { Zap, Cog, Search } from "lucide-react";
+import { Zap, Cog, Search, Power } from "lucide-react";
+import { NodeType } from "@/types/workflow";
+
 
 interface NodeTypeOption {
   id: string;
-  type: "action" | "operation";
+  mainType: NodeType;
+  type: string,
   name: string;
   description: string;
 }
@@ -20,54 +23,76 @@ interface NodeTypeOption {
 interface NodeTypeDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSelectNodeType: (type: "action" | "operation", name: string) => void;
+  onSelectNodeType: (mainType: NodeType, name: string) => void;
 }
 
 const nodeTemplates: NodeTypeOption[] = [
-  {
+    {
     id: "1",
-    type: "action",
-    name: "HTTP Request",
-    description: "Make an HTTP API call",
+    mainType: "trigger",
+    type: "trigger",
+    name: "HTML Input",
+    description: "Make an HTML input",
   },
   {
     id: "2",
+    mainType: "trigger",
+    type: "trigger",
+    name: "HTTP Request",
+    description: "Make an HTTP API call",
+  },
+    {
+    id: "3",
+    mainType: "trigger",
+    type: "trigger",
+    name: "Receive Email",
+    description: "Receive an email",
+  },
+  {
+    id: "4",
+    mainType: "trigger",
+    type: "trigger",
+    name: "Database Query",
+    description: "Execute a database query",
+  },
+  {
+    id: "5",
+    mainType: "trigger",
+    type: "trigger",
+    name: "Webhook Trigger",
+    description: "Trigger on webhook event",
+  },
+  {
+    id: "6",
+    mainType: "action",
     type: "action",
     name: "Send Email",
     description: "Send an email notification",
   },
   {
-    id: "3",
-    type: "action",
-    name: "Database Query",
-    description: "Execute a database query",
-  },
-  {
-    id: "4",
-    type: "action",
-    name: "Webhook Trigger",
-    description: "Trigger on webhook event",
-  },
-  {
-    id: "5",
+    id: "7",
+    mainType: "operation",
     type: "operation",
     name: "Filter Data",
-    description: "Filter array of items",
+    description: "Filter array of items"
   },
   {
-    id: "6",
+    id: "8",
+    mainType: "operation",
     type: "operation",
     name: "Transform Data",
     description: "Transform data structure",
   },
   {
-    id: "7",
+    id: "9",
+    mainType: "operation",
     type: "operation",
     name: "Aggregate",
     description: "Aggregate multiple values",
   },
   {
-    id: "8",
+    id: "10",
+    mainType: "operation",
     type: "operation",
     name: "Condition",
     description: "Conditional branching",
@@ -75,10 +100,10 @@ const nodeTemplates: NodeTypeOption[] = [
 ];
 
 export const NodeTypeDrawer = ({
-  open,
-  onOpenChange,
-  onSelectNodeType,
-}: NodeTypeDrawerProps) => {
+    open,
+    onOpenChange,
+    onSelectNodeType,
+  }: NodeTypeDrawerProps) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredTemplates = nodeTemplates.filter(
@@ -88,14 +113,14 @@ export const NodeTypeDrawer = ({
   );
 
   const handleSelectNode = (template: NodeTypeOption) => {
-    onSelectNodeType(template.type, template.name);
+    onSelectNodeType(template.mainType, template.name);
     onOpenChange(false);
     setSearchQuery("");
   };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-[400px] sm:w-[540px]">
+      <SheetContent side="left" className="w-[400px] sm:w-[540px]">
         <SheetHeader>
           <SheetTitle>Add Node</SheetTitle>
           <SheetDescription>
@@ -118,9 +143,15 @@ export const NodeTypeDrawer = ({
           <ScrollArea className="h-[calc(100vh-200px)]">
             <div className="space-y-2 pr-4">
               {filteredTemplates.map((template) => {
-                const Icon = template.type === "action" ? Zap : Cog;
-                const isAction = template.type === "action";
-                
+                let Icon =  Cog;
+                switch (template.mainType) {
+                  case "action":
+                    Icon = Zap;
+                    break;
+                  case "trigger":
+                    Icon = Power;
+                    break;
+                }
                 return (
                   <button
                     key={template.id}
@@ -129,16 +160,8 @@ export const NodeTypeDrawer = ({
                     aria-label={`Add ${template.name} node`}
                   >
                     <div className="flex items-start gap-3">
-                      <div
-                        className={`h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                          isAction ? "bg-primary/10" : "bg-secondary/10"
-                        }`}
-                      >
-                        <Icon
-                          className={`h-5 w-5 ${
-                            isAction ? "text-primary" : "text-secondary"
-                          }`}
-                        />
+                      <div className={`h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-primary/10`} >
+                        <Icon className={`h-5 w-5 text-primary`} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium mb-1">{template.name}</p>
@@ -146,7 +169,7 @@ export const NodeTypeDrawer = ({
                           {template.description}
                         </p>
                         <span className="inline-block mt-2 text-xs px-2 py-1 rounded-full bg-muted capitalize">
-                          {template.type}
+                          {template.mainType}
                         </span>
                       </div>
                     </div>

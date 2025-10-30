@@ -1,5 +1,5 @@
 // Node types
-export type NodeType = "action" | "operation";
+export type NodeType = "action" | "operation" | "trigger";
 
 export interface WorkflowNode {
   id: string;

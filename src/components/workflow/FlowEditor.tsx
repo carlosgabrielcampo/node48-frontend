@@ -18,34 +18,33 @@ import { Button } from "@/components/ui/button";
 import { Download, Upload, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { WorkflowData } from "@/types/workflow";
-
+import { v4 as uuidv4 } from 'uuid'
+import { NodeType } from "@/types/workflow";
 const nodeTypes = {
   custom: CustomNode,
+  action: CustomNode,
+  trigger: CustomNode,
+  operation: CustomNode,
 };
 
 interface FlowEditorProps {
   onAddNode: () => void;
-  onNodeAdded?: (type: "action" | "operation", name: string) => void;
+  onNodeAdded?: (type: string, name: string) => void;
 }
 
 export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
-  const [pendingNode, setPendingNode] = useState<{ type: "action" | "operation"; name: string } | null>(null);
+  const [pendingNode, setPendingNode] = useState<{ mainType: string; name: string } | null>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   // Expose addNode through callback
   useEffect(() => {
     if (onNodeAdded) {
-      // Create a method that can be called externally
-      (window as any).__addWorkflowNode = (type: "action" | "operation", name: string) => {
-        setPendingNode({ type, name });
-      };
+      (window as any).__addWorkflowNode = (mainType: NodeType, name: string) => { setPendingNode({ mainType, name }); };
     }
-    return () => {
-      delete (window as any).__addWorkflowNode;
-    };
+    return () => { delete (window as any).__addWorkflowNode; };
   }, [onNodeAdded]);
 
   const onConnect = useCallback(
@@ -58,9 +57,9 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
 
       const newEdge: Edge = {
         ...connection,
-        id: `edge-${connection.source}-${connection.target}-${Date.now()}`,
+        id: `${connection.source}|${connection.target}`,
         type: "smoothstep",
-        animated: true,
+        animated: false,
         style: { stroke: "hsl(var(--primary))", strokeWidth: 2 },
         markerEnd: {
           type: MarkerType.ArrowClosed,
@@ -92,19 +91,19 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
   );
 
   const handleAddNode = useCallback(
-    (type: "action" | "operation", name: string) => {
+    (type: string, name: string) => {
       const newNode: Node = {
-        id: `node-${Date.now()}`,
-        type: "custom",
+        id: uuidv4(),
+        type,
         position: {
           x: Math.random() * 400 + 100,
           y: Math.random() * 300 + 100,
         },
         data: {
-          name,
           type,
+          name,
           onDelete: handleDeleteNode,
-        },
+        }
       };
       setNodes((nds) => [...nds, newNode]);
       toast.success(`Added ${name}`);
@@ -115,7 +114,7 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
   // Handle pending node addition
   useEffect(() => {
     if (pendingNode) {
-      handleAddNode(pendingNode.type, pendingNode.name);
+      handleAddNode(pendingNode.mainType, pendingNode.name);
       setPendingNode(null);
     }
   }, [pendingNode, handleAddNode]);
@@ -124,20 +123,15 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
     (event: React.KeyboardEvent) => {
       if (event.key === "Delete" || event.key === "Backspace") {
         // Delete selected nodes
-        const selectedNodes = selectedElements.filter((id) =>
-          nodes.some((n) => n.id === id)
-        );
-        const selectedEdges = selectedElements.filter((id) =>
-          edges.some((e) => e.id === id)
-        );
+        const selectedNodes = selectedElements.filter((id) => nodes.some((n) => n.id === id) );
+        const selectedEdges = selectedElements.filter((id) => edges.some((e) => e.id === id) );
 
         if (selectedNodes.length > 0) {
           setNodes((nds) => nds.filter((node) => !selectedNodes.includes(node.id)));
           setEdges((eds) =>
             eds.filter(
               (edge) =>
-                !selectedNodes.includes(edge.source) &&
-                !selectedNodes.includes(edge.target)
+                !selectedNodes.includes(edge.source) && !selectedNodes.includes(edge.target)
             )
           );
           toast.success(`Deleted ${selectedNodes.length} node(s)`);
@@ -198,11 +192,10 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
           // Convert to ReactFlow format
           const importedNodes: Node[] = workflowData.nodes.map((node) => ({
             id: node.id,
-            type: "custom",
+            type: node.type,
             position: node.position,
             data: {
               name: node.name,
-              type: node.type,
               onDelete: handleDeleteNode,
             },
           }));
@@ -233,6 +226,7 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
     },
     [setNodes, setEdges, handleDeleteNode]
   );
+  console.log({nodes, edges})
 
   return (
     <div className="flex-1 flex flex-col" ref={reactFlowWrapper}>
@@ -282,31 +276,9 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
         >
           <Background className="bg-canvas" gap={20} />
           <Controls />
-          <MiniMap
-            nodeColor={(node) => {
-              return node.data.type === "action"
-                ? "hsl(var(--primary))"
-                : "hsl(var(--secondary))";
-            }}
-          />
+          <MiniMap nodeColor="hsl(var(--primary))"/>
         </ReactFlow>
       </div>
-
-      {/* Quick add buttons */}
-      {nodes.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={onAddNode}
-            className="gap-2"
-            aria-label="Add first workflow step"
-          >
-            <Plus className="h-5 w-5" />
-            Add first step
-          </Button>
-        </div>
-      )}
     </div>
   );
 };
