@@ -1,62 +1,30 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { WorkflowSidebar } from "@/components/workflow/WorkflowSidebar";
 import { WorkflowTopBar } from "@/components/workflow/WorkflowTopBar";
-import { WorkflowCanvas } from "@/components/workflow/WorkflowCanvas";
-import { NodeDrawer } from "@/components/workflow/NodeDrawer";
-import { toast } from "sonner";
-
-interface Node {
-  id: string;
-  type: string;
-  label: string;
-  position: { x: number; y: number };
-}
+import { FlowEditor } from "@/components/workflow/FlowEditor";
+import { NodeTypeDrawer } from "@/components/workflow/NodeTypeDrawer";
 
 const Workflow = () => {
-  const [nodes, setNodes] = useState<Node[]>([]);
   const [isActive, setIsActive] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [workflowId, setWorkflowId] = useState<string | undefined>();
 
-  const handleAddNode = () => {
+  const handleAddNode = useCallback(() => {
     setIsDrawerOpen(true);
-  };
+  }, []);
 
-  const handleSelectNode = (template: { id: string; type: string; name: string }) => {
-    const newNode: Node = {
-      id: `node-${Date.now()}`,
-      type: template.type,
-      label: template.name,
-      position: {
-        x: Math.random() * 400 + 200,
-        y: Math.random() * 300 + 100,
-      },
-    };
-    setNodes([...nodes, newNode]);
-    toast.success(`Added ${template.name} to workflow`);
-  };
-
-  const handleNodeMove = (nodeId: string, position: { x: number; y: number }) => {
-    setNodes((prevNodes) =>
-      prevNodes.map((node) =>
-        node.id === nodeId ? { ...node, position } : node
-      )
-    );
-  };
+  const handleNodeAdded = useCallback((type: "action" | "operation", name: string) => {
+    // Trigger node addition in FlowEditor
+    if ((window as any).__addWorkflowNode) {
+      (window as any).__addWorkflowNode(type, name);
+    }
+    setIsDrawerOpen(false);
+  }, []);
 
   const handleSave = async () => {
     try {
       // Simulating API call - replace with actual endpoint
-      // const response = await fetch('/api/workflow', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ nodes, isActive }),
-      // });
-      // const data = await response.json();
-      // setWorkflowId(data.id);
-
-      // Mock successful save
       await new Promise((resolve) => setTimeout(resolve, 500));
       setWorkflowId(`workflow-${Date.now()}`);
     } catch (error) {
@@ -67,11 +35,6 @@ const Workflow = () => {
   const handleRun = async () => {
     try {
       // Simulating API call - replace with actual endpoint
-      // await fetch(`/api/workflow/${workflowId}/execute`, {
-      //   method: 'POST',
-      // });
-
-      // Mock successful execution
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       throw error;
@@ -81,13 +44,6 @@ const Workflow = () => {
   const handleToggleActive = async (active: boolean) => {
     try {
       // Simulating API call - replace with actual endpoint
-      // await fetch(`/api/workflow/${workflowId}/state`, {
-      //   method: 'PUT',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ active }),
-      // });
-
-      // Mock successful toggle
       await new Promise((resolve) => setTimeout(resolve, 300));
       setIsActive(active);
     } catch (error) {
@@ -113,16 +69,12 @@ const Workflow = () => {
             onToggleActive={handleToggleActive}
           />
 
-          <WorkflowCanvas
-            nodes={nodes}
-            onAddNode={handleAddNode}
-            onNodeMove={handleNodeMove}
-          />
+          <FlowEditor onAddNode={handleAddNode} onNodeAdded={handleNodeAdded} />
 
-          <NodeDrawer
+          <NodeTypeDrawer
             open={isDrawerOpen}
             onOpenChange={setIsDrawerOpen}
-            onSelectNode={handleSelectNode}
+            onSelectNodeType={handleNodeAdded}
           />
         </div>
       </div>
