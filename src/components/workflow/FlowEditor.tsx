@@ -276,7 +276,7 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
           onConnect={onConnect}
           onSelectionChange={onSelectionChange}
           nodeTypes={nodeTypes}
-          connectionMode={ConnectionMode.Loose}
+          connectionMode={ConnectionMode.Strict}
           fitView
           attributionPosition="bottom-left"
         >
@@ -294,26 +294,17 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
 
       {/* Quick add buttons */}
       {nodes.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="flex flex-col gap-3 pointer-events-auto">
-            <Button
-              onClick={() => handleAddNode("action", "Action Node")}
-              size="lg"
-              className="gap-2"
-            >
-              <Plus className="h-5 w-5" />
-              Add Action Node
-            </Button>
-            <Button
-              onClick={() => handleAddNode("operation", "Operation Node")}
-              size="lg"
-              variant="secondary"
-              className="gap-2"
-            >
-              <Plus className="h-5 w-5" />
-              Add Operation Node
-            </Button>
-          </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={onAddNode}
+            className="gap-2"
+            aria-label="Add first workflow step"
+          >
+            <Plus className="h-5 w-5" />
+            Add first step
+          </Button>
         </div>
       )}
     </div>

@@ -24,7 +24,7 @@ export const CustomNode = memo(({ id, data, selected }: NodeProps<CustomNodeData
       {/* Input Handle */}
       <Handle
         type="target"
-        position={Position.Top}
+        position={Position.Left}
         className="!bg-primary !w-3 !h-3 !border-2 !border-background"
       />
 
@@ -66,7 +66,7 @@ export const CustomNode = memo(({ id, data, selected }: NodeProps<CustomNodeData
       {/* Output Handle */}
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
         className="!bg-primary !w-3 !h-3 !border-2 !border-background"
       />
     </div>
