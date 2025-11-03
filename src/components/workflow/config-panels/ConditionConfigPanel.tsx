@@ -12,42 +12,47 @@ interface ConditionConfigPanelProps {
 }
 
 export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelProps) => {
-  const conditions = node.Conditions || [];
+  // Handle config array format
+  const conditions = (node.config as ConditionBlock[]) || [];
+
+  const updateConditions = (newConditions: ConditionBlock[]) => {
+    onUpdate({ config: newConditions });
+  };
 
   const addCondition = () => {
     const newCondition: ConditionBlock = {
       condition: [{ field: "", type: "regex", validator: "" }],
       nextStepId: "",
     };
-    onUpdate({ Conditions: [...conditions, newCondition] });
+    updateConditions([...conditions, newCondition]);
   };
 
   const removeCondition = (index: number) => {
-    onUpdate({ Conditions: conditions.filter((_, i) => i !== index) });
+    updateConditions(conditions.filter((_, i) => i !== index));
   };
 
   const updateCondition = (index: number, updates: Partial<ConditionBlock>) => {
     const updated = [...conditions];
     updated[index] = { ...updated[index], ...updates };
-    onUpdate({ Conditions: updated });
+    updateConditions(updated);
   };
 
   const addRule = (conditionIndex: number) => {
     const updated = [...conditions];
     updated[conditionIndex].condition.push({ field: "", type: "regex", validator: "" });
-    onUpdate({ Conditions: updated });
+    updateConditions(updated);
   };
 
   const removeRule = (conditionIndex: number, ruleIndex: number) => {
     const updated = [...conditions];
     updated[conditionIndex].condition = updated[conditionIndex].condition.filter((_, i) => i !== ruleIndex);
-    onUpdate({ Conditions: updated });
+    updateConditions(updated);
   };
 
   const updateRule = (conditionIndex: number, ruleIndex: number, updates: Partial<ConditionRule>) => {
     const updated = [...conditions];
     updated[conditionIndex].condition[ruleIndex] = { ...updated[conditionIndex].condition[ruleIndex], ...updates };
-    onUpdate({ Conditions: updated });
+    updateConditions(updated);
   };
 
   return (

@@ -1,0 +1,133 @@
+{
+    "id": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
+    "name": "CSV FLOW",
+    "description": "string",
+    "createdAtUTC": "2025-09-03T12:00:00.000Z",
+    "updatedAtUTC": "2025-09-03T12:00:00.000Z",
+    "startStep": "7517d1af-0126-432d-9d22-cf4db2bde364",
+    "settings": {
+        "retryPolicy": "none",
+        "timeoutSeconds": "number"
+    },
+    "steps": {
+        "7517d1af-0126-432d-9d22-cf4db2bde364": {
+            "id": "7517d1af-0126-432d-9d22-cf4db2bde364",
+            "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
+            "name": "Read CSV",
+            "type": "csv",
+            "createdAtUTC": "2025-09-03T12:00:00.000Z",
+            "position": { "x": 120, "y": 80 },
+            "nextStepId": "2931ca06-03d7-4bd2-b751-cdeb428c7e5f",
+            "config": {
+                "filePath": "_test/mock/database/Autorizados.csv",
+                "encoding": "utf-8",
+                "type": "csv",
+                "nullValues": ["", "NULL", "null"],
+                "chunkSize": 200,
+                "errorPolicy": "skip",
+                "parser": {
+                    "escape": "'",
+                    "strict": true,
+                    "separator": ";"
+                }
+            },
+            "outputVar": "Autorizados"
+        },
+        "2931ca06-03d7-4bd2-b751-cdeb428c7e5f": {
+            "id": "2931ca06-03d7-4bd2-b751-cdeb428c7e5f",
+            "name": "Loop over CSV rows",
+            "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
+            "createdAtUTC": "2025-09-03T12:00:00.000Z",
+            "position": { "x": 160, "y": 80 },
+            "type": "loop",
+            "config": [{
+                "sourceVar": "{{Autorizados}}", 
+                "outputVar": "csvAutorizados",
+                "type": "format",
+                "fields": [
+                    {
+                        "field": "{{Autorizados.DT_NASC}}",
+                        "type": "convert",
+                        "convertionType": "brDateFormatToDate"
+                    }
+                ],
+                "nextStepId": "3760b877-ac4e-48db-8567-d062800c81cb"
+            },{
+                "sourceVar": "{{Autorizados}}",
+                "outputVar": "csvAutorizados",
+                "type": "create",
+                "limit": 10,
+                "offset": 100,
+                "nextStepId": "3760b877-ac4e-48db-8567-d062800c81cb"
+            }],
+            "nextStepId": "3e2a1246-2581-4bb5-a382-9e04667d17a4"
+        },
+        "3760b877-ac4e-48db-8567-d062800c81cb": {
+            "id": "3760b877-ac4e-48db-8567-d062800c81cb",
+            "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
+            "name": "Call External API",
+            "type": "api",
+            "createdAtUTC": "2025-09-03T12:00:00.000Z",
+            "position": { "x": 200, "y": 80 },
+            "nextStepId": "4171ac10-ac21-4c63-bd59-bf3110218ff1",
+            "errorStepId": "97080422-645e-428f-a872-108893576136",
+            "list": {
+                "timeoutMs": 15000,
+                "keys": [ "{{config.method}}", "{{config.baseUrl}}", "{{config.endpoint}}" ]               
+            },
+            "config": {
+                "baseUrl": "http://localhost:3009",
+                "endpoint": "/api/webhook/status",
+                "method": "GET",
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer {{env.API_TOKEN}}"
+                },
+                "body": {
+                    "name": "{{csvAutorizados.NOME}}",
+                    "phone": "{{csvAutorizados.TELEFONE}}",
+                    "cpf": "{{csvAutorizados.CPF}}",
+                    "birthDate": "{{csvAutorizados.DT_NASC}}"
+                },
+                "reponseFormat": "json"
+            },
+            "outputVar": "apiAutorizados"
+        },
+        "3e2a1246-2581-4bb5-a382-9e04667d17a4": {
+            "id": "3e2a1246-2581-4bb5-a382-9e04667d17a4",
+            "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
+            "createdAtUTC": "2025-09-03T12:00:00.000Z",
+            "position": { "x": 240, "y": 80 },
+            "type": "condition",
+            "config": [
+                {
+                    "condition": [{ "field": "{{Autorizados}}", "type": "arraySizeEquals", "validator": 100 }],
+                    "nextStepId": ""
+                },
+                {
+                    "condition": [{ "field": "{{Autorizados}}", "type": "arraySizeEquals", "validator": 6957 }],
+                    "nextStepId": ""
+                }
+            ],
+            "nextStepId": ""
+        },
+        "4171ac10-ac21-4c63-bd59-bf3110218ff1": {
+            "id": "4171ac10-ac21-4c63-bd59-bf3110218ff1",
+            "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
+            "createdAtUTC": "2025-09-03T12:00:00.000Z",
+            "position": { "x": 240, "y": 100 },
+            "type": "condition",
+            "config": [
+                {
+                    "condition": [{ "field": "{{csvAutorizados.DT_NASC}}", "type": "regex", "validator": "/10/" }],
+                    "nextStepId": ""
+                },
+                {
+                    "condition": [{ "field": "{{csvAutorizados.DT_NASC}}", "type": "regex", "validator": "/11/" }],
+                    "nextStepId": ""
+                }
+            ],
+            "nextStepId": ""
+        }
+    }
+}

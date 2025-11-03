@@ -21,6 +21,7 @@ import { WorkflowData, WorkflowNode } from "@/types/workflow";
 import { v4 as uuidv4 } from 'uuid'
 import { NodeType } from "@/types/workflow";
 import { NodeConfigPanel } from "./NodeConfigPanel";
+import { parseWorkflowJSON, isWorkflowJSON } from "@/lib/workflowParser";
 const nodeTypes = {
   custom: CustomNode,
   action: CustomNode,
@@ -104,7 +105,15 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
         name: node.data.name,
         position: node.position,
         type: node.data.type,
-        data: node.data
+        data: node.data,
+        // Extract common workflow properties from data
+        config: node.data.config,
+        nextStepId: node.data.nextStepId,
+        errorStepId: node.data.errorStepId,
+        outputVar: node.data.outputVar,
+        list: node.data.list,
+        workflowId: node.data.workflowId,
+        createdAtUTC: node.data.createdAtUTC,
       };
       setSelectedNode(workflowNode);
       setConfigPanelOpen(true);
@@ -140,7 +149,15 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
       name: node.data.name,
       position: node.position,
       type: node.data.type,
-      data: node.data
+      data: node.data,
+      // Extract common workflow properties from data
+      config: node.data.config,
+      nextStepId: node.data.nextStepId,
+      errorStepId: node.data.errorStepId,
+      outputVar: node.data.outputVar,
+      list: node.data.list,
+      workflowId: node.data.workflowId,
+      createdAtUTC: node.data.createdAtUTC,
     };
     setSelectedNode(workflowNode);
     setConfigPanelOpen(true);
@@ -150,7 +167,20 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
     setNodes((nds) =>
       nds.map((node) =>
         node.id === nodeId
-          ? { ...node, data: { ...node.data, ...updates }, position: updates.position || node.position }
+          ? { 
+              ...node, 
+              data: { 
+                ...node.data, 
+                ...updates,
+                name: updates.name || node.data.name,
+                config: updates.config !== undefined ? updates.config : node.data.config,
+                nextStepId: updates.nextStepId !== undefined ? updates.nextStepId : node.data.nextStepId,
+                errorStepId: updates.errorStepId !== undefined ? updates.errorStepId : node.data.errorStepId,
+                outputVar: updates.outputVar !== undefined ? updates.outputVar : node.data.outputVar,
+                list: updates.list !== undefined ? updates.list : node.data.list,
+              }, 
+              position: updates.position || node.position 
+            }
           : node
       )
     );
@@ -233,6 +263,29 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
     toast.success("Workflow exported");
   }, [nodes, edges]);
 
+  const handleLoadSample = useCallback(async () => {
+    try {
+      const response = await fetch('/sample-workflow.json');
+      const jsonData = await response.json();
+      
+      if (isWorkflowJSON(jsonData)) {
+        const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(
+          jsonData,
+          handleDeleteNode,
+          handleClickOnNode
+        );
+        setNodes(parsedNodes);
+        setEdges(parsedEdges);
+        toast.success(`Loaded "${jsonData.name}" with ${parsedNodes.length} nodes`);
+      } else {
+        toast.error("Invalid workflow format");
+      }
+    } catch (error) {
+      toast.error("Failed to load sample workflow");
+      console.error(error);
+    }
+  }, [setNodes, setEdges, handleDeleteNode, handleClickOnNode]);
+
   const handleImport = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
@@ -240,34 +293,49 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const workflowData: WorkflowData = JSON.parse(e.target?.result as string);
-          // Convert to ReactFlow format
-          const importedNodes: Node[] = workflowData.nodes.map((node) => ({
-            id: node.id,
-            position: node.position,
-            type: node.data.type,
-            data: {
-              mainType: node.data.mainType,
+          const jsonData = JSON.parse(e.target?.result as string);
+          
+          // Check if it's the new workflow JSON format
+          if (isWorkflowJSON(jsonData)) {
+            const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(
+              jsonData,
+              handleDeleteNode,
+              handleClickOnNode
+            );
+            setNodes(parsedNodes);
+            setEdges(parsedEdges);
+            toast.success(`Workflow "${jsonData.name}" imported with ${parsedNodes.length} nodes`);
+          } else {
+            // Legacy format
+            const workflowData: WorkflowData = jsonData;
+            const importedNodes: Node[] = workflowData.nodes.map((node) => ({
+              id: node.id,
+              position: node.position,
               type: node.data.type,
-              name: node.name,
-              onDelete: handleDeleteNode,
-            },
-          }));
-          const importedEdges: Edge[] = workflowData.connections.map((conn) => ({
-            id: conn.id,
-            source: conn.source.nodeId,
-            target: conn.target.nodeId,
-            type: "smoothstep",
-            animated: true,
-            style: { stroke: "hsl(var(--primary))", strokeWidth: 2 },
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-              color: "hsl(var(--primary))",
-            },
-          }));
-          setNodes(importedNodes);
-          setEdges(importedEdges);
-          toast.success("Workflow imported");
+              data: {
+                mainType: node.data.mainType,
+                type: node.data.type,
+                name: node.name,
+                onDelete: handleDeleteNode,
+                onClick: handleClickOnNode,
+              },
+            }));
+            const importedEdges: Edge[] = workflowData.connections.map((conn) => ({
+              id: conn.id,
+              source: conn.source.nodeId,
+              target: conn.target.nodeId,
+              type: "smoothstep",
+              animated: true,
+              style: { stroke: "hsl(var(--primary))", strokeWidth: 2 },
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+                color: "hsl(var(--primary))",
+              },
+            }));
+            setNodes(importedNodes);
+            setEdges(importedEdges);
+            toast.success("Workflow imported");
+          }
         } catch (error) {
           toast.error("Failed to import workflow");
           console.error(error);
@@ -276,7 +344,7 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
       reader.readAsText(file);
       event.target.value = "";
     },
-    [setNodes, setEdges, handleDeleteNode]
+    [setNodes, setEdges, handleDeleteNode, handleClickOnNode]
   );
 
 
@@ -286,6 +354,9 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
         <Button onClick={onAddNode} size="sm" className="gap-2">
           <Plus className="h-4 w-4" />
           Add Node
+        </Button>
+        <Button onClick={handleLoadSample} size="sm" variant="secondary" className="gap-2">
+          Load Sample
         </Button>
         <Button onClick={handleExport} size="sm" variant="outline" className="gap-2">
           <Download className="h-4 w-4" />
