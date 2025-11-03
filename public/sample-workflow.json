@@ -13,7 +13,8 @@
         "7517d1af-0126-432d-9d22-cf4db2bde364": {
             "id": "7517d1af-0126-432d-9d22-cf4db2bde364",
             "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
-            "name": "Read CSV",
+            "name": "CSV",
+            "description": "Read CSV",
             "type": "csv",
             "createdAtUTC": "2025-09-03T12:00:00.000Z",
             "position": { "x": 120, "y": 80 },
@@ -35,7 +36,8 @@
         },
         "2931ca06-03d7-4bd2-b751-cdeb428c7e5f": {
             "id": "2931ca06-03d7-4bd2-b751-cdeb428c7e5f",
-            "name": "Loop over CSV rows",
+            "name": "Loop",
+            "description": "Loop over CSV rows",
             "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
             "createdAtUTC": "2025-09-03T12:00:00.000Z",
             "position": { "x": 160, "y": 80 },

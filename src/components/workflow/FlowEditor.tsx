@@ -196,7 +196,6 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
   // Handle pending node addition
   useEffect(() => {
     if (pendingNode) {
-      console.log({pendingNode})
       handleAddNode(pendingNode);
       setPendingNode(null);
     }

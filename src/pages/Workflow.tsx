@@ -3,7 +3,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { WorkflowSidebar } from "@/components/workflow/WorkflowSidebar";
 import { WorkflowTopBar } from "@/components/workflow/WorkflowTopBar";
 import { FlowEditor } from "@/components/workflow/FlowEditor";
-import { NodeTypeDrawer } from "@/components/workflow/NodeTypeDrawer";
+import { NodeTypeDrawer } from "@/components/workflow/nodes/NodeTypeDrawer";
 import { NodeType } from "@/types/workflow";
 
 const Workflow = () => {
