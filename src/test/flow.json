@@ -38,7 +38,7 @@
             "name": "Loop over CSV rows",
             "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
             "createdAtUTC": "2025-09-03T12:00:00.000Z",
-            "position": { "x": 240, "y": 80 },
+            "position": { "x": 160, "y": 80 },
             "type": "loop",
             "config": [{
                 "sourceVar": "{{Autorizados}}", 
@@ -68,7 +68,7 @@
             "name": "Call External API",
             "type": "api",
             "createdAtUTC": "2025-09-03T12:00:00.000Z",
-            "position": { "x": 240, "y": 80 },
+            "position": { "x": 200, "y": 80 },
             "nextStepId": "4171ac10-ac21-4c63-bd59-bf3110218ff1",
             "errorStepId": "97080422-645e-428f-a872-108893576136",
             "list": {
@@ -115,7 +115,7 @@
             "id": "4171ac10-ac21-4c63-bd59-bf3110218ff1",
             "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
             "createdAtUTC": "2025-09-03T12:00:00.000Z",
-            "position": { "x": 240, "y": 80 },
+            "position": { "x": 240, "y": 100 },
             "type": "condition",
             "config": [
                 {
