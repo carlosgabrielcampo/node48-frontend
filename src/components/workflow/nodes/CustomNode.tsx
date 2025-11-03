@@ -10,10 +10,9 @@ interface CustomNodeData {
   onClick?: (id: string) => void;
 }
 
-export const CustomNode = memo(({ id, type, data, selected }: NodeProps<CustomNodeData>) => {
-  console.log({ id, type, data, selected })
+export const CustomNode = memo(({ id, data, selected }: NodeProps<CustomNodeData>) => {
   let Icon = Cog
-  switch (type) {
+  switch (data.type) {
     case "action":
       Icon = Zap;
       break;
@@ -38,7 +37,7 @@ export const CustomNode = memo(({ id, type, data, selected }: NodeProps<CustomNo
       }`}
     >
       {/* Input Handle */}
-      {type !== 'trigger' && <Handle
+      {data.type !== 'trigger' && <Handle
         type="target"
         position={Position.Left}
         className="!bg-primary !w-3 !h-3 !border-2 !border-background"
@@ -61,7 +60,7 @@ export const CustomNode = memo(({ id, type, data, selected }: NodeProps<CustomNo
           </button>
         </div>
         <div className="text-xs text-muted-foreground capitalize">
-          {type}
+          {data.type}
         </div>
       </div>
 

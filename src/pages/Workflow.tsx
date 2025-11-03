@@ -11,15 +11,12 @@ const Workflow = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [workflowId, setWorkflowId] = useState<string | undefined>();
 
-  const handleAddNode = useCallback(() => {
-    setIsDrawerOpen(true);
-  }, []);
+  const handleAddNode = useCallback(() => { setIsDrawerOpen(true); }, []);
 
-  const handleNodeAdded = useCallback((mainType: NodeType, name: string) => {
-    console.log({handleNodeAdded: mainType})
+  const handleNodeAdded = useCallback(({mainType, type, name}) => {
     // Trigger node addition in FlowEditor
     if ((window as any).__addWorkflowNode) {
-      (window as any).__addWorkflowNode(mainType, name);
+      (window as any).__addWorkflowNode({mainType, type, name});
     }
     setIsDrawerOpen(false);
   }, []);

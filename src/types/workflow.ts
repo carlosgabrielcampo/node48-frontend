@@ -59,7 +59,6 @@ export interface CsvConfig {
 
 export interface WorkflowNode {
   id: string;
-  type: NodeType;
   name: string;
   position: { x: number; y: number };
   workflowId?: string;
@@ -67,6 +66,8 @@ export interface WorkflowNode {
   nextStepId?: string;
   errorStepId?: string;
   outputVar?: string;
+  type: NodeType,
+  data: Record<string, any>
   
   // Condition node
   Conditions?: ConditionBlock[];

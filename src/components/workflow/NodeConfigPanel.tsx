@@ -25,7 +25,8 @@ export const NodeConfigPanel = ({
   };
 
   const renderConfigPanel = () => {
-    switch (node.type) {
+    console.log("node", node)
+    switch (node?.data?.type) {
       case "condition":
         return <ConditionConfigPanel node={node} onUpdate={handleUpdate} />;
       case "api":
@@ -37,7 +38,7 @@ export const NodeConfigPanel = ({
       default:
         return (
           <div className="text-sm text-muted-foreground">
-            No configuration available for {node.type} nodes.
+            No configuration available for {node?.type} nodes.
           </div>
         );
     }
@@ -48,7 +49,7 @@ export const NodeConfigPanel = ({
       <SheetContent className="w-[500px] sm:max-w-[500px] overflow-y-auto">
         <SheetHeader>
           <SheetTitle>
-            Configure {node.name || node.type}
+            Configure {node.data.name || node.data.type}
           </SheetTitle>
         </SheetHeader>
         <div className="mt-6">

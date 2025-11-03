@@ -26,9 +26,9 @@ export type NodeType = "action" | "operation" | "trigger";
 
 export interface WorkflowNode {
   id: string;
-  type: NodeType;
   name: string;
   position: { x: number; y: number };
+  data: []
 }
 
 // Connection types

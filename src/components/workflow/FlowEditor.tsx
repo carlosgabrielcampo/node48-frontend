@@ -13,7 +13,7 @@ import ReactFlow, {
   MarkerType,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { CustomNode } from "./CustomNode";
+import { CustomNode } from "./nodes/CustomNode";
 import { Button } from "@/components/ui/button";
 import { Download, Upload, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -30,14 +30,14 @@ const nodeTypes = {
 
 interface FlowEditorProps {
   onAddNode: () => void;
-  onNodeAdded?: (type: string, name: string) => void;
+  onNodeAdded?: ({mainType, type, name}) => void;
 }
 
 export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
-  const [pendingNode, setPendingNode] = useState<{ mainType: string; name: string } | null>(null);
+  const [pendingNode, setPendingNode] = useState<{ mainType: string; type: string; name: string } | null>(null);
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
   const [configPanelOpen, setConfigPanelOpen] = useState(false);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -45,7 +45,10 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
   // Expose addNode through callback
   useEffect(() => {
     if (onNodeAdded) {
-      (window as any).__addWorkflowNode = (mainType: NodeType, name: string) => { setPendingNode({ mainType, name }); };
+      (window as any).__addWorkflowNode = (template: { mainType: string; type: string; name: string }) => { 
+        console.log("setPendingNode", template)
+        setPendingNode(template); 
+      };
     }
     return () => { delete (window as any).__addWorkflowNode; };
   }, [onNodeAdded]);
@@ -93,48 +96,51 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
     [setNodes, setEdges]
   );
 
+  const handleClickOnNode = useCallback((id: string) => {
+    const node = nodes.find(n => n.id === id);
+    if (node) {
+      const workflowNode: WorkflowNode = {
+        id: node.id,
+        name: node.data.name,
+        position: node.position,
+        type: node.data.type,
+        data: node.data
+      };
+      setSelectedNode(workflowNode);
+      setConfigPanelOpen(true);
+    }
+  }, [nodes])
+
   const handleAddNode = useCallback(
-    (type: string, name: string) => {
+    ({mainType, type, name}) => {
       const newNode: Node = {
         id: uuidv4(),
-        type,
+        type: mainType,
         position: {
           x: Math.random() * 400 + 100,
           y: Math.random() * 300 + 100,
         },
         data: {
-          type,
           name,
+          mainType: mainType,
+          type: type,
           onDelete: handleDeleteNode,
-          onClick: (id: string) => {
-            const node = nodes.find(n => n.id === id);
-            if (node) {
-              const workflowNode: WorkflowNode = {
-                id: node.id,
-                type: node.data.type,
-                name: node.data.name,
-                position: node.position,
-                ...node.data
-              };
-              setSelectedNode(workflowNode);
-              setConfigPanelOpen(true);
-            }
-          }
+          onClick: handleClickOnNode
         }
       };
       setNodes((nds) => [...nds, newNode]);
       toast.success(`Added ${name}`);
     },
-    [setNodes, handleDeleteNode, nodes]
+    [setNodes, handleDeleteNode, handleClickOnNode]
   );
 
   const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     const workflowNode: WorkflowNode = {
       id: node.id,
-      type: node.data.type,
       name: node.data.name,
       position: node.position,
-      ...node.data
+      type: node.data.type,
+      data: node.data
     };
     setSelectedNode(workflowNode);
     setConfigPanelOpen(true);
@@ -160,7 +166,8 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
   // Handle pending node addition
   useEffect(() => {
     if (pendingNode) {
-      handleAddNode(pendingNode.mainType, pendingNode.name);
+      console.log({pendingNode})
+      handleAddNode(pendingNode);
       setPendingNode(null);
     }
   }, [pendingNode, handleAddNode]);
@@ -199,6 +206,7 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
         type: node.data.type,
         name: node.data.name,
         position: node.position,
+        data: node.data
       })),
       connections: edges.map((edge, index) => ({
         id: edge.id,
@@ -229,23 +237,22 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
           const workflowData: WorkflowData = JSON.parse(e.target?.result as string);
-
           // Convert to ReactFlow format
           const importedNodes: Node[] = workflowData.nodes.map((node) => ({
             id: node.id,
-            type: node.type,
             position: node.position,
+            type: node.data.type,
             data: {
+              mainType: node.data.mainType,
+              type: node.data.type,
               name: node.name,
               onDelete: handleDeleteNode,
             },
           }));
-
           const importedEdges: Edge[] = workflowData.connections.map((conn) => ({
             id: conn.id,
             source: conn.source.nodeId,
@@ -258,7 +265,6 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
               color: "hsl(var(--primary))",
             },
           }));
-
           setNodes(importedNodes);
           setEdges(importedEdges);
           toast.success("Workflow imported");
@@ -272,11 +278,10 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
     },
     [setNodes, setEdges, handleDeleteNode]
   );
-  console.log({nodes, edges})
+
 
   return (
     <div className="flex-1 flex flex-col" ref={reactFlowWrapper}>
-      {/* Toolbar */}
       <div className="flex items-center gap-2 p-4 border-b bg-background">
         <Button onClick={onAddNode} size="sm" className="gap-2">
           <Plus className="h-4 w-4" />
