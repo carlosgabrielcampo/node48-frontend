@@ -262,29 +262,6 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
     toast.success("Workflow exported");
   }, [nodes, edges]);
 
-  const handleLoadSample = useCallback(async () => {
-    try {
-      const response = await fetch('/sample-workflow.json');
-      const jsonData = await response.json();
-      
-      if (isWorkflowJSON(jsonData)) {
-        const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(
-          jsonData,
-          handleDeleteNode,
-          handleClickOnNode
-        );
-        setNodes(parsedNodes);
-        setEdges(parsedEdges);
-        toast.success(`Loaded "${jsonData.name}" with ${parsedNodes.length} nodes`);
-      } else {
-        toast.error("Invalid workflow format");
-      }
-    } catch (error) {
-      toast.error("Failed to load sample workflow");
-      console.error(error);
-    }
-  }, [setNodes, setEdges, handleDeleteNode, handleClickOnNode]);
-
   const handleImport = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
@@ -353,9 +330,6 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
         <Button onClick={onAddNode} size="sm" className="gap-2">
           <Plus className="h-4 w-4" />
           Add Node
-        </Button>
-        <Button onClick={handleLoadSample} size="sm" variant="secondary" className="gap-2">
-          Load Sample
         </Button>
         <Button onClick={handleExport} size="sm" variant="outline" className="gap-2">
           <Download className="h-4 w-4" />

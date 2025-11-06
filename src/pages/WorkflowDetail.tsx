@@ -4,12 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { workflowService } from "@/services/workflowService";
 import Workflow from "./Workflow";
 
+
+
 const WorkflowDetail = () => {
   const { id } = useParams<{ id: string }>();
+
   const navigate = useNavigate();
 
   const { data: workflow, isLoading, error } = useQuery({
