@@ -1,3 +1,4 @@
+import { nodeTemplates } from "@/components/workflow/nodes/Templates";
 import { Node, Edge, MarkerType } from "reactflow";
 
 // Workflow JSON format (from backend)
@@ -62,25 +63,16 @@ export const parseWorkflowJSON = (
     });
   };
 
-  // Determine mainType based on step type
-  const getMainType = (type: string): string => {
-    if (type === "csv" || type === "loop") return "operation";
-    if (type === "api" || type === "condition") return "action";
-    return "custom";
-  };
-
   // Convert each step to a node
   Object.values(workflowJSON.steps).forEach((step) => {
-    const mainType = getMainType(step.type);
-    
     nodes.push({
       id: step.id,
-      type: mainType,
+      type: nodeTemplates[step.type].mainType || "default",
       position: step.position,
       data: {
-        name: step.name || step.type,
-        mainType,
-        type: step.type,
+        name: step.name,
+        mainType: nodeTemplates[step.type].mainType,
+        type: nodeTemplates[step.type].type,
         onDelete,
         onClick,
         // Store all step data for config panel

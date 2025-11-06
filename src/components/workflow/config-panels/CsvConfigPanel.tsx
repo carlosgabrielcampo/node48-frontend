@@ -5,14 +5,18 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 interface CsvConfigPanelProps {
   node: WorkflowNode;
   onUpdate: (updates: Partial<WorkflowNode>) => void;
 }
 
+
+
 export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
-  const config = (node.config as CsvConfig) || {
+  console.log(node.config)
+  const defaultConfig =  {
     filePath: "",
     encoding: "utf-8",
     type: "csv",
@@ -25,21 +29,25 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
       separator: ";",
     },
   };
+  const [stateConfig, setConfig] = useState<CsvConfig>((node.config as CsvConfig) ?? defaultConfig);
+  const saveConfig = () => {
+    onUpdate({ config: { ...node.config, ...stateConfig } });
+  }
 
   const updateConfig = (updates: Partial<CsvConfig>) => {
-    onUpdate({ config: { ...config, ...updates } });
+    setConfig({ ...stateConfig, ...updates })
   };
 
   const addNullValue = () => {
-    updateConfig({ nullValues: [...config.nullValues, ""] });
+    updateConfig({ nullValues: [...stateConfig.nullValues, ""] });
   };
 
   const removeNullValue = (index: number) => {
-    updateConfig({ nullValues: config.nullValues.filter((_, i) => i !== index) });
+    updateConfig({ nullValues: stateConfig.nullValues.filter((_, i) => i !== index) });
   };
 
   const updateNullValue = (index: number, value: string) => {
-    const updated = [...config.nullValues];
+    const updated = [...stateConfig.nullValues];
     updated[index] = value;
     updateConfig({ nullValues: updated });
   };
@@ -49,7 +57,7 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
       <div>
         <Label>File Path</Label>
         <Input
-          value={config.filePath}
+          value={stateConfig.filePath}
           onChange={(e) => updateConfig({ filePath: e.target.value })}
           placeholder="_test/mock/database/Autorizados.csv"
           className="mt-1"
@@ -59,7 +67,7 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
       <div>
         <Label>Encoding</Label>
         <Input
-          value={config.encoding}
+          value={stateConfig.encoding}
           onChange={(e) => updateConfig({ encoding: e.target.value })}
           placeholder="utf-8"
           className="mt-1"
@@ -69,7 +77,7 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
       <div>
         <Label>Type</Label>
         <Input
-          value={config.type}
+          value={stateConfig.type}
           onChange={(e) => updateConfig({ type: e.target.value })}
           placeholder="csv"
           className="mt-1"
@@ -80,7 +88,7 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
         <Label>Chunk Size</Label>
         <Input
           type="number"
-          value={config.chunkSize}
+          value={stateConfig.chunkSize}
           onChange={(e) => updateConfig({ chunkSize: parseInt(e.target.value) || 200 })}
           className="mt-1"
         />
@@ -89,7 +97,7 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
       <div>
         <Label>Error Policy</Label>
         <Input
-          value={config.errorPolicy}
+          value={stateConfig.errorPolicy}
           onChange={(e) => updateConfig({ errorPolicy: e.target.value })}
           placeholder="skip"
           className="mt-1"
@@ -114,7 +122,7 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
             Add
           </Button>
         </div>
-        {config.nullValues.map((value, index) => (
+        {stateConfig.nullValues.map((value, index) => (
           <div key={index} className="flex gap-2">
             <Input
               value={value}
@@ -135,8 +143,8 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
         <div>
           <Label className="text-xs">Escape Character</Label>
           <Input
-            value={config.parser.escape}
-            onChange={(e) => updateConfig({ parser: { ...config.parser, escape: e.target.value } })}
+            value={stateConfig.parser.escape}
+            onChange={(e) => updateConfig({ parser: { ...stateConfig.parser, escape: e.target.value } })}
             placeholder="'"
             className="mt-1"
           />
@@ -145,8 +153,8 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
         <div>
           <Label className="text-xs">Separator</Label>
           <Input
-            value={config.parser.separator}
-            onChange={(e) => updateConfig({ parser: { ...config.parser, separator: e.target.value } })}
+            value={stateConfig.parser.separator}
+            onChange={(e) => updateConfig({ parser: { ...stateConfig.parser, separator: e.target.value } })}
             placeholder=";"
             className="mt-1"
           />
@@ -155,8 +163,8 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
         <div className="flex items-center space-x-2">
           <Checkbox
             id="strict"
-            checked={config.parser.strict}
-            onCheckedChange={(checked) => updateConfig({ parser: { ...config.parser, strict: checked === true } })}
+            checked={stateConfig.parser.strict}
+            onCheckedChange={(checked) => updateConfig({ parser: { ...stateConfig.parser, strict: checked === true } })}
           />
           <Label htmlFor="strict" className="text-xs cursor-pointer">
             Strict Mode
@@ -172,6 +180,11 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
           placeholder="Node ID"
           className="mt-1"
         />
+      </div>
+      <div className="flex items-center justify-between ">
+        <Button size="sm" className="mt-1 w-full" onClick={saveConfig}>
+          Save
+        </Button>
       </div>
     </div>
   );

@@ -4,6 +4,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Save, Play } from "lucide-react";
 import { toast } from "sonner";
+import { SidebarTrigger } from "../ui/sidebar";
+
 
 interface WorkflowTopBarProps {
   workflowId?: string;
@@ -66,9 +68,8 @@ export const WorkflowTopBar = ({
   return (
     <header className="h-14 border-b bg-background flex items-center justify-between px-4 sticky top-0 z-50">
       <div className="flex items-center gap-4">
-        <h1 className="text-lg font-semibold">Create Workflow</h1>
+        <SidebarTrigger className="absolute"  aria-label="Toggle sidebar" />
       </div>
-
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <Switch

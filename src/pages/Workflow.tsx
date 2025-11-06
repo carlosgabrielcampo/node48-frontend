@@ -6,13 +6,12 @@ import { FlowEditor } from "@/components/workflow/FlowEditor";
 import { NodeTypeDrawer } from "@/components/workflow/nodes/NodeTypeDrawer";
 import { NodeType } from "@/types/workflow";
 
-const Workflow = () => {
+const Workflow = ({workflow}) => {
   const [isActive, setIsActive] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [workflowId, setWorkflowId] = useState<string | undefined>();
 
   const handleAddNode = useCallback(() => { setIsDrawerOpen(true); }, []);
-
   const handleNodeAdded = useCallback(({mainType, type, name}) => {
     // Trigger node addition in FlowEditor
     if ((window as any).__addWorkflowNode) {
@@ -20,7 +19,6 @@ const Workflow = () => {
     }
     setIsDrawerOpen(false);
   }, []);
-
   const handleSave = async () => {
     try {
       // Simulating API call - replace with actual endpoint
@@ -30,7 +28,6 @@ const Workflow = () => {
       throw error;
     }
   };
-
   const handleRun = async () => {
     try {
       // Simulating API call - replace with actual endpoint
@@ -39,7 +36,6 @@ const Workflow = () => {
       throw error;
     }
   };
-
   const handleToggleActive = async (active: boolean) => {
     try {
       // Simulating API call - replace with actual endpoint
@@ -55,9 +51,6 @@ const Workflow = () => {
       <div className="min-h-screen flex w-full">
         <WorkflowSidebar />
         <div className="flex-1 flex flex-col">
-          <div className="flex items-center h-14 border-b px-4">
-            <SidebarTrigger aria-label="Toggle sidebar" />
-          </div>
           <WorkflowTopBar
             workflowId={workflowId}
             onSave={handleSave}
@@ -65,13 +58,14 @@ const Workflow = () => {
             isActive={isActive}
             onToggleActive={handleToggleActive}
           />
-          <FlowEditor onAddNode={handleAddNode} onNodeAdded={handleNodeAdded} />
+          <FlowEditor onAddNode={handleAddNode} onNodeAdded={handleNodeAdded} workflow={workflow} />
           <NodeTypeDrawer
             open={isDrawerOpen}
             onOpenChange={setIsDrawerOpen}
             onSelectNodeType={handleNodeAdded}
           />
         </div>
+        
       </div>
     </SidebarProvider>
   );

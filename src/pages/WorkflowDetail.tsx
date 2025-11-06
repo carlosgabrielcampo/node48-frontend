@@ -19,7 +19,6 @@ const WorkflowDetail = () => {
     queryFn: () => workflowService.getWorkflow(id!),
     enabled: !!id,
   });
-
   useEffect(() => {
     if (error || (!isLoading && !workflow)) {
       navigate("/workflows");
@@ -40,7 +39,7 @@ const WorkflowDetail = () => {
   if (!workflow) {
     return null;
   }
-
+  
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b bg-card">
@@ -72,7 +71,7 @@ const WorkflowDetail = () => {
           </div>
         </div>
       </div>
-      <Workflow />
+      <Workflow workflow={workflow}/>
     </div>
   );
 };

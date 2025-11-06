@@ -21,20 +21,22 @@ import { WorkflowData, WorkflowNode } from "@/types/workflow";
 import { v4 as uuidv4 } from 'uuid'
 import { NodeType } from "@/types/workflow";
 import { NodeConfigPanel } from "./NodeConfigPanel";
-import { parseWorkflowJSON, isWorkflowJSON } from "@/lib/workflowParser";
+import { parseWorkflowJSON, isWorkflowJSON, WorkflowJSON } from "@/lib/workflowParser";
+import { nodeTemplates } from "./nodes/Templates";
 const nodeTypes = {
-  custom: CustomNode,
-  action: CustomNode,
-  trigger: CustomNode,
-  operation: CustomNode,
+  'default': CustomNode,
+  'action': CustomNode,
+  'trigger': CustomNode,
+  'operation': CustomNode,
 };
 
 interface FlowEditorProps {
   onAddNode: () => void;
   onNodeAdded?: ({mainType, type, name}) => void;
+  workflow: WorkflowJSON | null;
 }
 
-export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
+export const FlowEditor = ({ onAddNode, onNodeAdded, workflow }: FlowEditorProps) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
@@ -43,11 +45,9 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
   const [configPanelOpen, setConfigPanelOpen] = useState(false);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
-  // Expose addNode through callback
   useEffect(() => {
     if (onNodeAdded) {
       (window as any).__addWorkflowNode = (template: { mainType: string; type: string; name: string }) => { 
-        console.log("setPendingNode", template)
         setPendingNode(template); 
       };
     }
@@ -234,6 +234,7 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
         id: node.id,
         type: node.data.type,
         name: node.data.name,
+        mainType: node.data.mainType,
         position: node.position,
         data: node.data
       })),
@@ -323,6 +324,18 @@ export const FlowEditor = ({ onAddNode, onNodeAdded }: FlowEditorProps) => {
     [setNodes, setEdges, handleDeleteNode, handleClickOnNode]
   );
 
+  console.log({nodes, edges})
+  useEffect(() => {
+    if(workflow){
+      const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(
+        (workflow as WorkflowJSON),
+        handleDeleteNode,
+        handleClickOnNode
+      );
+      setNodes(parsedNodes);
+      setEdges(parsedEdges);
+    }
+  },[])
 
   return (
     <div className="flex-1 flex flex-col" ref={reactFlowWrapper}>

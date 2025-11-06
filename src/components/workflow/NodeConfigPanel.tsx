@@ -25,15 +25,14 @@ export const NodeConfigPanel = ({
   };
 
   const renderConfigPanel = () => {
-    console.log("node", node)
     switch (node?.data?.type) {
-      case "condition":
+      case "conditional_operation":
         return <ConditionConfigPanel node={node} onUpdate={handleUpdate} />;
-      case "api":
+      case "api_call":
         return <ApiConfigPanel node={node} onUpdate={handleUpdate} />;
-      case "loop":
+      case "loop_operation":
         return <LoopConfigPanel node={node} onUpdate={handleUpdate} />;
-      case "csv":
+      case "read_csv":
         return <CsvConfigPanel node={node} onUpdate={handleUpdate} />;
       default:
         return (

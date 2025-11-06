@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Handle, Position, NodeProps,  } from "reactflow";
 import { Zap, Cog, Trash2, Power } from "lucide-react";
 import { NodeType } from "@/types/workflow";
+import { nodeTemplates } from "./Templates";
 
 interface CustomNodeData {
   name: string;
@@ -26,7 +27,6 @@ export const CustomNode = memo(({ id, data, selected }: NodeProps<CustomNodeData
     height: 10,
     bottom: -5,
   };
-
   return (
     <div
       onClick={() => data.onClick?.(id)}
@@ -49,7 +49,7 @@ export const CustomNode = memo(({ id, data, selected }: NodeProps<CustomNodeData
             <div className={`h-8 w-8 rounded-lg flex items-center justify-center bg-primary/10`}>
               <Icon className={`h-4 w-4 text-primary`} />
             </div>
-            <span className="text-sm font-semibold text-foreground"> {data.name} </span>
+            <span className="text-sm font-semibold text-foreground"> {nodeTemplates[data.type]?.name} </span>
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); data.onDelete(id); }}
