@@ -48,11 +48,12 @@ const Workflow = ({workflow}) => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      <div className="min-h-screen flex w-full bg-background">
         <WorkflowSidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col transition-all duration-200">
           <WorkflowTopBar
             workflowId={workflowId}
+            workflowName={workflow?.name || "Untitled Workflow"}
             onSave={handleSave}
             onRun={handleRun}
             isActive={isActive}
@@ -65,7 +66,6 @@ const Workflow = ({workflow}) => {
             onSelectNodeType={handleNodeAdded}
           />
         </div>
-        
       </div>
     </SidebarProvider>
   );

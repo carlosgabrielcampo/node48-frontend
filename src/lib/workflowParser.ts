@@ -66,19 +66,105 @@ export const parseWorkflowJSON = (
   Object.values(workflowJSON.steps).forEach((step) => {
     nodes.push({
       id: step.id,
-      type: nodeTemplates[step.type].type || "default",
+      type: nodeTemplates[step.type]?.type || "default",
       position: step.position,
       data: {
         name: step.name,
-        mainType: nodeTemplates[step.type].mainType,
-        type: nodeTemplates[step.type].type,
+        type: step.type,
+        mainType: nodeTemplates[step.type]?.mainType || "default",
         onDelete,
         onClick,
-        // Store all step data for config panel
-        ...step,
+        // Preserve all step properties in data
+        config: step.config,
+        nextStepId: step.nextStepId,
+        errorStepId: step.errorStepId,
+        outputVar: step.outputVar,
+        list: step.list,
+        workflowId: step.workflowId,
+        createdAtUTC: step.createdAtUTC,
       },
     });
-    Object.values(step.connections).map((nextStep: string) => addEdge(step.id, nextStep))
+
+    // Create edges based on connections object if available
+    if (step.connections) {
+      Object.entries(step.connections).forEach(([handleId, targetId]) => {
+        if (targetId) {
+          const isError = handleId === step.errorStepId;
+          edges.push({
+            id: `${step.id}-${handleId}-${targetId}`,
+            source: step.id,
+            sourceHandle: handleId,
+            target: targetId,
+            type: "smoothstep",
+            animated: false,
+            style: { 
+              stroke: isError ? "hsl(var(--destructive))" : "hsl(var(--connection-line))", 
+              strokeWidth: 2 
+            },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: isError ? "hsl(var(--destructive))" : "hsl(var(--connection-line))",
+            },
+          });
+        }
+      });
+    } else {
+      // Fallback to old parsing logic
+      // Create edges based on nextStepId
+      if (step.nextStepId) {
+        edges.push({
+          id: `${step.id}-${step.nextStepId}`,
+          source: step.id,
+          sourceHandle: step.nextStepId,
+          target: step.nextStepId,
+          type: "smoothstep",
+          animated: false,
+          style: { stroke: "hsl(var(--connection-line))", strokeWidth: 2 },
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            color: "hsl(var(--connection-line))",
+          },
+        });
+      }
+
+      // For api nodes, create edge for errorStepId
+      if (step.type === "api_call" && step.errorStepId) {
+        edges.push({
+          id: `${step.id}-error-${step.errorStepId}`,
+          source: step.id,
+          sourceHandle: step.errorStepId,
+          target: step.errorStepId,
+          type: "smoothstep",
+          animated: false,
+          style: { stroke: "hsl(var(--destructive))", strokeWidth: 2 },
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            color: "hsl(var(--destructive))",
+          },
+        });
+      }
+
+      // For conditional and loop nodes, create edges from config entries
+      if ((step.type === "conditional_operation" || step.type === "loop_operation") && Array.isArray(step.config)) {
+        step.config.forEach((configItem, index) => {
+          if (configItem.nextStepId) {
+            edges.push({
+              id: `${step.id}-config-${index}-${configItem.nextStepId}`,
+              source: step.id,
+              sourceHandle: configItem.nextStepId,
+              target: configItem.nextStepId,
+              type: "smoothstep",
+              animated: false,
+              style: { stroke: "hsl(var(--connection-line))", strokeWidth: 2 },
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+                color: "hsl(var(--connection-line))",
+              },
+            });
+          }
+        });
+      }
+    }
   });
 
   return { nodes, edges };
