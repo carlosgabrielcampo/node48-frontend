@@ -17,8 +17,6 @@ export const workflowService = {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 300));
     const response = await fetch('http://localhost:4014/v1/workflows');
-    console.log({getWorkflows: response})
-
     const mockWorkflows = await response.json();
     return [...mockWorkflows];
   },
@@ -38,7 +36,6 @@ export const workflowService = {
       await new Promise((resolve) => setTimeout(resolve, 400));
       const now = new Date().toISOString();
       const response = await fetch('http://localhost:4014/v1/workflows');
-      console.log({createWorkflow: response})
       const mockWorkflows = await response.json();
 
       const newWorkflow: Workflow = {
@@ -61,7 +58,6 @@ export const workflowService = {
   deleteWorkflow: async (id: string): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
     const response = await fetch('http://localhost:4014/v1/workflows');
-      console.log({deleteWorkflow: response})
     let mockWorkflows = await response.json();
     mockWorkflows = mockWorkflows.filter((w) => w.id !== id);
   },

@@ -13,32 +13,33 @@ import ReactFlow, {
   MarkerType,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { CustomNode } from "./nodes/types/CustomNode";
-import { Button } from "@/components/ui/button";
-import { Download, Upload, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { WorkflowData, WorkflowNode } from "@/types/workflow";
+import { WorkflowNode } from "@/types/workflow";
 import { v4 as uuidv4 } from 'uuid'
-import { NodeType } from "@/types/workflow";
-import { NodeConfigPanel } from "./NodeConfigPanel";
+
 import { parseWorkflowJSON, isWorkflowJSON, WorkflowJSON } from "@/lib/workflowParser";
-const nodeTypes = {
-  "conditional_operation": CustomNode,
-  "read_csv": CustomNode,
-  "api_call": CustomNode,
-  "loop_operation": CustomNode,
-  'default': CustomNode,
-};
+
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import { DefaultNode } from "../nodes/DefaultNode";
+import { NodeConfigPanel } from "../config-panels/NodeConfigPanel";
+
+const nodeTypes = { "custom": DefaultNode };
 
 interface FlowEditorProps {
   onAddNode: () => void;
   onNodeAdded?: ({mainType, type, name}) => void;
   workflow: WorkflowJSON | null;
+  nodes: any;
+  setNodes: any;
+  edges: any;
+  setEdges: any;
+  onEdgesChange: any;
+  onNodesChange: any;
 }
 
-export const FlowEditor = ({ onAddNode, onNodeAdded, workflow }: FlowEditorProps) => {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+export const FlowEditor = ({ onAddNode, onNodeAdded, workflow, nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }: FlowEditorProps) => {
+
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
   const [pendingNode, setPendingNode] = useState<{ mainType: string; type: string; name: string } | null>(null);
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
@@ -47,11 +48,11 @@ export const FlowEditor = ({ onAddNode, onNodeAdded, workflow }: FlowEditorProps
 
   useEffect(() => {
     if (onNodeAdded) {
-      (window as any).__addWorkflowNode = (template: { mainType: string; type: string; name: string }) => { 
+      globalThis.__addWorkflowNode = (template: { mainType: string; type: string; name: string }) => { 
         setPendingNode(template); 
       };
     }
-    return () => { delete (window as any).__addWorkflowNode; };
+    return () => { delete (globalThis).__addWorkflowNode; };
   }, [onNodeAdded]);
 
   const onConnect = useCallback(
@@ -228,98 +229,6 @@ export const FlowEditor = ({ onAddNode, onNodeAdded, workflow }: FlowEditorProps
     [selectedElements, nodes, edges, setNodes, setEdges]
   );
 
-  const handleExport = useCallback(() => {
-    const workflowData: WorkflowData = {
-      nodes: nodes.map((node) => ({
-        id: node.id,
-        type: node.data.type,
-        name: node.data.name,
-        mainType: node.data.mainType,
-        position: node.position,
-        data: node.data
-      })),
-      connections: edges.map((edge, index) => ({
-        id: edge.id,
-        source: {
-          nodeId: edge.source,
-          outputIndex: 0,
-        },
-        target: {
-          nodeId: edge.target,
-          inputIndex: 0,
-        },
-      })),
-    };
-
-    const blob = new Blob([JSON.stringify(workflowData, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `workflow-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Workflow exported");
-  }, [nodes, edges]);
-
-  const handleImport = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const jsonData = JSON.parse(e.target?.result as string);
-          // Check if it's the new workflow JSON format
-          if (isWorkflowJSON(jsonData)) {
-            const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(jsonData, handleDeleteNode, handleClickOnNode);
-            setNodes(parsedNodes); 
-            setEdges(parsedEdges); 
-            toast.success(`Workflow "${jsonData.name}" imported with ${parsedNodes.length} nodes`);
-          } else {
-            // Legacy format
-            const workflowData: WorkflowData = jsonData;
-            const importedNodes: Node[] = workflowData.nodes.map((node) => ({
-              id: node.id,
-              position: node.position,
-              type: node.data.type,
-              data: {
-                mainType: node.data.mainType,
-                type: node.data.type,
-                name: node.name,
-                onDelete: handleDeleteNode,
-                onClick: handleClickOnNode,
-              },
-            }));
-            const importedEdges: Edge[] = workflowData.connections.map((conn) => ({
-              id: conn.id,
-              source: conn.source.nodeId,
-              target: conn.target.nodeId,
-              type: "smoothstep",
-              animated: true,
-              style: { stroke: "hsl(var(--primary))", strokeWidth: 2 },
-              markerEnd: {
-                type: MarkerType.ArrowClosed,
-                color: "hsl(var(--primary))",
-              },
-            }));
-            setNodes(importedNodes);
-            setEdges(importedEdges);
-            toast.success("Workflow imported");
-          }
-        } catch (error) {
-          toast.error("Failed to import workflow");
-          console.error(error);
-        }
-      };
-      reader.readAsText(file);
-      event.target.value = "";
-    },
-    [setNodes, setEdges, handleDeleteNode, handleClickOnNode]
-  );
-
-  console.log({nodes, edges})
   useEffect(() => {
     if(workflow){
       const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(
@@ -331,38 +240,9 @@ export const FlowEditor = ({ onAddNode, onNodeAdded, workflow }: FlowEditorProps
       setEdges(parsedEdges);
     }
   },[])
-
+  console.log({edges, nodes})
   return (
     <div className="flex-1 flex flex-col" ref={reactFlowWrapper}>
-      <div className="flex items-center gap-2 p-4 border-b bg-background">
-        <Button onClick={onAddNode} size="sm" className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Node
-        </Button>
-        <Button onClick={handleExport} size="sm" variant="outline" className="gap-2">
-          <Download className="h-4 w-4" />
-          Export
-        </Button>
-        <label>
-          <Button size="sm" variant="outline" className="gap-2" asChild>
-            <span>
-              <Upload className="h-4 w-4" />
-              Import
-            </span>
-          </Button>
-          <input
-            type="file"
-            accept=".json"
-            onChange={handleImport}
-            className="hidden"
-          />
-        </label>
-        <div className="flex-1" />
-        <div className="text-sm text-muted-foreground">
-          {nodes.length} nodes, {edges.length} connections
-        </div>
-      </div>
-
       {/* Canvas */}
       <div className="flex-1" onKeyDown={handleKeyDown} tabIndex={0}>
         <ReactFlow

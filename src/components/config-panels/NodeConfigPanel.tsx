@@ -1,9 +1,6 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { WorkflowNode } from "@/types/workflow";
-import { ConditionConfigPanel } from "./config-panels/ConditionConfigPanel";
-import { ApiConfigPanel } from "./config-panels/ApiConfigPanel";
-import { LoopConfigPanel } from "./config-panels/LoopConfigPanel";
-import { CsvConfigPanel } from "./config-panels/CsvConfigPanel";
+import { ConditionConfigPanel, ApiConfigPanel, CsvConfigPanel, LoopConfigPanel } from "./";
 
 interface NodeConfigPanelProps {
   node: WorkflowNode | null;

@@ -3,13 +3,20 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { WorkflowSidebar } from "@/components/workflow/WorkflowSidebar";
 import { WorkflowTopBar } from "@/components/workflow/WorkflowTopBar";
 import { FlowEditor } from "@/components/workflow/FlowEditor";
-import { NodeTypeDrawer } from "@/components/workflow/nodes/NodeTypeDrawer";
+import { WorkflowToolBar } from "@/components/workflow/WorkflowToolBar";
 import { NodeType } from "@/types/workflow";
+import { format } from "date-fns";
+import { ArrowLeft, Calendar, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { NodeTypeDrawer } from "@/components/nodes/NodeTypeDrawer";
+import { useEdgesState, useNodesState } from "reactflow";
 
 const Workflow = ({workflow}) => {
   const [isActive, setIsActive] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [workflowId, setWorkflowId] = useState<string | undefined>();
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const handleAddNode = useCallback(() => { setIsDrawerOpen(true); }, []);
   const handleNodeAdded = useCallback(({mainType, type, name}) => {
@@ -51,15 +58,28 @@ const Workflow = ({workflow}) => {
       <div className="min-h-screen flex w-full bg-background">
         <WorkflowSidebar />
         <div className="flex-1 flex flex-col transition-all duration-200">
-          <WorkflowTopBar
-            workflowId={workflowId}
-            workflowName={workflow?.name || "Untitled Workflow"}
+          <WorkflowTopBar workflowName={workflow?.name || "Untitled Workflow"} />
+          <WorkflowToolBar
             onSave={handleSave}
             onRun={handleRun}
             isActive={isActive}
             onToggleActive={handleToggleActive}
+            nodes={nodes} 
+            setNodes={setNodes} 
+            edges={edges} 
+            setEdges={setEdges}
           />
-          <FlowEditor onAddNode={handleAddNode} onNodeAdded={handleNodeAdded} workflow={workflow} />
+          <FlowEditor 
+            onAddNode={handleAddNode} 
+            onNodeAdded={handleNodeAdded} 
+            workflow={workflow} 
+            nodes={nodes} 
+            setNodes={setNodes} 
+            onNodesChange={onNodesChange}
+            edges={edges} 
+            setEdges={setEdges}
+            onEdgesChange={onEdgesChange}
+          />
           <NodeTypeDrawer
             open={isDrawerOpen}
             onOpenChange={setIsDrawerOpen}

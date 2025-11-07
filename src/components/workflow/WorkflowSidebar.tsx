@@ -1,4 +1,4 @@
-import { LayoutDashboard, User, FolderKanban, FileText, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, User, FolderKanban, FileText, ChevronLeft, ChevronRight, Workflow } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 const navItems = [
   { title: "Overview", url: "/", icon: LayoutDashboard },
   { title: "Personal", url: "/personal", icon: User },
-  { title: "Projects", url: "/projects", icon: FolderKanban },
+  { title: "Workflows", url: "/workflows", icon: Workflow },
   { title: "Templates", url: "/templates", icon: FileText },
 ];
 
@@ -56,11 +56,12 @@ export const WorkflowSidebar = () => {
         </SidebarGroup>
         
         {/* Centered Toggle Button */}
+      </SidebarContent>
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
-          className="absolute top-1/2 -right-3 -translate-y-1/2 h-6 w-6 rounded-full border border-sidebar-border bg-sidebar-background shadow-sm hover:bg-sidebar-accent z-50 transition-transform duration-200"
+          className="absolute top-1/2 -right-3 -translate-y-1/2 h-6 w-6 rounded-full border border-sidebar-border bg-sidebar-background shadow-sm hover:bg-sidebar-accent z-99 transition-transform duration-200"
           aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
         >
           {open ? (
@@ -69,7 +70,6 @@ export const WorkflowSidebar = () => {
             <ChevronRight className="h-3 w-3" />
           )}
         </Button>
-      </SidebarContent>
     </Sidebar>
   );
 };

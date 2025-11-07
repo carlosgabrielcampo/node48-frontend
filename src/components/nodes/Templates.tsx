@@ -1,6 +1,6 @@
 import { NodeType } from "@/types/workflow";
 import { ForwardRefExoticComponent } from "react";
-import { LucideProps, Power, Zap, Cog } from "lucide-react";
+import { LucideProps, Power, Zap, Cog, Network } from "lucide-react";
 
 interface NodeTypeOption {
     mainType: NodeType;
@@ -78,9 +78,9 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
   "conditional_operation": {
     mainType: "operation",
     type: "conditional_operation",
-    name: "Condition Node",
+    name: "Condition",
     description: "Advanced conditional logic with multiple rules",
-    icon: Cog
+    icon: Network
   },
   "api_call": {
     mainType: "action",
