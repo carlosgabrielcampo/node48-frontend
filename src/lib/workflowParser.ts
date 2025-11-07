@@ -66,7 +66,7 @@ export const parseWorkflowJSON = (
   Object.values(workflowJSON.steps).forEach((step) => {
     nodes.push({
       id: step.id,
-      type: nodeTemplates[step.type].mainType || "default",
+      type: nodeTemplates[step.type].type || "default",
       position: step.position,
       data: {
         name: step.name,

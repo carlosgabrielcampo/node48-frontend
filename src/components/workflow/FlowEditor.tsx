@@ -23,10 +23,11 @@ import { NodeType } from "@/types/workflow";
 import { NodeConfigPanel } from "./NodeConfigPanel";
 import { parseWorkflowJSON, isWorkflowJSON, WorkflowJSON } from "@/lib/workflowParser";
 const nodeTypes = {
+  "conditional_operation": CustomNode,
+  "read_csv": CustomNode,
+  "api_call": CustomNode,
+  "loop_operation": CustomNode,
   'default': CustomNode,
-  'action': CustomNode,
-  'trigger': CustomNode,
-  'operation': CustomNode,
 };
 
 interface FlowEditorProps {
