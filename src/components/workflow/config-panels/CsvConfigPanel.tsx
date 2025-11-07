@@ -12,10 +12,7 @@ interface CsvConfigPanelProps {
   onUpdate: (updates: Partial<WorkflowNode>) => void;
 }
 
-
-
 export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
-  console.log(node.config)
   const defaultConfig =  {
     filePath: "",
     encoding: "utf-8",
@@ -182,9 +179,7 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
         />
       </div>
       <div className="flex items-center justify-between ">
-        <Button size="sm" className="mt-1 w-full" onClick={saveConfig}>
-          Save
-        </Button>
+        <Button size="sm" className="mt-1 w-full" onClick={saveConfig}>Save</Button>
       </div>
     </div>
   );

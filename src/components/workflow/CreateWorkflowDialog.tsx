@@ -76,35 +76,18 @@ export const CreateWorkflowDialog = ({ open, onOpenChange, onSuccess }: CreateWo
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name *</Label>
-              <Input
-                id="name"
-                placeholder="Enter workflow name"
-                {...register("name")}
-              />
-              {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
-              )}
+              <Input id="name" placeholder="Enter workflow name" {...register("name")} />
+              { errors.name && ( <p className="text-sm text-destructive">{errors.name.message}</p> ) }
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Enter workflow description (optional)"
-                rows={3}
-                {...register("description")}
-              />
-              {errors.description && (
-                <p className="text-sm text-destructive">{errors.description.message}</p>
-              )}
+              <Textarea id="description" placeholder="Enter workflow description (optional)" rows={3} {...register("description")} />
+              {errors.description && ( <p className="text-sm text-destructive">{errors.description.message}</p> )}
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Workflow"}
-            </Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="submit" disabled={isSubmitting}>{ isSubmitting ? "Creating..." : "Create Workflow" }</Button>
           </DialogFooter>
         </form>
       </DialogContent>

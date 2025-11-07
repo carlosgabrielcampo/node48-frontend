@@ -13,7 +13,7 @@ import ReactFlow, {
   MarkerType,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { CustomNode } from "./nodes/CustomNode";
+import { CustomNode } from "./nodes/types/CustomNode";
 import { Button } from "@/components/ui/button";
 import { Download, Upload, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -22,7 +22,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { NodeType } from "@/types/workflow";
 import { NodeConfigPanel } from "./NodeConfigPanel";
 import { parseWorkflowJSON, isWorkflowJSON, WorkflowJSON } from "@/lib/workflowParser";
-import { nodeTemplates } from "./nodes/Templates";
 const nodeTypes = {
   'default': CustomNode,
   'action': CustomNode,
@@ -271,16 +270,11 @@ export const FlowEditor = ({ onAddNode, onNodeAdded, workflow }: FlowEditorProps
       reader.onload = (e) => {
         try {
           const jsonData = JSON.parse(e.target?.result as string);
-          
           // Check if it's the new workflow JSON format
           if (isWorkflowJSON(jsonData)) {
-            const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(
-              jsonData,
-              handleDeleteNode,
-              handleClickOnNode
-            );
-            setNodes(parsedNodes);
-            setEdges(parsedEdges);
+            const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(jsonData, handleDeleteNode, handleClickOnNode);
+            setNodes(parsedNodes); 
+            setEdges(parsedEdges); 
             toast.success(`Workflow "${jsonData.name}" imported with ${parsedNodes.length} nodes`);
           } else {
             // Legacy format

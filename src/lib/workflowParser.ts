@@ -1,5 +1,6 @@
 import { nodeTemplates } from "@/components/workflow/nodes/Templates";
 import { Node, Edge, MarkerType } from "reactflow";
+import { string } from "zod";
 
 // Workflow JSON format (from backend)
 export interface WorkflowStep {
@@ -7,6 +8,7 @@ export interface WorkflowStep {
   workflowId?: string;
   name?: string;
   type: string;
+  connections: Record<string, string>,
   createdAtUTC?: string;
   position: { x: number; y: number };
   nextStepId?: string;
@@ -28,9 +30,6 @@ export interface WorkflowJSON {
   steps: Record<string, WorkflowStep>;
 }
 
-/**
- * Converts workflow JSON format to React Flow format
- */
 export const parseWorkflowJSON = (
   workflowJSON: WorkflowJSON,
   onDelete: (id: string) => void,
@@ -79,47 +78,12 @@ export const parseWorkflowJSON = (
         ...step,
       },
     });
-
-    // Add edge from this step's nextStepId
-    if (step.nextStepId) {
-      addEdge(step.id, step.nextStepId);
-    }
-
-    // Add edge from errorStepId (for api nodes)
-    if (step.errorStepId) {
-      addEdge(step.id, step.errorStepId, "error");
-    }
-
-    // Handle nested nextStepId in config arrays
-    if (Array.isArray(step.config)) {
-      step.config.forEach((configEntry, index) => {
-        if (configEntry.nextStepId) {
-          addEdge(step.id, configEntry.nextStepId, `config[${index}]`);
-        }
-
-        // For condition nodes, check nested conditions
-        if (Array.isArray(configEntry.condition)) {
-          // This is a condition block, already handled by configEntry.nextStepId
-        }
-      });
-    }
-
-    // Handle Conditions array (alternative format)
-    if (Array.isArray(step.Conditions)) {
-      step.Conditions.forEach((conditionBlock, index) => {
-        if (conditionBlock.nextStepId) {
-          addEdge(step.id, conditionBlock.nextStepId, `condition[${index}]`);
-        }
-      });
-    }
+    Object.values(step.connections).map((nextStep: string) => addEdge(step.id, nextStep))
   });
 
   return { nodes, edges };
 };
 
-/**
- * Detects if JSON is in workflow format (has steps object)
- */
 export const isWorkflowJSON = (data: any): data is WorkflowJSON => {
   return (
     data &&

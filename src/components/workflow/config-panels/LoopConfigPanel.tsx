@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 interface LoopConfigPanelProps {
   node: WorkflowNode;
@@ -12,40 +13,38 @@ interface LoopConfigPanelProps {
 }
 
 export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
+  const newEntry: LoopConfigEntry = {
+    sourceVar: "",
+    outputVar: "",
+    type: "format",
+    nextStepId: "",
+    fields: [],
+  };
   const config = (node.config as LoopConfigEntry[]) || [];
+  const [stateConfig, setConfig] = useState(node.config as LoopConfigEntry[]);
+  const saveConfig = () => { onUpdate({config: stateConfig}) }
+  
+  const addConfigEntry = () => { setConfig([...config, newEntry]); };
 
-  const addConfigEntry = () => {
-    const newEntry: LoopConfigEntry = {
-      sourceVar: "",
-      outputVar: "",
-      type: "format",
-      nextStepId: "",
-      fields: [],
-    };
-    onUpdate({ config: [...config, newEntry] });
-  };
-
-  const removeConfigEntry = (index: number) => {
-    onUpdate({ config: config.filter((_, i) => i !== index) });
-  };
+  const removeConfigEntry = (index: number) => { setConfig(config.filter((_, i) => i !== index)); };
 
   const updateConfigEntry = (index: number, updates: Partial<LoopConfigEntry>) => {
     const updated = [...config];
     updated[index] = { ...updated[index], ...updates };
-    onUpdate({ config: updated });
+    setConfig(updated);
   };
 
   const addField = (configIndex: number) => {
     const updated = [...config];
     const fields = updated[configIndex].fields || [];
     updated[configIndex].fields = [...fields, { field: "", type: "convert", convertionType: "" }];
-    onUpdate({ config: updated });
+    setConfig(updated);
   };
 
   const removeField = (configIndex: number, fieldIndex: number) => {
     const updated = [...config];
     updated[configIndex].fields = updated[configIndex].fields?.filter((_, i) => i !== fieldIndex);
-    onUpdate({ config: updated });
+    setConfig(updated);
   };
 
   const updateField = (configIndex: number, fieldIndex: number, updates: Partial<LoopFormatField>) => {
@@ -53,7 +52,7 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
     const fields = updated[configIndex].fields || [];
     fields[fieldIndex] = { ...fields[fieldIndex], ...updates };
     updated[configIndex].fields = fields;
-    onUpdate({ config: updated });
+    setConfig(updated);
   };
 
   return (
@@ -66,7 +65,7 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
         </Button>
       </div>
 
-      {config.map((entry, index) => (
+      {stateConfig.map((entry, index) => (
         <Card key={index} className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <Label className="font-medium">Config {index + 1}</Label>
@@ -172,7 +171,6 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
               </div>
             </>
           )}
-
           <div>
             <Label className="text-xs">Next Step ID</Label>
             <Input
@@ -184,7 +182,7 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
           </div>
         </Card>
       ))}
-
+      <Button size="sm" className="mt-1 w-full" onClick={saveConfig}>Save</Button>
       {config.length === 0 && (
         <div className="text-sm text-muted-foreground text-center py-8">
           No configuration entries. Click "Add Config" to create one.

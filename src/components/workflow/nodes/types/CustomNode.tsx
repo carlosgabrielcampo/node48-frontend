@@ -2,46 +2,33 @@ import { memo } from "react";
 import { Handle, Position, NodeProps,  } from "reactflow";
 import { Zap, Cog, Trash2, Power } from "lucide-react";
 import { NodeType } from "@/types/workflow";
-import { nodeTemplates } from "./Templates";
-
+import { nodeTemplates } from "../Templates";
+import { v4 as uuidv4 } from 'uuid'
 interface CustomNodeData {
   name: string;
   type: NodeType;
+  mainType: string;
   onDelete: (id: string) => void;
   onClick?: (id: string) => void;
 }
 
 export const CustomNode = memo(({ id, data, selected }: NodeProps<CustomNodeData>) => {
-  let Icon = Cog
-  switch (data.type) {
-    case "action":
-      Icon = Zap;
-      break;
-    case "trigger": 
-      Icon = Power;
-      break;
-  }
-
-  const DEFAULT_HANDLE_STYLE = {
-    width: 10,
-    height: 10,
-    bottom: -5,
-  };
+  const Icon = nodeTemplates[data.type]?.icon || Cog
+  console.log({data})
   return (
     <div
       onClick={() => data.onClick?.(id)}
-      className={`rounded-lg border-2 bg-card shadow-lg transition-all h-[120px] min-w-[180px] cursor-pointer ${
+      className={`rounded-lg border-2 bg-card shadow-lg transition-all h-[100px] min-w-[180px] cursor-pointer ${
         selected 
           ? "border-primary shadow-xl ring-2 ring-primary/20" 
           : "border-border hover:border-primary/50"
       }`}
     >
-      {/* Input Handle */}
-      {data.type !== 'trigger' && <Handle
+      <Handle
         type="target"
         position={Position.Left}
         className="!bg-primary !w-3 !h-3 !border-2 !border-background"
-      />}
+      />
 
       <div className="p-4">
         <div className="flex items-center justify-between gap-2 mb-2">
@@ -67,23 +54,9 @@ export const CustomNode = memo(({ id, data, selected }: NodeProps<CustomNodeData
       {/* Output Handle */}
         <Handle
           type="source"
-          id="red"
+          className="!bg-primary !w-3 !h-3 !border-2 !border-background"
+          id={uuidv4()}
           position={Position.Right}
-          style={{ ...DEFAULT_HANDLE_STYLE, top: '67.5%', background: 'red' }}
-          onConnect={(params) => console.log('handle onConnect', params)}
-        />
-        <Handle
-          type="source"
-          position={Position.Right}
-          id="blue"
-          style={{ ...DEFAULT_HANDLE_STYLE, top: '50%', background: 'blue' }}
-          onConnect={(params) => console.log('handle onConnect', params)}
-        />
-        <Handle
-          type="source"
-          position={Position.Right}
-          id="orange"
-          style={{ ...DEFAULT_HANDLE_STYLE, top: '85%', background: 'orange' }}
           onConnect={(params) => console.log('handle onConnect', params)}
         />
     </div>
