@@ -8,6 +8,9 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
 import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
 import { WorkflowNode } from "@/types/workflow";
+import { MarkerType } from "reactflow";
+import { WorkflowData } from "@/types/workflow";
+
 interface WorkflowToolBarProps {
   workflowId?: string;
   workflowName?: string;
@@ -19,6 +22,10 @@ interface WorkflowToolBarProps {
   setNodes: any;
   edges: any;
   setEdges: any;
+  setSelectedNode: any;
+  selectedNode: any;
+  setConfigPanelOpen: any;
+  configPanelOpen: any;
 }
 
 export const WorkflowToolBar = ({
@@ -28,8 +35,11 @@ export const WorkflowToolBar = ({
   onRun,
   isActive,
   onToggleActive,
+  setSelectedNode,
+  setConfigPanelOpen,
   nodes, setNodes, edges, setEdges 
 }: WorkflowToolBarProps) => {
+
   const [isSaving, setIsSaving] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [isToggling, setIsToggling] = useState(false);

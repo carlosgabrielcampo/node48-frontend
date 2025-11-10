@@ -36,14 +36,30 @@ interface FlowEditorProps {
   setEdges: any;
   onEdgesChange: any;
   onNodesChange: any;
+  setSelectedNode: any;
+  selectedNode: any;
+  setConfigPanelOpen: any;
+  configPanelOpen: any;
 }
 
-export const FlowEditor = ({ onAddNode, onNodeAdded, workflow, nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }: FlowEditorProps) => {
+export const FlowEditor = ({ 
+  onAddNode, 
+  onNodeAdded, 
+  workflow, 
+  nodes, 
+  setNodes, 
+  onNodesChange, 
+  edges, 
+  setEdges, 
+  onEdgesChange,
+  setSelectedNode,
+  selectedNode,
+  setConfigPanelOpen,
+  configPanelOpen,
+}: FlowEditorProps) => {
 
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
   const [pendingNode, setPendingNode] = useState<{ mainType: string; type: string; name: string } | null>(null);
-  const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
-  const [configPanelOpen, setConfigPanelOpen] = useState(false);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -151,7 +167,6 @@ export const FlowEditor = ({ onAddNode, onNodeAdded, workflow, nodes, setNodes, 
       position: node.position,
       type: node.data.type,
       data: node.data,
-      // Extract common workflow properties from data
       config: node.data.config,
       nextStepId: node.data.nextStepId,
       errorStepId: node.data.errorStepId,

@@ -17,6 +17,8 @@ const Workflow = ({workflow}) => {
   const [workflowId, setWorkflowId] = useState<string | undefined>();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
+  const [configPanelOpen, setConfigPanelOpen] = useState(false);
 
   const handleAddNode = useCallback(() => { setIsDrawerOpen(true); }, []);
   const handleNodeAdded = useCallback(({mainType, type, name}) => {
@@ -68,6 +70,10 @@ const Workflow = ({workflow}) => {
             setNodes={setNodes} 
             edges={edges} 
             setEdges={setEdges}
+            setSelectedNode={setSelectedNode}
+            selectedNode={selectedNode}
+            setConfigPanelOpen={setConfigPanelOpen}
+            configPanelOpen={configPanelOpen}
           />
           <FlowEditor 
             onAddNode={handleAddNode} 
@@ -79,6 +85,10 @@ const Workflow = ({workflow}) => {
             edges={edges} 
             setEdges={setEdges}
             onEdgesChange={onEdgesChange}
+            setSelectedNode={setSelectedNode}
+            selectedNode={selectedNode}
+            setConfigPanelOpen={setConfigPanelOpen}
+            configPanelOpen={configPanelOpen}
           />
           <NodeTypeDrawer
             open={isDrawerOpen}
