@@ -177,26 +177,6 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
           </div>
         ))}
       </Card>
-
-      <div>
-        <Label>Next Step ID</Label>
-        <Input
-          value={node.nextStepId || ""}
-          onChange={(e) => onUpdate({ nextStepId: e.target.value })}
-          placeholder="Node ID"
-          className="mt-1"
-        />
-      </div>
-
-      <div>
-        <Label>Error Step ID</Label>
-        <Input
-          value={node.errorStepId || ""}
-          onChange={(e) => onUpdate({ errorStepId: e.target.value })}
-          placeholder="Node ID"
-          className="mt-1"
-        />
-      </div>
     </div>
   );
 };

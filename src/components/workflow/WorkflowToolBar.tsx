@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -8,14 +8,12 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
 import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
 import { WorkflowNode } from "@/types/workflow";
-import { MarkerType } from "reactflow";
+import { MarkerType, Edge, Node } from "reactflow";
 import { WorkflowData } from "@/types/workflow";
 
 interface WorkflowToolBarProps {
   workflowId?: string;
   workflowName?: string;
-  onSave: () => Promise<void>;
-  onRun: () => Promise<void>;
   isActive: boolean;
   onToggleActive: (active: boolean) => Promise<void>;
   nodes: any;
@@ -26,18 +24,22 @@ interface WorkflowToolBarProps {
   selectedNode: any;
   setConfigPanelOpen: any;
   configPanelOpen: any;
+  setWorkflowId: (id: string) => void;
+  onAddNode: () => void;
+  setIsActive: Dispatch<SetStateAction<boolean>>;
 }
 
 export const WorkflowToolBar = ({
-  workflowId,
-  workflowName = "Untitled Workflow",
-  onSave,
-  onRun,
+  setIsActive,
   isActive,
-  onToggleActive,
   setSelectedNode,
   setConfigPanelOpen,
-  nodes, setNodes, edges, setEdges 
+  setWorkflowId,
+  onAddNode,
+  nodes, 
+  setNodes, 
+  edges, 
+  setEdges 
 }: WorkflowToolBarProps) => {
 
   const [isSaving, setIsSaving] = useState(false);
@@ -45,6 +47,20 @@ export const WorkflowToolBar = ({
   const [isToggling, setIsToggling] = useState(false);
   const { open } = useSidebar();
 
+  const onSave = async () => {
+    // Simulating API call - replace with actual endpoint
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    setWorkflowId(`workflow-${Date.now()}`);
+  };
+  const onRun = async () => {
+      // Simulating API call - replace with actual endpoint
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  };
+  const onToggleActive = async (active: boolean) => {
+    // Simulating API call - replace with actual endpoint
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    setIsActive(active);
+  };
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -57,7 +73,6 @@ export const WorkflowToolBar = ({
       setIsSaving(false);
     }
   };
-
   const handleRun = async () => {
     setIsRunning(true);
     try {
@@ -70,7 +85,6 @@ export const WorkflowToolBar = ({
       setIsRunning(false);
     }
   };
-
   const handleToggleActive = async (checked: boolean) => {
     setIsToggling(true);
     try {
@@ -83,11 +97,9 @@ export const WorkflowToolBar = ({
       setIsToggling(false);
     }
   };
-
   const handleDuplicate = () => {
     toast.info("Duplicate feature coming soon");
   };
-
   const handleDelete = () => {
     toast.info("Delete feature coming soon");
   };
@@ -120,7 +132,8 @@ export const WorkflowToolBar = ({
         setSelectedNode(workflowNode);
         setConfigPanelOpen(true);
       }
-    }, [nodes])
+    }, [nodes, setConfigPanelOpen, setSelectedNode])
+
   const handleExport = useCallback(() => {
     const workflowData: WorkflowData = {
       nodes: nodes.map((node) => ({
@@ -182,7 +195,6 @@ export const WorkflowToolBar = ({
                 type: node.data.type,
                 name: node.name,
                 onDelete: handleDeleteNode,
-                onClick: handleClickOnNode,
               },
             }));
             const importedEdges: Edge[] = workflowData.connections.map((conn) => ({
@@ -216,7 +228,7 @@ export const WorkflowToolBar = ({
   return (
       <div className="flex items-center gap-2 p-4 border-b bg-background">
         <Button 
-          // onClick={onAddNode} 
+          onClick={onAddNode} 
           size="sm" 
           className="gap-2"
         >
@@ -224,7 +236,7 @@ export const WorkflowToolBar = ({
           Add Node
         </Button>
         <Button 
-          // onClick={handleExport} 
+          onClick={handleExport} 
           size="sm" variant="outline" className="gap-2">
           <Download className="h-4 w-4" />
           Export
@@ -239,7 +251,7 @@ export const WorkflowToolBar = ({
           <input
             type="file"
             accept=".json"
-            // onChange={handleImport}
+            onChange={handleImport}
             className="hidden"
           />
         </label>

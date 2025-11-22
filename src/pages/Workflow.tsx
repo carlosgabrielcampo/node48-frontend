@@ -4,12 +4,9 @@ import { WorkflowSidebar } from "@/components/workflow/WorkflowSidebar";
 import { WorkflowTopBar } from "@/components/workflow/WorkflowTopBar";
 import { FlowEditor } from "@/components/workflow/FlowEditor";
 import { WorkflowToolBar } from "@/components/workflow/WorkflowToolBar";
-import { NodeType } from "@/types/workflow";
-import { format } from "date-fns";
-import { ArrowLeft, Calendar, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { NodeTypeDrawer } from "@/components/nodes/NodeTypeDrawer";
 import { useEdgesState, useNodesState } from "reactflow";
+import { WorkflowNode } from "@/types/workflow";
 
 const Workflow = ({workflow}) => {
   const [isActive, setIsActive] = useState(false);
@@ -28,32 +25,7 @@ const Workflow = ({workflow}) => {
     }
     setIsDrawerOpen(false);
   }, []);
-  const handleSave = async () => {
-    try {
-      // Simulating API call - replace with actual endpoint
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setWorkflowId(`workflow-${Date.now()}`);
-    } catch (error) {
-      throw error;
-    }
-  };
-  const handleRun = async () => {
-    try {
-      // Simulating API call - replace with actual endpoint
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    } catch (error) {
-      throw error;
-    }
-  };
-  const handleToggleActive = async (active: boolean) => {
-    try {
-      // Simulating API call - replace with actual endpoint
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      setIsActive(active);
-    } catch (error) {
-      throw error;
-    }
-  };
+
 
   return (
     <SidebarProvider>
@@ -62,10 +34,9 @@ const Workflow = ({workflow}) => {
         <div className="flex-1 flex flex-col transition-all duration-200">
           <WorkflowTopBar workflowName={workflow?.name || "Untitled Workflow"} />
           <WorkflowToolBar
-            onSave={handleSave}
-            onRun={handleRun}
+            setIsActive={setIsActive}
+            setWorkflowId={setWorkflowId}
             isActive={isActive}
-            onToggleActive={handleToggleActive}
             nodes={nodes} 
             setNodes={setNodes} 
             edges={edges} 
@@ -74,10 +45,10 @@ const Workflow = ({workflow}) => {
             selectedNode={selectedNode}
             setConfigPanelOpen={setConfigPanelOpen}
             configPanelOpen={configPanelOpen}
+            onAddNode={handleAddNode}
           />
           <FlowEditor 
             onAddNode={handleAddNode} 
-            onNodeAdded={handleNodeAdded} 
             workflow={workflow} 
             nodes={nodes} 
             setNodes={setNodes} 

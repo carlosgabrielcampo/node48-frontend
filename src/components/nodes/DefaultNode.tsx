@@ -8,7 +8,7 @@ interface DefaultNodeData {
   type: string; // Actual node type string like "conditional_operation", "api_call", etc.
   mainType: string;
   onDelete: (id: string) => void;
-  onClick?: (id: string) => void;
+  onClick?: (data: any) => void;
   config?: any[];
   connections: any[];
   errorStepId?: string;
@@ -17,14 +17,11 @@ interface DefaultNodeData {
 
 export const DefaultNode = memo(({ id, data, selected }: NodeProps<DefaultNodeData>) => {
   const Icon = nodeTemplates[data.type]?.icon || Cog;
-  
-
   const outputHandles = Object.entries(data.connections).map(([source, target]) => {return {source, target}});;
   const nodeHeight = 80 + (outputHandles.length > 2 ? (outputHandles.length - 2) * 30 : 0);
 
   return (
     <div
-      onClick={() => data.onClick?.(id)}
       style={{ minHeight: `${nodeHeight}px` }}
       className={`rounded-lg border-2 bg-node-hover min-h-[100px] shadow-lg transition-all w-[200px] cursor-pointer relative ${
         selected 
@@ -54,6 +51,13 @@ export const DefaultNode = memo(({ id, data, selected }: NodeProps<DefaultNodeDa
 
             </div>
           </div>
+          <button
+            onClick={() => { data.onClick?.(data) }}
+            className="h-6 w-6 rounded hover:bg-primary/10 flex items-center justify-center transition-colors flex-shrink-0"
+            aria-label="Acess node settings"
+          >
+            <Cog className="h-3 w-3 text-muted-foreground hover:text-primary" />
+          </button>
           <button
             onClick={(e) => { e.stopPropagation(); data.onDelete(id); }}
             className="h-6 w-6 rounded hover:bg-destructive/10 flex items-center justify-center transition-colors flex-shrink-0"

@@ -128,16 +128,6 @@ export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelPro
             <Plus className="h-3 w-3 mr-1" />
             Add Rule
           </Button>
-
-          <div>
-            <Label className="text-xs">Next Step ID</Label>
-            <Input
-              value={condition.nextStepId}
-              onChange={(e) => updateCondition(condIndex, { nextStepId: e.target.value })}
-              placeholder="Node ID"
-              className="mt-1"
-            />
-          </div>
         </Card>
       ))}
 

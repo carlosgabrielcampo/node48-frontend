@@ -171,15 +171,6 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
               </div>
             </>
           )}
-          <div>
-            <Label className="text-xs">Next Step ID</Label>
-            <Input
-              value={entry.nextStepId}
-              onChange={(e) => updateConfigEntry(index, { nextStepId: e.target.value })}
-              placeholder="Node ID"
-              className="mt-1"
-            />
-          </div>
         </Card>
       ))}
       <Button size="sm" className="mt-1 w-full" onClick={saveConfig}>Save</Button>

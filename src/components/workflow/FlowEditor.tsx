@@ -27,7 +27,6 @@ import { NodeConfigPanel } from "../config-panels/NodeConfigPanel";
 const nodeTypes = { "custom": DefaultNode };
 
 interface FlowEditorProps {
-  onAddNode: () => void;
   onNodeAdded?: ({mainType, type, name}) => void;
   workflow: WorkflowJSON | null;
   nodes: any;
@@ -40,10 +39,11 @@ interface FlowEditorProps {
   selectedNode: any;
   setConfigPanelOpen: any;
   configPanelOpen: any;
+  onAddNode: () => void;
 }
 
-export const FlowEditor = ({ 
-  onAddNode, 
+export const FlowEditor = ({
+  onAddNode,
   onNodeAdded, 
   workflow, 
   nodes, 
@@ -114,28 +114,6 @@ export const FlowEditor = ({
     [setNodes, setEdges]
   );
 
-  const handleClickOnNode = useCallback((id: string) => {
-    const node = nodes.find(n => n.id === id);
-    if (node) {
-      const workflowNode: WorkflowNode = {
-        id: node.id,
-        name: node.data.name,
-        position: node.position,
-        type: node.data.type,
-        data: node.data,
-        // Extract common workflow properties from data
-        config: node.data.config,
-        nextStepId: node.data.nextStepId,
-        errorStepId: node.data.errorStepId,
-        outputVar: node.data.outputVar,
-        list: node.data.list,
-        workflowId: node.data.workflowId,
-        createdAtUTC: node.data.createdAtUTC,
-      };
-      setSelectedNode(workflowNode);
-      setConfigPanelOpen(true);
-    }
-  }, [nodes])
 
   const handleAddNode = useCallback(
     ({mainType, type, name}) => {
@@ -151,16 +129,17 @@ export const FlowEditor = ({
           mainType: mainType,
           type: type,
           onDelete: handleDeleteNode,
-          onClick: handleClickOnNode
         }
       };
       setNodes((nds) => [...nds, newNode]);
       toast.success(`Added ${name}`);
     },
-    [setNodes, handleDeleteNode, handleClickOnNode]
+    [setNodes, handleDeleteNode ]
   );
 
-  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+  const handleNodeClick = useCallback((node: Node) => {
+    console.log("Node Clicked", node)
+
     const workflowNode: WorkflowNode = {
       id: node.id,
       name: node.data.name,
@@ -207,7 +186,7 @@ export const FlowEditor = ({
     }
     
     toast.success("Node updated");
-  }, [setNodes, selectedNode]);
+  }, [setNodes, selectedNode, setSelectedNode]);
 
   // Handle pending node addition
   useEffect(() => {
@@ -249,7 +228,7 @@ export const FlowEditor = ({
       const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(
         (workflow as WorkflowJSON),
         handleDeleteNode,
-        handleClickOnNode
+        handleNodeClick
       );
       setNodes(parsedNodes);
       setEdges(parsedEdges);
@@ -267,7 +246,6 @@ export const FlowEditor = ({
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onSelectionChange={onSelectionChange}
-          onNodeClick={handleNodeClick}
           nodeTypes={nodeTypes}
           connectionMode={ConnectionMode.Strict}
           fitView

@@ -168,16 +168,6 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
           </Label>
         </div>
       </Card>
-
-      <div>
-        <Label>Next Step ID</Label>
-        <Input
-          value={node.nextStepId || ""}
-          onChange={(e) => onUpdate({ nextStepId: e.target.value })}
-          placeholder="Node ID"
-          className="mt-1"
-        />
-      </div>
       <div className="flex items-center justify-between ">
         <Button size="sm" className="mt-1 w-full" onClick={saveConfig}>Save</Button>
       </div>

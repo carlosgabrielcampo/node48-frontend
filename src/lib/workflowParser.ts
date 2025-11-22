@@ -33,7 +33,7 @@ export interface WorkflowJSON {
 export const parseWorkflowJSON = (
   workflowJSON: WorkflowJSON,
   onDelete: (id: string) => void,
-  onClick: (id: string) => void
+  onClick: (id: string) => void,
 ): { nodes: Node[]; edges: Edge[] } => {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
