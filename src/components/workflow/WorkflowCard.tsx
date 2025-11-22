@@ -1,8 +1,8 @@
 import { formatDistanceToNow } from "date-fns";
-import { Clock, FileText } from "lucide-react";
+import { Clock, FileText, Trash2, Copy } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Workflow } from "@/services/workflowService";
-
+import { Button } from '@/components/ui/button'
 interface WorkflowCardProps {
   workflow: Workflow;
   onClick: () => void;
@@ -31,6 +31,22 @@ export const WorkflowCard = ({ workflow, onClick }: WorkflowCardProps) => {
               </CardDescription>
             )}
           </div>
+          <div className="flex items-center gap-2 pl-3 border-border">
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-label="Duplicate workflow"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label="Delete workflow"
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
         </div>
       </CardHeader>
       <CardContent>

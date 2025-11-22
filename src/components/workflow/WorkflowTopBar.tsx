@@ -13,7 +13,7 @@ export const WorkflowTopBar = ({
 }: WorkflowTopBarProps) => {
   const navigate = useNavigate()
   return (
-    <header className="h-14 border-b bg-background flex items-center justify-between p-6 z-40 bg-primary/10">
+    <header className="h-14 border-b bg-background flex items-center justify-between p-6 z-40">
         <div className="flex flex-row justify-between w-[100%] ">
           <div className="flex justify-between items-center">
             <Button

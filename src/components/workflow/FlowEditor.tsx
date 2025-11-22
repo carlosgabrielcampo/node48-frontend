@@ -4,8 +4,6 @@ import ReactFlow, {
   Controls,
   MiniMap,
   addEdge,
-  useNodesState,
-  useEdgesState,
   Connection,
   Edge,
   Node,
@@ -17,10 +15,7 @@ import { toast } from "sonner";
 import { WorkflowNode } from "@/types/workflow";
 import { v4 as uuidv4 } from 'uuid'
 
-import { parseWorkflowJSON, isWorkflowJSON, WorkflowJSON } from "@/lib/workflowParser";
-
-import { Label } from "../ui/label";
-import { Switch } from "../ui/switch";
+import { parseWorkflowJSON, WorkflowJSON } from "@/lib/workflowParser";
 import { DefaultNode } from "../nodes/DefaultNode";
 import { NodeConfigPanel } from "../config-panels/NodeConfigPanel";
 
@@ -39,11 +34,9 @@ interface FlowEditorProps {
   selectedNode: any;
   setConfigPanelOpen: any;
   configPanelOpen: any;
-  onAddNode: () => void;
 }
 
 export const FlowEditor = ({
-  onAddNode,
   onNodeAdded, 
   workflow, 
   nodes, 
@@ -63,6 +56,7 @@ export const FlowEditor = ({
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    console.log({onNodeAdded})
     if (onNodeAdded) {
       globalThis.__addWorkflowNode = (template: { mainType: string; type: string; name: string }) => { 
         setPendingNode(template); 
@@ -117,6 +111,7 @@ export const FlowEditor = ({
 
   const handleAddNode = useCallback(
     ({mainType, type, name}) => {
+      console.log("add node")
       const newNode: Node = {
         id: uuidv4(),
         type: mainType,
@@ -160,7 +155,7 @@ export const FlowEditor = ({
 
   const handleUpdateNode = useCallback((nodeId: string, updates: Partial<WorkflowNode>) => {
     setNodes((nds) =>
-      nds.map((node) =>
+      nds.map((node: Node) =>
         node.id === nodeId
           ? { 
               ...node, 
@@ -190,6 +185,7 @@ export const FlowEditor = ({
 
   // Handle pending node addition
   useEffect(() => {
+    console.log({pendingNode})
     if (pendingNode) {
       handleAddNode(pendingNode);
       setPendingNode(null);

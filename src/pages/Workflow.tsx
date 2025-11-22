@@ -7,6 +7,13 @@ import { WorkflowToolBar } from "@/components/workflow/WorkflowToolBar";
 import { NodeTypeDrawer } from "@/components/nodes/NodeTypeDrawer";
 import { useEdgesState, useNodesState } from "reactflow";
 import { WorkflowNode } from "@/types/workflow";
+interface Window {
+  __addWorkflowNode?: (args: {
+    mainType: string;
+    type: string;
+    name: string;
+  }) => void;
+}
 
 const Workflow = ({workflow}) => {
   const [isActive, setIsActive] = useState(false);
@@ -17,11 +24,10 @@ const Workflow = ({workflow}) => {
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
   const [configPanelOpen, setConfigPanelOpen] = useState(false);
 
-  const handleAddNode = useCallback(() => { setIsDrawerOpen(true); }, []);
   const handleNodeAdded = useCallback(({mainType, type, name}) => {
     // Trigger node addition in FlowEditor
-    if ((window as any).__addWorkflowNode) {
-      (window as any).__addWorkflowNode({mainType, type, name});
+    if ((window as Window).__addWorkflowNode) {
+      (window as Window).__addWorkflowNode({mainType, type, name});
     }
     setIsDrawerOpen(false);
   }, []);
@@ -45,12 +51,12 @@ const Workflow = ({workflow}) => {
             selectedNode={selectedNode}
             setConfigPanelOpen={setConfigPanelOpen}
             configPanelOpen={configPanelOpen}
-            onAddNode={handleAddNode}
+            setIsDrawerOpen={setIsDrawerOpen}
           />
-          <FlowEditor 
-            onAddNode={handleAddNode} 
-            workflow={workflow} 
-            nodes={nodes} 
+          <FlowEditor
+            onNodeAdded={handleNodeAdded}
+            workflow={workflow}
+            nodes={nodes}
             setNodes={setNodes} 
             onNodesChange={onNodesChange}
             edges={edges} 
