@@ -2,29 +2,13 @@ import { useCallback, useState, Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Save, Play, Copy, Trash2, Download, Plus, Upload } from "lucide-react";
+import { Save, Play, Download, Plus, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
-import { WorkflowNode } from "@/types/workflow";
+import { WorkflowNode } from "@/types/config-panels";
 import { MarkerType, Edge, Node } from "reactflow";
-import { WorkflowData } from "@/types/workflow";
-
-interface WorkflowToolBarProps {
-  workflowId?: string;
-  workflowName?: string;
-  isActive: boolean;
-  nodes: any;
-  setNodes: any;
-  edges: any;
-  setEdges: any;
-  setSelectedNode: any;
-  selectedNode: any;
-  setConfigPanelOpen: any;
-  configPanelOpen: any;
-  setWorkflowId: (id: string) => void;
-  setIsActive: Dispatch<SetStateAction<boolean>>;
-  setIsDrawerOpen: Dispatch<SetStateAction<boolean>>;
-}
+import { WorkflowData } from "@/types/config-panels";
+import { WorkflowToolBarProps } from "@/types/workflows";
 
 export const WorkflowToolBar = ({
   setIsActive,

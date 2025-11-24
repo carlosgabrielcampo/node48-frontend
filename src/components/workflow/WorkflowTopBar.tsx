@@ -2,15 +2,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import { WorkflowTopBarProps } from "@/types/workflows";
 
-interface WorkflowTopBarProps {
-  workflowId?: string;
-  workflowName?: string;
-}
 
-export const WorkflowTopBar = ({
-  workflowName = "Untitled Workflow",
-}: WorkflowTopBarProps) => {
+export const WorkflowTopBar = ({ workflowName = "Untitled Workflow" }: WorkflowTopBarProps) => {
   const navigate = useNavigate()
   return (
     <header className="h-14 border-b bg-background flex items-center justify-between p-6 z-40">

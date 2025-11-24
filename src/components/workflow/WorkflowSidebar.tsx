@@ -1,4 +1,4 @@
-import { LayoutDashboard, User, FolderKanban, FileText, ChevronLeft, ChevronRight, Workflow } from "lucide-react";
+import { LayoutDashboard, User, FileText, ChevronLeft, ChevronRight, Workflow } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -24,10 +24,7 @@ export const WorkflowSidebar = () => {
   const { open, toggleSidebar } = useSidebar();
 
   return (
-    <Sidebar 
-      collapsible="icon" 
-      className="transition-all duration-200 ease-in-out border-r border-sidebar-border"
-    >
+    <Sidebar collapsible="icon" className="transition-all duration-200 ease-in-out border-r border-sidebar-border">
       <SidebarContent className="relative">
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>

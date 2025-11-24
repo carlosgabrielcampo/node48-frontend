@@ -1,13 +1,6 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { WorkflowNode } from "@/types/workflow";
+import { WorkflowNode, NodeConfigPanelProps } from "@/types/config-panels";
 import { ConditionConfigPanel, ApiConfigPanel, CsvConfigPanel, LoopConfigPanel } from "./";
-
-interface NodeConfigPanelProps {
-  node: WorkflowNode | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onUpdate: (nodeId: string, updates: Partial<WorkflowNode>) => void;
-}
 
 export const NodeConfigPanel = ({
   node,

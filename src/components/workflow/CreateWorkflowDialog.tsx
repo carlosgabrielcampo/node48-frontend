@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { CreateWorkflowDialogProps } from "@/types/workflows";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
@@ -23,11 +24,7 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-interface CreateWorkflowDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess: (workflow: { name: string; description?: string }) => void;
-}
+
 
 export const CreateWorkflowDialog = ({ open, onOpenChange, onSuccess }: CreateWorkflowDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);

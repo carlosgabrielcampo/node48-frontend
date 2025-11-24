@@ -1,4 +1,4 @@
-import { WorkflowNode, ConditionBlock, ConditionRule } from "@/types/workflow";
+import { ConditionConfigPanelProps, ConditionBlock, ConditionRule } from "@/types/config-panels";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,10 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 
-interface ConditionConfigPanelProps {
-  node: WorkflowNode;
-  onUpdate: (updates: Partial<WorkflowNode>) => void;
-}
+
 
 export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelProps) => {
   // Handle config array format

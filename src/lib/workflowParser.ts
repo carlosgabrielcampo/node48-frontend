@@ -1,6 +1,4 @@
-import { nodeTemplates } from "@/components/workflow/nodes/Templates";
 import { Node, Edge, MarkerType } from "reactflow";
-import { string } from "zod";
 
 // Workflow JSON format (from backend)
 export interface WorkflowStep {

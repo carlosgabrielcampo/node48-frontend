@@ -1,4 +1,4 @@
-import { WorkflowNode, CsvConfig } from "@/types/workflow";
+import { CsvConfigPanelProps, CsvConfig } from "@/types/config-panels";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,11 +6,6 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-
-interface CsvConfigPanelProps {
-  node: WorkflowNode;
-  onUpdate: (updates: Partial<WorkflowNode>) => void;
-}
 
 export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
   const defaultConfig =  {

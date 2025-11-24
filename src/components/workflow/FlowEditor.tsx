@@ -12,29 +12,14 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { toast } from "sonner";
-import { WorkflowNode } from "@/types/workflow";
+import { WorkflowNode } from "@/types/config-panels";
 import { v4 as uuidv4 } from 'uuid'
-
+import { FlowEditorProps } from "@/types/workflows";
 import { parseWorkflowJSON, WorkflowJSON } from "@/lib/workflowParser";
 import { DefaultNode } from "../nodes/DefaultNode";
 import { NodeConfigPanel } from "../config-panels/NodeConfigPanel";
 
 const nodeTypes = { "custom": DefaultNode };
-
-interface FlowEditorProps {
-  onNodeAdded?: ({mainType, type, name}) => void;
-  workflow: WorkflowJSON | null;
-  nodes: any;
-  setNodes: any;
-  edges: any;
-  setEdges: any;
-  onEdgesChange: any;
-  onNodesChange: any;
-  setSelectedNode: any;
-  selectedNode: any;
-  setConfigPanelOpen: any;
-  configPanelOpen: any;
-}
 
 export const FlowEditor = ({
   onNodeAdded, 
@@ -132,7 +117,7 @@ export const FlowEditor = ({
     [setNodes, handleDeleteNode ]
   );
 
-  const handleNodeClick = useCallback((node: Node) => {
+  const handleNodeClick = useCallback((node) => {
     console.log("Node Clicked", node)
 
     const workflowNode: WorkflowNode = {

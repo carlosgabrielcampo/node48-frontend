@@ -1,4 +1,4 @@
-import { WorkflowNode, LoopConfigEntry, LoopFormatField } from "@/types/workflow";
+import { LoopConfigEntry, LoopFormatField, LoopConfigPanelProps } from "@/types/config-panels";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,11 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-
-interface LoopConfigPanelProps {
-  node: WorkflowNode;
-  onUpdate: (updates: Partial<WorkflowNode>) => void;
-}
 
 export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
   const newEntry: LoopConfigEntry = {

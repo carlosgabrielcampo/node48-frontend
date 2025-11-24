@@ -1,5 +1,5 @@
 // Node types
-export type NodeType = "action" | "operation" | "trigger" | "condition" | "api" | "loop" | "csv";
+export type NodeType = "custom";
 
 // Condition node types
 export interface ConditionRule {
@@ -97,4 +97,31 @@ export interface WorkflowConnection {
 export interface WorkflowData {
   nodes: WorkflowNode[];
   connections: WorkflowConnection[];
+}
+
+export interface LoopConfigPanelProps {
+  node: WorkflowNode;
+  onUpdate: (updates: Partial<WorkflowNode>) => void;
+}
+
+export interface NodeConfigPanelProps {
+  node: WorkflowNode | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onUpdate: (nodeId: string, updates: Partial<WorkflowNode>) => void;
+}
+
+export interface CsvConfigPanelProps {
+  node: WorkflowNode;
+  onUpdate: (updates: Partial<WorkflowNode>) => void;
+}
+
+export interface ConditionConfigPanelProps {
+  node: WorkflowNode;
+  onUpdate: (updates: Partial<WorkflowNode>) => void;
+}
+
+export interface ApiConfigPanelProps {
+  node: WorkflowNode;
+  onUpdate: (updates: Partial<WorkflowNode>) => void;
 }

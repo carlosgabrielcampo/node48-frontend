@@ -6,7 +6,7 @@ import { FlowEditor } from "@/components/workflow/FlowEditor";
 import { WorkflowToolBar } from "@/components/workflow/WorkflowToolBar";
 import { NodeTypeDrawer } from "@/components/nodes/NodeTypeDrawer";
 import { useEdgesState, useNodesState } from "reactflow";
-import { WorkflowNode } from "@/types/workflow";
+import { WorkflowNode } from "@/types/config-panels";
 interface Window {
   __addWorkflowNode?: (args: {
     mainType: string;

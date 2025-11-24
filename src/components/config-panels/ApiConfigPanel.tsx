@@ -1,15 +1,10 @@
-import { WorkflowNode, ApiConfig } from "@/types/workflow";
+import { ApiConfigPanelProps, ApiConfig } from "@/types/config-panels";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
-
-interface ApiConfigPanelProps {
-  node: WorkflowNode;
-  onUpdate: (updates: Partial<WorkflowNode>) => void;
-}
 
 export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
   const config = (node.config as ApiConfig) || {

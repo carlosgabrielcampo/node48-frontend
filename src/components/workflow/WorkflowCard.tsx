@@ -1,12 +1,8 @@
 import { formatDistanceToNow } from "date-fns";
 import { Clock, FileText, Trash2, Copy } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Workflow } from "@/services/workflowService";
 import { Button } from '@/components/ui/button'
-interface WorkflowCardProps {
-  workflow: Workflow;
-  onClick: () => void;
-}
+import { WorkflowCardProps } from "@/types/workflows";
 
 export const WorkflowCard = ({ workflow, onClick }: WorkflowCardProps) => {
   const formattedDate = formatDistanceToNow(new Date(workflow.createdAtUTC), {

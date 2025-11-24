@@ -16,9 +16,10 @@ interface DefaultNodeData {
 }
 
 export const DefaultNode = memo(({ id, data, selected }: NodeProps<DefaultNodeData>) => {
+  console.log({data})
   const Icon = nodeTemplates[data.type]?.icon || Cog;
   const outputHandles = Object.entries(data.connections).map(([source, target]) => {return {source, target}});;
-  const nodeHeight = 80 + (outputHandles.length > 2 ? (outputHandles.length - 2) * 30 : 0);
+  const nodeHeight = 80 + (outputHandles?.length > 2 ? (outputHandles?.length - 2) * 30 : 0);
 
   return (
     <div
