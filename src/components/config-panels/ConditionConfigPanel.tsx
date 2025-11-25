@@ -10,10 +10,10 @@ import { Plus, Trash2 } from "lucide-react";
 
 export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelProps) => {
   // Handle config array format
-  const conditions = (node.config as ConditionBlock[]) || [];
+  const conditions = (node.parameters as ConditionBlock[]) || [];
 
   const updateConditions = (newConditions: ConditionBlock[]) => {
-    onUpdate({ config: newConditions });
+    onUpdate({ parameters: newConditions });
   };
 
   const addCondition = () => {

@@ -9,7 +9,6 @@ interface DefaultNodeData {
   mainType: string;
   onDelete: (id: string) => void;
   onClick?: (data: any) => void;
-  config?: any[];
   connections: any[];
   errorStepId?: string;
   nextStepId?: string;

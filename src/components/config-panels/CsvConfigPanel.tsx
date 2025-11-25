@@ -21,9 +21,9 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
       separator: ";",
     },
   };
-  const [stateConfig, setConfig] = useState<CsvConfig>((node.config as CsvConfig) ?? defaultConfig);
+  const [stateConfig, setConfig] = useState<CsvConfig>((node.parameters as CsvConfig) ?? defaultConfig);
   const saveConfig = () => {
-    onUpdate({ config: { ...node.config, ...stateConfig } });
+    onUpdate({ parameters: { ...node.parameters, ...stateConfig } });
   }
 
   const updateConfig = (updates: Partial<CsvConfig>) => {

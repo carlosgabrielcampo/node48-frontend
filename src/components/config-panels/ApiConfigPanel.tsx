@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 
 export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
-  const config = (node.config as ApiConfig) || {
+  const parameters = (node.parameters as ApiConfig) || {
     baseUrl: "",
     endpoint: "",
     method: "GET",
@@ -17,34 +17,34 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
   };
 
   const updateConfig = (updates: Partial<ApiConfig>) => {
-    onUpdate({ config: { ...config, ...updates } });
+    onUpdate({ parameters: { ...parameters, ...updates } });
   };
 
   const addHeader = () => {
-    updateConfig({ headers: { ...config.headers, "": "" } });
+    updateConfig({ headers: { ...parameters.headers, "": "" } });
   };
 
   const removeHeader = (key: string) => {
-    const { [key]: _, ...rest } = config.headers;
+    const { [key]: _, ...rest } = parameters.headers;
     updateConfig({ headers: rest });
   };
 
   const updateHeader = (oldKey: string, newKey: string, value: string) => {
-    const { [oldKey]: _, ...rest } = config.headers;
+    const { [oldKey]: _, ...rest } = parameters.headers;
     updateConfig({ headers: { ...rest, [newKey]: value } });
   };
 
   const addBodyField = () => {
-    updateConfig({ body: { ...config.body, "": "" } });
+    updateConfig({ body: { ...parameters.body, "": "" } });
   };
 
   const removeBodyField = (key: string) => {
-    const { [key]: _, ...rest } = config.body;
+    const { [key]: _, ...rest } = parameters.body;
     updateConfig({ body: rest });
   };
 
   const updateBodyField = (oldKey: string, newKey: string, value: string) => {
-    const { [oldKey]: _, ...rest } = config.body;
+    const { [oldKey]: _, ...rest } = parameters.body;
     updateConfig({ body: { ...rest, [newKey]: value } });
   };
 
@@ -53,7 +53,7 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
       <div>
         <Label>Base URL</Label>
         <Input
-          value={config.baseUrl}
+          value={parameters.baseUrl}
           onChange={(e) => updateConfig({ baseUrl: e.target.value })}
           placeholder="http://localhost:3009"
           className="mt-1"
@@ -63,7 +63,7 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
       <div>
         <Label>Endpoint</Label>
         <Input
-          value={config.endpoint}
+          value={parameters.endpoint}
           onChange={(e) => updateConfig({ endpoint: e.target.value })}
           placeholder="/api/webhook/status"
           className="mt-1"
@@ -72,7 +72,7 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
 
       <div>
         <Label>Method</Label>
-        <Select value={config.method} onValueChange={(value) => updateConfig({ method: value })}>
+        <Select value={parameters.method} onValueChange={(value) => updateConfig({ method: value })}>
           <SelectTrigger className="mt-1">
             <SelectValue />
           </SelectTrigger>
@@ -89,18 +89,8 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
       <div>
         <Label>Response Format</Label>
         <Input
-          value={config.reponseFormat}
+          value={parameters.reponseFormat}
           onChange={(e) => updateConfig({ reponseFormat: e.target.value })}
-          className="mt-1"
-        />
-      </div>
-
-      <div>
-        <Label>Output Variable</Label>
-        <Input
-          value={node.outputVar || ""}
-          onChange={(e) => onUpdate({ outputVar: e.target.value })}
-          placeholder="apiAutorizados"
           className="mt-1"
         />
       </div>
@@ -123,7 +113,7 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
             Add
           </Button>
         </div>
-        {Object.entries(config.headers).map(([key, value]) => (
+        {Object.entries(parameters.headers).map(([key, value]) => (
           <div key={key} className="flex gap-2">
             <Input
               value={key}
@@ -152,7 +142,7 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
             Add
           </Button>
         </div>
-        {Object.entries(config.body).map(([key, value]) => (
+        {Object.entries(parameters.body).map(([key, value]) => (
           <div key={key} className="flex gap-2">
             <Input
               value={key}

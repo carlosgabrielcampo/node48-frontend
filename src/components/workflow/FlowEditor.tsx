@@ -108,10 +108,9 @@ export const FlowEditor = ({
                 ...node.data, 
                 ...updates,
                 name: updates.name || node.data.name,
-                config: updates.config !== undefined ? updates.config : node.data.config,
+                parameters: updates.parameters !== undefined ? updates.parameters : node.data.parameters,
                 list: updates.list !== undefined ? updates.list : node.data.list,
               }, 
-              position: updates.position || node.position 
             }
           : node
       )

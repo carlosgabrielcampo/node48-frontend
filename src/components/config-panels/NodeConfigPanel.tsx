@@ -1,6 +1,6 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { WorkflowNode, NodeConfigPanelProps } from "@/types/config-panels";
-import { ConditionConfigPanel, ApiConfigPanel, CsvConfigPanel, LoopConfigPanel } from "./";
+import { parametersPanels } from "./";
 
 export const NodeConfigPanel = ({
   node,
@@ -15,21 +15,15 @@ export const NodeConfigPanel = ({
   };
 
   const renderConfigPanel = () => {
-    switch (node?.type) {
-      case "conditional_operation":
-        return <ConditionConfigPanel node={node} onUpdate={handleUpdate} />;
-      case "api_call":
-        return <ApiConfigPanel node={node} onUpdate={handleUpdate} />;
-      case "loop_operation":
-        return <LoopConfigPanel node={node} onUpdate={handleUpdate} />;
-      case "read_csv":
-        return <CsvConfigPanel node={node} onUpdate={handleUpdate} />;
-      default:
+
+    if(!parametersPanels[node?.type]){
         return (
           <div className="text-sm text-muted-foreground">
             No configuration available for {node?.type} nodes.
           </div>
         );
+    } else {
+      return parametersPanels[node?.type](node, handleUpdate)
     }
   };
   console.log({Sheet: node})

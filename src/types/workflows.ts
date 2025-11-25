@@ -64,7 +64,7 @@ export interface WorkflowStep {
   nextStepId?: string;
   errorStepId?: string;
   outputVar?: string;
-  config?: any;
+  parameters?: any;
   list?: any;
   Conditions?: any[];
 }

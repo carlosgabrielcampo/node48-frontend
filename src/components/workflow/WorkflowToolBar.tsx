@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Save, Play, Download, Plus, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
-import { WorkflowNode } from "@/types/config-panels";
 import { MarkerType, Edge, Node } from "reactflow";
 import { WorkflowData } from "@/types/config-panels";
 import { WorkflowToolBarProps } from "@/types/workflows";

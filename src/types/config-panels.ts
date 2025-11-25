@@ -64,7 +64,7 @@ export interface WorkflowNode {
   data: Record<string, any>
   
   // Config can be different types based on node type
-  config?: ApiConfig | CsvConfig | LoopConfigEntry[] | ConditionBlock[];
+  parameters?: ApiConfig | CsvConfig | LoopConfigEntry[] | ConditionBlock[];
   list?: {
     timeoutMs: number;
     keys: string[];
