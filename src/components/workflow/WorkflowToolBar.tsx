@@ -9,26 +9,27 @@ import { WorkflowNode } from "@/types/config-panels";
 import { MarkerType, Edge, Node } from "reactflow";
 import { WorkflowData } from "@/types/config-panels";
 import { WorkflowToolBarProps } from "@/types/workflows";
-
+import { createNode } from "../nodes/NodeDataStructure";
 export const WorkflowToolBar = ({
   setIsActive,
   isActive,
-  setSelectedNode,
-  setConfigPanelOpen,
   setWorkflowId,
   setIsDrawerOpen,
   nodes,
   setNodes,
   edges,
-  setEdges
+  setEdges,
+  handleNodeClick,
+  handleDeleteNode
 }: WorkflowToolBarProps) => {
 
   const [isSaving, setIsSaving] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
 
-  const onAddNode = useCallback(() => { setIsDrawerOpen(true); }, []);
-
+  const onAddNode = useCallback(() => { 
+    setIsDrawerOpen(true); 
+  }, []);
   const onSave = async () => {
     // Simulating API call - replace with actual endpoint
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -79,43 +80,6 @@ export const WorkflowToolBar = ({
       setIsToggling(false);
     }
   };
-  const handleDuplicate = () => {
-    toast.info("Duplicate feature coming soon");
-  };
-  const handleDelete = () => {
-    toast.info("Delete feature coming soon");
-  };
-  const handleDeleteNode = useCallback(
-    (nodeId: string) => {
-      setNodes((nds) => nds.filter((node) => node.id !== nodeId));
-      setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
-      toast.success("Node deleted");
-    },
-    [setNodes, setEdges]
-  );
-  const handleClickOnNode = useCallback((id: string) => {
-    const node = nodes.find(n => n.id === id);
-    if (node) {
-      const workflowNode: WorkflowNode = {
-        id: node.id,
-        name: node.data.name,
-        position: node.position,
-        type: node.data.type,
-        data: node.data,
-        // Extract common workflow properties from data
-        config: node.data.config,
-        nextStepId: node.data.nextStepId,
-        errorStepId: node.data.errorStepId,
-        outputVar: node.data.outputVar,
-        list: node.data.list,
-        workflowId: node.data.workflowId,
-        createdAtUTC: node.data.createdAtUTC,
-      };
-      setSelectedNode(workflowNode);
-      setConfigPanelOpen(true);
-    }
-  }, [nodes, setConfigPanelOpen, setSelectedNode])
-
   const handleExport = useCallback(() => {
     const workflowData: WorkflowData = {
       nodes: nodes.map((node) => ({
@@ -161,24 +125,16 @@ export const WorkflowToolBar = ({
           const jsonData = JSON.parse(e.target?.result as string);
           // Check if it's the new workflow JSON format
           if (isWorkflowJSON(jsonData)) {
-            const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(jsonData, handleDeleteNode, handleClickOnNode);
+            const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(jsonData, handleDeleteNode, handleNodeClick);
             setNodes(parsedNodes);
             setEdges(parsedEdges);
             toast.success(`Workflow "${jsonData.name}" imported with ${parsedNodes.length} nodes`);
           } else {
             // Legacy format
             const workflowData: WorkflowData = jsonData;
-            const importedNodes: Node[] = workflowData.nodes.map((node) => ({
-              id: node.id,
-              position: node.position,
-              type: node.data.type,
-              data: {
-                mainType: node.data.mainType,
-                type: node.data.type,
-                name: node.name,
-                onDelete: handleDeleteNode,
-              },
-            }));
+            const importedNodes: Node[] = workflowData.nodes.map((node) => ( 
+              createNode({id: node.id, position: node.position, connections: node.data.connections, type: node.data.type, onDelete: handleDeleteNode, onClick: handleNodeClick})
+            ));
             const importedEdges: Edge[] = workflowData.connections.map((conn) => ({
               id: conn.id,
               source: conn.source.nodeId,
@@ -203,7 +159,7 @@ export const WorkflowToolBar = ({
       reader.readAsText(file);
       event.target.value = "";
     },
-    [setNodes, setEdges, handleDeleteNode, handleClickOnNode]
+    [setNodes, setEdges, handleDeleteNode, handleNodeClick]
   );
 
   return (

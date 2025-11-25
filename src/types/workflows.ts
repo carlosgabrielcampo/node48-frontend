@@ -14,6 +14,8 @@ export interface FlowEditorProps {
   selectedNode: any;
   setConfigPanelOpen: any;
   configPanelOpen: any;
+  handleNodeClick: any;
+  handleDeleteNode: any;
 }
 
 export interface CreateWorkflowDialogProps {
@@ -47,4 +49,33 @@ export interface WorkflowToolBarProps {
   setWorkflowId: (id: string) => void;
   setIsActive: Dispatch<SetStateAction<boolean>>;
   setIsDrawerOpen: Dispatch<SetStateAction<boolean>>;
+  handleNodeClick: any;
+  handleDeleteNode: any;
+}
+
+export interface WorkflowStep {
+  id: string;
+  workflowId?: string;
+  name?: string;
+  type: string;
+  connections: Record<string, string>,
+  createdAtUTC?: string;
+  position: { x: number; y: number };
+  nextStepId?: string;
+  errorStepId?: string;
+  outputVar?: string;
+  config?: any;
+  list?: any;
+  Conditions?: any[];
+}
+
+export interface WorkflowJSON {
+  id: string;
+  name: string;
+  description?: string;
+  createdAtUTC?: string;
+  updatedAtUTC?: string;
+  startStep: string;
+  settings?: any;
+  steps: Record<string, WorkflowStep>;
 }

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { Zap, Cog, Search, Power } from "lucide-react";
+import { Cog, Search } from "lucide-react";
 import { v4 as uuidv4} from 'uuid'
 import { nodeTemplates } from "./Templates";
 
@@ -31,8 +31,8 @@ export const NodeTypeDrawer = ({
       template.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSelectNode = ({mainType, type, name}) => {
-    onSelectNodeType({mainType, type, name});
+  const handleSelectNode = (node: any) => {
+    onSelectNodeType(node);
     onOpenChange(false);
     setSearchQuery("");
   };
@@ -62,19 +62,11 @@ export const NodeTypeDrawer = ({
           <ScrollArea className="h-[calc(100vh-200px)]">
             <div className="space-y-2 pr-4">
               {filteredTemplates.map((template) => {
-                let Icon =  Cog;
-                switch (template.mainType) {
-                  case "action":
-                    Icon = Zap;
-                    break;
-                  case "trigger":
-                    Icon = Power;
-                    break;
-                }
+                const Icon = nodeTemplates[template.type]?.icon || Cog;
                 return (
                   <button
                     key={uuidv4()}
-                    onClick={() => handleSelectNode({mainType: template.mainType, type: template.type, name: template.name})}
+                    onClick={() => handleSelectNode({mainType: "custom", type: template.type, name: template.name})}
                     className="w-full p-4 rounded-lg border bg-card hover:bg-accent transition-colors text-left"
                     aria-label={`Add ${template.name} node`}
                   >
@@ -88,7 +80,7 @@ export const NodeTypeDrawer = ({
                           {template.description}
                         </p>
                         <span className="inline-block mt-2 text-xs px-2 py-1 rounded-full bg-muted capitalize">
-                          {template.mainType}
+                          {template.type}
                         </span>
                       </div>
                     </div>

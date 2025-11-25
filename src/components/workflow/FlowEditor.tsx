@@ -15,9 +15,11 @@ import { toast } from "sonner";
 import { WorkflowNode } from "@/types/config-panels";
 import { v4 as uuidv4 } from 'uuid'
 import { FlowEditorProps } from "@/types/workflows";
-import { parseWorkflowJSON, WorkflowJSON } from "@/lib/workflowParser";
+import { parseWorkflowJSON } from "@/lib/workflowParser";
 import { DefaultNode } from "../nodes/DefaultNode";
 import { NodeConfigPanel } from "../config-panels/NodeConfigPanel";
+import { createEmptyNode } from "../nodes/NodeDataStructure";
+import { WorkflowJSON } from "@/types/workflows";
 
 const nodeTypes = { "custom": DefaultNode };
 
@@ -34,17 +36,19 @@ export const FlowEditor = ({
   selectedNode,
   setConfigPanelOpen,
   configPanelOpen,
+  handleNodeClick,
+  handleDeleteNode
 }: FlowEditorProps) => {
 
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
-  const [pendingNode, setPendingNode] = useState<{ mainType: string; type: string; name: string } | null>(null);
+  const [pendingNode, setPendingNode] = useState<any>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log({onNodeAdded})
     if (onNodeAdded) {
-      globalThis.__addWorkflowNode = (template: { mainType: string; type: string; name: string }) => { 
-        setPendingNode(template); 
+      globalThis.__addWorkflowNode = (node) => {
+      console.log({node})
+        setPendingNode(node); 
       };
     }
     return () => { delete (globalThis).__addWorkflowNode; };
@@ -57,10 +61,9 @@ export const FlowEditor = ({
         toast.error("Cannot connect a node to itself");
         return;
       }
-
       const newEdge: Edge = {
         ...connection,
-        id: `${connection.source}|${connection.target}`,
+        id: uuidv4(),
         type: "smoothstep",
         animated: false,
         style: { stroke: "hsl(var(--primary))", strokeWidth: 2 },
@@ -84,59 +87,16 @@ export const FlowEditor = ({
     setSelectedElements(selectedIds);
   }, []);
 
-  const handleDeleteNode = useCallback(
-    (nodeId: string) => {
-      setNodes((nds) => nds.filter((node) => node.id !== nodeId));
-      setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
-      toast.success("Node deleted");
-    },
-    [setNodes, setEdges]
-  );
-
-
   const handleAddNode = useCallback(
-    ({mainType, type, name}) => {
-      console.log("add node")
-      const newNode: Node = {
-        id: uuidv4(),
-        type: mainType,
-        position: {
-          x: Math.random() * 400 + 100,
-          y: Math.random() * 300 + 100,
-        },
-        data: {
-          name,
-          mainType: mainType,
-          type: type,
-          onDelete: handleDeleteNode,
-        }
-      };
+    ({type}) => {
+      const newNode: Node = createEmptyNode({ type, onDelete: handleDeleteNode, onClick: handleNodeClick });
       setNodes((nds) => [...nds, newNode]);
-      toast.success(`Added ${name}`);
+      toast.success(`Added ${type}`);
     },
-    [setNodes, handleDeleteNode ]
+    [setNodes, handleDeleteNode, handleNodeClick ]
   );
 
-  const handleNodeClick = useCallback((node) => {
-    console.log("Node Clicked", node)
-
-    const workflowNode: WorkflowNode = {
-      id: node.id,
-      name: node.data.name,
-      position: node.position,
-      type: node.data.type,
-      data: node.data,
-      config: node.data.config,
-      nextStepId: node.data.nextStepId,
-      errorStepId: node.data.errorStepId,
-      outputVar: node.data.outputVar,
-      list: node.data.list,
-      workflowId: node.data.workflowId,
-      createdAtUTC: node.data.createdAtUTC,
-    };
-    setSelectedNode(workflowNode);
-    setConfigPanelOpen(true);
-  }, []);
+ 
 
   const handleUpdateNode = useCallback((nodeId: string, updates: Partial<WorkflowNode>) => {
     setNodes((nds) =>
@@ -149,9 +109,6 @@ export const FlowEditor = ({
                 ...updates,
                 name: updates.name || node.data.name,
                 config: updates.config !== undefined ? updates.config : node.data.config,
-                nextStepId: updates.nextStepId !== undefined ? updates.nextStepId : node.data.nextStepId,
-                errorStepId: updates.errorStepId !== undefined ? updates.errorStepId : node.data.errorStepId,
-                outputVar: updates.outputVar !== undefined ? updates.outputVar : node.data.outputVar,
                 list: updates.list !== undefined ? updates.list : node.data.list,
               }, 
               position: updates.position || node.position 
@@ -170,7 +127,6 @@ export const FlowEditor = ({
 
   // Handle pending node addition
   useEffect(() => {
-    console.log({pendingNode})
     if (pendingNode) {
       handleAddNode(pendingNode);
       setPendingNode(null);
@@ -213,8 +169,12 @@ export const FlowEditor = ({
       );
       setNodes(parsedNodes);
       setEdges(parsedEdges);
+    } else {
+      setNodes([]);
+      setEdges([]);
     }
   },[])
+  
   console.log({edges, nodes})
   return (
     <div className="flex-1 flex flex-col" ref={reactFlowWrapper}>

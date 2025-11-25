@@ -15,7 +15,7 @@ export const NodeConfigPanel = ({
   };
 
   const renderConfigPanel = () => {
-    switch (node?.data?.type) {
+    switch (node?.type) {
       case "conditional_operation":
         return <ConditionConfigPanel node={node} onUpdate={handleUpdate} />;
       case "api_call":
@@ -32,13 +32,13 @@ export const NodeConfigPanel = ({
         );
     }
   };
-
+  console.log({Sheet: node})
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-[500px] sm:max-w-[500px] overflow-y-auto">
         <SheetHeader>
           <SheetTitle>
-            Configure {node.data.name || node.data.type}
+            Configure {node?.name || node?.type}
           </SheetTitle>
         </SheetHeader>
         <div className="mt-6">

@@ -1,6 +1,3 @@
-// Node types
-export type NodeType = "custom";
-
 // Condition node types
 export interface ConditionRule {
   field: string;
@@ -60,13 +57,10 @@ export interface CsvConfig {
 export interface WorkflowNode {
   id: string;
   name: string;
-  position: { x: number; y: number };
   workflowId?: string;
   createdAtUTC?: string;
-  nextStepId?: string;
-  errorStepId?: string;
-  outputVar?: string;
-  type: NodeType,
+
+  type: string,
   data: Record<string, any>
   
   // Config can be different types based on node type
