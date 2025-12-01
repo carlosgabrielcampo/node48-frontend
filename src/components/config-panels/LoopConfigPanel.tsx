@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2, PenBox } from "lucide-react";
 import { useState } from "react";
+import { Dropdown } from "../layout/dropdown";
 
 export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
   const newEntry: LoopConfigEntry = {
@@ -91,22 +92,15 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
               className="mt-1"
             />
           </div>
-
-          <div>
-            <Label className="text-xs">Type</Label>
-            <Select
-              value={entry.type}
-              onValueChange={(value: "format" | "create") => updateConfigEntry(index, { type: value })}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="format">Format</SelectItem>
-                <SelectItem value="create">Create</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          
+          <Dropdown itemList={[
+            {value: "format", displayName: "Format"},
+            {value: "create", displayName: "Create"},
+          ]} 
+            label={"Type"}
+            onValueChange={(value: "format" | "create") => updateConfigEntry(index, { type: value })}
+            value={entry.type}
+          />
 
           {entry.type === "format" && (
             <div className="space-y-2">

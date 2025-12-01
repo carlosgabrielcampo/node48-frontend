@@ -71,9 +71,7 @@ export const DefaultNode = memo(({ id, data, selected }: NodeProps<DefaultNodeDa
           const totalHandles = outputHandles.length;        
           return (
             <div key={source} className="flex  relative min-w-[100%] h-[40px]  justify-center items-center">
-              <div className="rounded-lg min-w-[90%] border-2 h-[90%]  border-2  items-center">
-                
-              </div>
+              <div className="rounded-lg min-w-[90%] border-2 h-[90%] border-2 items-center"/>
               <Handle
                 type="source"
                 id={source}

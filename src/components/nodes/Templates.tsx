@@ -1,5 +1,5 @@
 import { ForwardRefExoticComponent } from "react";
-import { LucideProps, Power, Zap, Cog, Network } from "lucide-react";
+import { LucideProps, Power, Zap, Cog, Network, RefreshCcw,  } from "lucide-react";
 
 interface NodeTypeOption {
     type: string,
@@ -80,7 +80,7 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
     type: "loop_operation",
     name: "Loop",
     description: "Iterate over data with format or create operations",
-    icon: Cog,
+    icon: RefreshCcw,
   },
   "read_csv":{
     type: "read_csv",

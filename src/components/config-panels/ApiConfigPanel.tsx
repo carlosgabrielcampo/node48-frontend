@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
+import { Dropdown } from "../layout/dropdown";
 
 export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
   const parameters = (node.parameters as ApiConfig) || {
@@ -69,31 +70,26 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
           className="mt-1"
         />
       </div>
+      <Dropdown itemList={[
+        {value: "GET", displayName: "GET"},
+        {value: "POST", displayName: "POST"},
+        {value: "PUT", displayName: "PUT"},
+        {value: "DELETE", displayName: "DELETE"},
+        {value: "PATCH", displayName: "PATCH"},
+      ]} 
+        label={"Method"}
+        onValueChange={(value) => updateConfig({ method: value })}
+        value={parameters.method}
+      />
 
-      <div>
-        <Label>Method</Label>
-        <Select value={parameters.method} onValueChange={(value) => updateConfig({ method: value })}>
-          <SelectTrigger className="mt-1">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="GET">GET</SelectItem>
-            <SelectItem value="POST">POST</SelectItem>
-            <SelectItem value="PUT">PUT</SelectItem>
-            <SelectItem value="DELETE">DELETE</SelectItem>
-            <SelectItem value="PATCH">PATCH</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <Label>Response Format</Label>
-        <Input
-          value={parameters.reponseFormat}
-          onChange={(e) => updateConfig({ reponseFormat: e.target.value })}
-          className="mt-1"
-        />
-      </div>
+      <Dropdown itemList={[
+        {value: "json", displayName: "json"},
+        {value: "text", displayName: "text"},
+      ]} 
+        label={"Response Format"}
+        onValueChange={(value) => updateConfig({ reponseFormat: value })}
+        value={parameters.reponseFormat}
+      />
 
       <div>
         <Label>Timeout (ms)</Label>

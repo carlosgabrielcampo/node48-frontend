@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
+import { Dropdown } from "../layout/dropdown";
 
 
 
@@ -92,22 +93,15 @@ export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelPro
                 />
               </div>
 
-              <div>
-                <Label className="text-xs">Type</Label>
-                <Select
-                  value={rule.type}
-                  onValueChange={(value) => updateRule(condIndex, ruleIndex, { type: value })}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="regex">Regex</SelectItem>
-                    <SelectItem value="equals">Equals</SelectItem>
-                    <SelectItem value="contains">Contains</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <Dropdown itemList={[
+                {value: "regex", displayName: "Regex"},
+                {value: "equals", displayName: "Equals"},
+                {value: "contains", displayName: "Contains"},
+              ]} 
+                label={"Type"}
+                onValueChange={(value) => updateRule(condIndex, ruleIndex, { type: value })}
+                value={rule.type}
+              />
 
               <div>
                 <Label className="text-xs">Validator</Label>

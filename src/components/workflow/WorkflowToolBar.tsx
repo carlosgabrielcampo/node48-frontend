@@ -167,19 +167,16 @@ export const WorkflowToolBar = ({
         className="gap-2"
       >
         <Plus className="h-4 w-4" />
-        Add Node
       </Button>
       <Button
         onClick={handleExport}
         size="sm" variant="outline" className="gap-2">
         <Download className="h-4 w-4" />
-        Export
       </Button>
       <label>
         <Button size="sm" variant="outline" className="gap-2" asChild>
           <span>
             <Upload className="h-4 w-4" />
-            Import
           </span>
         </Button>
         <input
@@ -199,7 +196,6 @@ export const WorkflowToolBar = ({
           aria-label="Toggle workflow active state"
         />
         <Label htmlFor="workflow-active" className="text-sm cursor-pointer whitespace-nowrap">
-          {isActive ? "Active" : "Inactive"}
         </Label>
       </div>
 
@@ -210,18 +206,15 @@ export const WorkflowToolBar = ({
         disabled={isRunning}
         aria-label="Execute workflow"
       >
-        <Play className="h-4 w-4 mr-2" />
-        {isRunning ? "Running..." : "Run"}
+        <Play />
       </Button>
-
       <Button
         size="sm"
         onClick={handleSave}
         disabled={isSaving}
         aria-label="Save workflow"
       >
-        <Save className="h-4 w-4 mr-2" />
-        {isSaving ? "Saving..." : "Save"}
+        <Save className="" />
       </Button>
     </div>
   );
