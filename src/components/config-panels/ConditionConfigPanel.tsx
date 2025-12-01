@@ -10,8 +10,8 @@ import { Dropdown } from "../layout/dropdown";
 
 
 export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelProps) => {
-  // Handle config array format
-  const conditions = (node.parameters as ConditionBlock[]) || [];
+  // Ensure parameters is always an array of ConditionBlock
+  const conditions = (Array.isArray(node.parameters) ? node.parameters : []) as ConditionBlock[];
 
   const updateConditions = (newConditions: ConditionBlock[]) => {
     onUpdate({ parameters: newConditions });

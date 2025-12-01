@@ -8,7 +8,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
-  const defaultConfig =  {
+  const defaultConfig: CsvConfig =  {
     filePath: "",
     encoding: "utf-8",
     type: "csv",
@@ -20,10 +20,27 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
       strict: true,
       separator: ";",
     },
+    outputVar: "",
+    nextStepId: ""
   };
-  const [stateConfig, setConfig] = useState<CsvConfig>((node.parameters as CsvConfig) ?? defaultConfig);
+  
+  // Handle parameters as array (JSON format) or object (legacy)
+  const getInitialConfig = (): CsvConfig => {
+    if (Array.isArray(node.parameters)) {
+      const firstParam = node.parameters[0];
+      // Type guard to check if it's a CsvConfig
+      if (firstParam && 'filePath' in firstParam && 'encoding' in firstParam) {
+        return firstParam as CsvConfig;
+      }
+    }
+    return defaultConfig;
+  };
+  
+  const [stateConfig, setConfig] = useState<CsvConfig>(getInitialConfig());
+  
   const saveConfig = () => {
-    onUpdate({ parameters: { ...node.parameters, ...stateConfig } });
+    // Update as array to match JSON format
+    onUpdate({ parameters: [{ ...stateConfig }] });
   }
 
   const updateConfig = (updates: Partial<CsvConfig>) => {
@@ -99,9 +116,19 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
       <div>
         <Label>Output Variable</Label>
         <Input
-          value={(node.data?.outputVar as string) || ""}
-          onChange={(e) => onUpdate({ data: { ...node.data, outputVar: e.target.value } })}
+          value={stateConfig.outputVar || ""}
+          onChange={(e) => updateConfig({ outputVar: e.target.value })}
           placeholder="Autorizados"
+          className="mt-1"
+        />
+      </div>
+      
+      <div>
+        <Label>Next Step ID</Label>
+        <Input
+          value={stateConfig.nextStepId || ""}
+          onChange={(e) => updateConfig({ nextStepId: e.target.value })}
+          placeholder="Next step identifier"
           className="mt-1"
         />
       </div>
