@@ -18,6 +18,9 @@ export interface ApiConfig {
   headers: Record<string, string>;
   body: Record<string, string>;
   reponseFormat: string;
+  nextStepId?: string;
+  errorStepId?: string;
+  outputVar?: string;
 }
 
 // Loop node types
@@ -47,11 +50,13 @@ export interface CsvParser {
 export interface CsvConfig {
   filePath: string;
   encoding: string;
-  type: string;
+  type?: string;
   nullValues: string[];
   chunkSize: number;
   errorPolicy: string;
   parser: CsvParser;
+  outputVar?: string;
+  nextStepId?: string;
 }
 
 export interface WorkflowNode {
@@ -64,7 +69,7 @@ export interface WorkflowNode {
   data: Record<string, any>
   
   // Config can be different types based on node type
-  parameters?: ApiConfig | CsvConfig | LoopConfigEntry[] | ConditionBlock[];
+  parameters?: ApiConfig[] | CsvConfig[] | LoopConfigEntry[] | ConditionBlock[];
   list?: {
     timeoutMs: number;
     keys: string[];
