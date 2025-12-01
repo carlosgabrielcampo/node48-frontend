@@ -99,8 +99,8 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
       <div>
         <Label>Output Variable</Label>
         <Input
-          value={node.outputVar || ""}
-          onChange={(e) => onUpdate({ outputVar: e.target.value })}
+          value={(node.data?.outputVar as string) || ""}
+          onChange={(e) => onUpdate({ data: { ...node.data, outputVar: e.target.value } })}
           placeholder="Autorizados"
           className="mt-1"
         />

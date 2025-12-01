@@ -1,4 +1,4 @@
-import { LayoutDashboard, User, FileText, ChevronLeft, ChevronRight, Workflow } from "lucide-react";
+import { LayoutDashboard, User, FileText, ChevronLeft, ChevronRight, Workflow, Settings } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -18,6 +18,7 @@ const navItems = [
   { title: "Personal", url: "/personal", icon: User },
   { title: "Workflows", url: "/workflows", icon: Workflow },
   { title: "Templates", url: "/templates", icon: FileText },
+  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 export const WorkflowSidebar = () => {

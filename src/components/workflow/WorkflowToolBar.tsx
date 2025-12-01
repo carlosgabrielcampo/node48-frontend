@@ -130,7 +130,7 @@ export const WorkflowToolBar = ({
             // Legacy format
             const workflowData: WorkflowData = jsonData;
             const importedNodes: Node[] = workflowData.nodes.map((node) => ( 
-              createNode({id: node.id, position: node.position, connections: node.data.connections, type: node.data.type, onDelete: handleDeleteNode, onClick: handleNodeClick})
+              createNode({id: node.id, position: node.data.position || {x: 0, y: 0}, connections: node.data.connections, type: node.data.type, onDelete: handleDeleteNode, onClick: handleNodeClick})
             ));
             const importedEdges: Edge[] = workflowData.connections.map((conn) => ({
               id: conn.id,

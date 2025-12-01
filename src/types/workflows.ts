@@ -1,4 +1,3 @@
-import { WorkflowJSON } from "@/lib/workflowParser";
 import { Workflow } from "@/services/workflowService";
 import { Dispatch, SetStateAction } from "react";
 export interface FlowEditorProps {
