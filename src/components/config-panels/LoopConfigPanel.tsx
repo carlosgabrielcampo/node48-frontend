@@ -64,9 +64,9 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
       {stateConfig.map((entry, index) => (
         <Card key={index} className="p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <div className="flex">
+            <div className="flex items-center gap-2">
               <Label className="font-medium">Config {index + 1}</Label>
-              <PenBox size="sm" className="ml-2 h-4 w-4" variant="outline"/>
+              <PenBox className="h-4 w-4 text-muted-foreground"/>
             </div>
             <Button onClick={() => removeConfigEntry(index)} size="sm" variant="ghost">
               <Trash2 className="h-4 w-4" />
