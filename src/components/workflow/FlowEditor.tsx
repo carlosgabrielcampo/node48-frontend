@@ -12,7 +12,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { toast } from "sonner";
-import { WorkflowNode } from "@/types/config-panels";
+import { WorkflowNode } from "@/types/configPanels";
 import { v4 as uuidv4 } from 'uuid'
 import { FlowEditorProps } from "@/types/workflows";
 import { parseWorkflowJSON } from "@/lib/workflowParser";

@@ -1,5 +1,5 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { WorkflowNode, NodeConfigPanelProps } from "@/types/config-panels";
+import { WorkflowNode, NodeConfigPanelProps } from "@/types/configPanels";
 import { parametersPanels } from "./";
 
 export const NodeConfigPanel = ({

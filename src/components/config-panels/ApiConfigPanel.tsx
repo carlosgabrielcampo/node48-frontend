@@ -1,4 +1,4 @@
-import { ApiConfigPanelProps, ApiConfig } from "@/types/config-panels";
+import { ApiConfigPanelProps, ApiConfig } from "@/types/configPanels";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

@@ -3,7 +3,7 @@ import { ApiConfigPanel } from './ApiConfigPanel'
 import { ConditionConfigPanel } from './ConditionConfigPanel'
 import { CsvConfigPanel } from './CsvConfigPanel'
 import { LoopConfigPanel } from './LoopConfigPanel'
-import { WorkflowNode } from '@/types/config-panels'
+import { WorkflowNode } from '@/types/configPanels'
 import { ReactElement } from 'react'
 type PanelFactory = (
     node: WorkflowNode,

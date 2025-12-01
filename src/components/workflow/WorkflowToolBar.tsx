@@ -6,13 +6,12 @@ import { Save, Play, Download, Plus, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
 import { MarkerType, Edge, Node } from "reactflow";
-import { WorkflowData } from "@/types/config-panels";
+import { WorkflowData } from "@/types/configPanels";
 import { WorkflowToolBarProps } from "@/types/workflows";
 import { createNode } from "../nodes/NodeDataStructure";
 export const WorkflowToolBar = ({
   setIsActive,
   isActive,
-  setWorkflowId,
   setIsDrawerOpen,
   nodes,
   setNodes,
@@ -32,7 +31,6 @@ export const WorkflowToolBar = ({
   const onSave = async () => {
     // Simulating API call - replace with actual endpoint
     await new Promise((resolve) => setTimeout(resolve, 500));
-    setWorkflowId(`workflow-${Date.now()}`);
   };
   const onRun = async () => {
     // Simulating API call - replace with actual endpoint
