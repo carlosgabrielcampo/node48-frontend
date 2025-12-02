@@ -15,17 +15,13 @@ import { toast } from "sonner";
 import { WorkflowNode } from "@/types/configPanels";
 import { v4 as uuidv4 } from 'uuid'
 import { FlowEditorProps } from "@/types/workflows";
-import { parseWorkflowJSON } from "@/lib/workflowParser";
 import { DefaultNode } from "../nodes/DefaultNode";
-import { NodeConfigPanel } from "../configPanels/NodeConfigPanel";
-import { createEmptyNode } from "../nodes/NodeDataStructure";
-import { WorkflowJSON } from "@/types/workflows";
+import { NodeConfigPanel } from "../configPanel/NodeConfigPanel";
 
 const nodeTypes = { "custom": DefaultNode };
 
 export const FlowEditor = ({
   onNodeAdded, 
-  workflow, 
   nodes, 
   setNodes, 
   onNodesChange, 
@@ -36,8 +32,7 @@ export const FlowEditor = ({
   selectedNode,
   setConfigPanelOpen,
   configPanelOpen,
-  handleNodeClick,
-  handleDeleteNode
+  handleAddNode
 }: FlowEditorProps) => {
 
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
@@ -47,7 +42,6 @@ export const FlowEditor = ({
   useEffect(() => {
     if (onNodeAdded) {
       globalThis.__addWorkflowNode = (node) => {
-      console.log({node})
         setPendingNode(node); 
       };
     }
@@ -56,7 +50,6 @@ export const FlowEditor = ({
 
   const onConnect = useCallback(
     (connection: Connection) => {
-      // Prevent self-connections
       if (connection.source === connection.target) {
         toast.error("Cannot connect a node to itself");
         return;
@@ -86,17 +79,6 @@ export const FlowEditor = ({
     ];
     setSelectedElements(selectedIds);
   }, []);
-
-  const handleAddNode = useCallback(
-    ({type}) => {
-      const newNode: Node = createEmptyNode({ type, onDelete: handleDeleteNode, onClick: handleNodeClick });
-      setNodes((nds) => [...nds, newNode]);
-      toast.success(`Added ${type}`);
-    },
-    [setNodes, handleDeleteNode, handleNodeClick ]
-  );
-
- 
 
   const handleUpdateNode = useCallback((nodeId: string, updates: Partial<WorkflowNode>) => {
     setNodes((nds) =>
@@ -158,23 +140,7 @@ export const FlowEditor = ({
     },
     [selectedElements, nodes, edges, setNodes, setEdges]
   );
-
-  useEffect(() => {
-    if(workflow){
-      const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(
-        (workflow as WorkflowJSON),
-        handleDeleteNode,
-        handleNodeClick
-      );
-      setNodes(parsedNodes);
-      setEdges(parsedEdges);
-    } else {
-      setNodes([]);
-      setEdges([]);
-    }
-  },[])
   
-  console.log({edges, nodes})
   return (
     <div className="flex-1 flex flex-col" ref={reactFlowWrapper}>
       {/* Canvas */}
@@ -192,7 +158,7 @@ export const FlowEditor = ({
           attributionPosition="bottom-left"
         >
           <Background className="bg-canvas" gap={20} />
-          <Controls />
+          <Controls position="bottom-left" />
           <MiniMap nodeColor="hsl(var(--primary))" className="bg-canvas"/>
         </ReactFlow>
       </div>

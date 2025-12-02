@@ -1,4 +1,5 @@
 // Condition node types
+
 export interface ConditionRule {
   field: string;
   type: string;
@@ -12,6 +13,10 @@ export interface ConditionBlock {
 
 // API node types
 export interface ApiConfig {
+  list?: {
+    timeoutMs: number;
+    keys: string[];
+  };
   baseUrl: string;
   endpoint: string;
   method: string;
@@ -33,7 +38,7 @@ export interface LoopFormatField {
 export interface LoopConfigEntry {
   sourceVar: string;
   outputVar: string;
-  type: "format" | "create";
+  type: "format" | "create" | "raw";
   nextStepId: string;
   fields?: LoopFormatField[];
   limit?: number;
@@ -59,6 +64,9 @@ export interface CsvConfig {
   nextStepId?: string;
 }
 
+export type Conditionals = ApiConfig | CsvConfig | LoopConfigEntry | ConditionBlock;
+
+
 export interface WorkflowNode {
   id: string;
   name: string;
@@ -69,7 +77,7 @@ export interface WorkflowNode {
   data: Record<string, any>
   
   // Config can be different types based on node type
-  parameters?: ApiConfig[] | CsvConfig[] | LoopConfigEntry[] | ConditionBlock[];
+  parameters?: Conditionals;
   list?: {
     timeoutMs: number;
     keys: string[];
@@ -98,6 +106,11 @@ export interface WorkflowData {
   connections: WorkflowConnection[];
 }
 
+export interface ConfigPanelProps {
+  stateConfig: any;
+  setConfig: any;
+}
+
 export interface LoopConfigPanelProps {
   node: WorkflowNode;
   onUpdate: (updates: Partial<WorkflowNode>) => void;
@@ -124,3 +137,4 @@ export interface ApiConfigPanelProps {
   node: WorkflowNode;
   onUpdate: (updates: Partial<WorkflowNode>) => void;
 }
+

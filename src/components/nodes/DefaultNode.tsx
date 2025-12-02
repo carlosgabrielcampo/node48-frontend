@@ -7,6 +7,7 @@ interface DefaultNodeData {
   name: string;
   type: string; // Actual node type string like "conditional_operation", "api_call", etc.
   mainType: string;
+  startStep: boolean;
   onDelete: (id: string) => void;
   onClick?: (data: any) => void;
   connections: any[];
@@ -18,7 +19,6 @@ export const DefaultNode = memo(({ id, data, selected }: NodeProps<DefaultNodeDa
   const Icon = nodeTemplates[data.type]?.icon || Cog;
   const outputHandles = Object.entries(data.connections).map(([source, target]) => {return {source, target}});;
   const nodeHeight = 80 + (outputHandles?.length > 2 ? (outputHandles?.length - 2) * 30 : 0);
- console.log(data)
   return (
     <div
       style={{ minHeight: `${nodeHeight}px` }}
@@ -29,14 +29,16 @@ export const DefaultNode = memo(({ id, data, selected }: NodeProps<DefaultNodeDa
       }`}
     >
       {/* Input Handle */}
-      <div className="absolute bg-primary h-[50px]">
-        <Handle
-          type="target"
-          position={Position.Left}
-          id={id}
-          className=" top-50 !bg-primary z-50 !w-3 !h-3 !border-2 !border-background"
-        />
-      </div>
+      { !data.startStep &&
+          <div className="absolute bg-primary h-[50px]">
+            <Handle
+              type="target"
+              position={Position.Left}
+              id={id}
+              className=" top-50 !bg-primary z-50 !w-3 !h-3 !border-2 !border-background"
+            />
+          </div>
+      }
 
       {/* Node Content */}
       <div className="p-3">

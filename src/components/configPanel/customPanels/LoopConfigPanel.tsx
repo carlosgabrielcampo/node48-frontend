@@ -4,35 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2, PenBox } from "lucide-react";
-import { useState } from "react";
-import { Dropdown } from "../layout/dropdown";
-
-export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
+import { SidebarDropdown } from "../../layout/dropdown";
+import { ConfigPanelProps } from "@/types/configPanels";
+import { SidebarInput } from "@/components/layout/input";
+export const LoopConfigPanel = ({ stateConfig, setConfig }: ConfigPanelProps) => {
   const newEntry: LoopConfigEntry = {
     sourceVar: "",
     outputVar: "",
-    type: "format",
+    type: "raw",
     nextStepId: "",
     fields: [],
   };
-  
-  // Ensure parameters is always an array and type-guard to LoopConfigEntry[]
-  const getInitialConfig = (): LoopConfigEntry[] => {
-    if (Array.isArray(node.parameters)) {
-      const firstParam = node.parameters[0];
-      // Type guard to check if it's a LoopConfigEntry
-      if (firstParam && 'sourceVar' in firstParam && 'type' in firstParam) {
-        return node.parameters as LoopConfigEntry[];
-      }
-    }
-    return [];
-  };
-  
-  const [stateConfig, setConfig] = useState<LoopConfigEntry[]>(getInitialConfig());
-  
-  const saveConfig = () => { 
-    onUpdate({ parameters: stateConfig }) 
-  }
   
   const addConfigEntry = () => { 
     setConfig([...stateConfig, newEntry]); 
@@ -70,7 +52,7 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
   };
 
   return (
-    <div className="space-y-4">
+    <>
       <div className="flex items-center justify-between">
         <Label className="text-base font-semibold">Loop Configuration</Label>
         <Button onClick={addConfigEntry} size="sm" variant="outline">
@@ -90,31 +72,27 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
-
-          <div>
-            <Label className="text-xs">Source Variable</Label>
-            <Input
-              value={entry.sourceVar}
-              onChange={(e) => updateConfigEntry(index, { sourceVar: e.target.value })}
-              placeholder="{{Autorizados}}"
-              className="mt-1"
-            />
-          </div>
-
-          <div>
-            <Label className="text-xs">Output Variable</Label>
-            <Input
-              value={entry.outputVar}
-              onChange={(e) => updateConfigEntry(index, { outputVar: e.target.value })}
-              placeholder="csvAutorizados"
-              className="mt-1"
-            />
-          </div>
           
-          <Dropdown itemList={[
-            {value: "format", displayName: "Format"},
-            {value: "create", displayName: "Create"},
-          ]} 
+          <SidebarInput 
+            label={"Source Variable"}
+            placeholder="{{Autorizados}}"
+            value={entry.sourceVar} 
+            onChange={(e) => updateConfigEntry(index, { sourceVar: e.target.value })} 
+            className="mt-1"
+          />
+          <SidebarInput 
+            label={"Output Variable<"}
+            placeholder="csvAutorizados"
+            value={entry.outputVar} 
+            onChange={(e) => updateConfigEntry(index, { outputVar: e.target.value })}
+            className="mt-1"
+          />
+          <SidebarDropdown 
+            itemList={[
+              {value: "format", displayName: "Format"},
+              {value: "create", displayName: "Create"},
+              {value: "raw", displayName: "Raw"},
+            ]} 
             label={"Type"}
             onValueChange={(value: "format" | "create") => updateConfigEntry(index, { type: value })}
             value={entry.type}
@@ -183,12 +161,11 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
           )}
         </Card>
       ))}
-      <Button size="sm" className="mt-1 w-full" onClick={saveConfig}>Save</Button>
       {stateConfig.length === 0 && (
         <div className="text-sm text-muted-foreground text-center py-8">
           No configuration entries. Click "Add Config" to create one.
         </div>
       )}
-    </div>
+    </>
   );
 };

@@ -1,55 +1,42 @@
-import { ConditionConfigPanelProps, ConditionBlock, ConditionRule } from "@/types/configPanels";
+import { ConfigPanelProps, ConditionBlock, ConditionRule } from "@/types/configPanels";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
-import { Dropdown } from "../layout/dropdown";
+import { SidebarDropdown } from "../../layout/dropdown";
 
 
 
-export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelProps) => {
-  // Ensure parameters is always an array of ConditionBlock
-  const conditions = (Array.isArray(node.parameters) ? node.parameters : []) as ConditionBlock[];
-
-  const updateConditions = (newConditions: ConditionBlock[]) => {
-    onUpdate({ parameters: newConditions });
-  };
-
+export const ConditionConfigPanel = ({ stateConfig, setConfig }: ConfigPanelProps) => {
   const addCondition = () => {
     const newCondition: ConditionBlock = {
       condition: [{ field: "", type: "regex", validator: "" }],
       nextStepId: "",
     };
-    updateConditions([...conditions, newCondition]);
+    setConfig([...stateConfig, newCondition]);
   };
 
   const removeCondition = (index: number) => {
-    updateConditions(conditions.filter((_, i) => i !== index));
-  };
-
-  const updateCondition = (index: number, updates: Partial<ConditionBlock>) => {
-    const updated = [...conditions];
-    updated[index] = { ...updated[index], ...updates };
-    updateConditions(updated);
+    setConfig(stateConfig.filter((_, i) => i !== index));
   };
 
   const addRule = (conditionIndex: number) => {
-    const updated = [...conditions];
+    const updated = [...stateConfig];
     updated[conditionIndex].condition.push({ field: "", type: "regex", validator: "" });
-    updateConditions(updated);
+    setConfig(updated);
   };
 
   const removeRule = (conditionIndex: number, ruleIndex: number) => {
-    const updated = [...conditions];
+    const updated = [...stateConfig];
     updated[conditionIndex].condition = updated[conditionIndex].condition.filter((_, i) => i !== ruleIndex);
-    updateConditions(updated);
+    setConfig(updated);
   };
 
   const updateRule = (conditionIndex: number, ruleIndex: number, updates: Partial<ConditionRule>) => {
-    const updated = [...conditions];
+    const updated = [...stateConfig];
     updated[conditionIndex].condition[ruleIndex] = { ...updated[conditionIndex].condition[ruleIndex], ...updates };
-    updateConditions(updated);
+    setConfig(updated);
   };
 
   return (
@@ -62,7 +49,7 @@ export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelPro
         </Button>
       </div>
 
-      {conditions.map((condition, condIndex) => (
+      {stateConfig.map((condition, condIndex) => (
         <Card key={condIndex} className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <Label className="text-sm font-medium">Condition {condIndex + 1}</Label>
@@ -92,7 +79,7 @@ export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelPro
                 />
               </div>
 
-              <Dropdown itemList={[
+              <SidebarDropdown itemList={[
                 {value: "regex", displayName: "Regex"},
                 {value: "equals", displayName: "Equals"},
                 {value: "contains", displayName: "Contains"},
@@ -121,7 +108,7 @@ export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelPro
         </Card>
       ))}
 
-      {conditions.length === 0 && (
+      {stateConfig.length === 0 && (
         <div className="text-sm text-muted-foreground text-center py-8">
           No conditions defined. Click "Add Condition" to create one.
         </div>

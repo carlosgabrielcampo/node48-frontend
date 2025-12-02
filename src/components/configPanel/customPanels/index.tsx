@@ -11,8 +11,8 @@ type PanelFactory = (
  ) => ReactElement
 
 export const parametersPanels: Record<string, PanelFactory>  = {
-    "conditional_operation": (node, handleUpdate) => <ConditionConfigPanel node={node} onUpdate={handleUpdate} />,
-    "api_call": (node, handleUpdate) => <ApiConfigPanel node={node} onUpdate={handleUpdate} />,
-    "loop_operation": (node, handleUpdate)  => <LoopConfigPanel node={node} onUpdate={handleUpdate} />,
-    "read_csv": (node, handleUpdate)  => <CsvConfigPanel node={node} onUpdate={handleUpdate} />
+    "conditional_operation": (stateConfig, setConfig) => <ConditionConfigPanel stateConfig={stateConfig} setConfig={setConfig} />,
+    "api_call": (stateConfig, setConfig) => <ApiConfigPanel stateConfig={stateConfig} setConfig={setConfig} />,
+    "loop_operation": (stateConfig, setConfig)  => <LoopConfigPanel stateConfig={stateConfig} setConfig={setConfig}/>,
+    "read_csv": (stateConfig, setConfig)  => <CsvConfigPanel stateConfig={stateConfig} setConfig={setConfig} />
 }

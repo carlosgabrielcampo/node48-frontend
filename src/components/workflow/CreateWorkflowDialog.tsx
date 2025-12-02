@@ -24,8 +24,6 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-
-
 export const CreateWorkflowDialog = ({ open, onOpenChange, onSuccess }: CreateWorkflowDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();

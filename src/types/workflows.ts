@@ -13,9 +13,10 @@ export interface FlowEditorProps {
   selectedNode: any;
   setConfigPanelOpen: any;
   configPanelOpen: any;
-  handleNodeClick: any;
-  handleDeleteNode: any;
+  handleAddNode: any;
 }
+
+
 
 export interface CreateWorkflowDialogProps {
   open: boolean;
@@ -41,11 +42,6 @@ export interface WorkflowToolBarProps {
   setNodes: any;
   edges: any;
   setEdges: any;
-  setSelectedNode: any;
-  selectedNode: any;
-  setConfigPanelOpen: any;
-  configPanelOpen: any;
-  setWorkflowId: (id: string) => void;
   setIsActive: Dispatch<SetStateAction<boolean>>;
   setIsDrawerOpen: Dispatch<SetStateAction<boolean>>;
   handleNodeClick: any;

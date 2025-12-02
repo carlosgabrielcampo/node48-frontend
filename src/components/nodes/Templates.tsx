@@ -16,12 +16,6 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
     type: "html_input",
     icon: Power,
   },
-  "http_request": {
-    type: "http_request",
-    name: "HTTP Request",
-    description: "Make an HTTP API call",
-    icon: Power,
-  },
   "receive_email": {
     type: "receive_email",
     name: "Receive Email",

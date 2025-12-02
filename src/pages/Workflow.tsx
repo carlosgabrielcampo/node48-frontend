@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { WorkflowSidebar } from "@/components/workflow/WorkflowSidebar";
 import { WorkflowTopBar } from "@/components/workflow/WorkflowTopBar";
@@ -8,7 +8,10 @@ import { NodeTypeDrawer } from "@/components/nodes/NodeTypeDrawer";
 import { useEdgesState, useNodesState } from "reactflow";
 import { WorkflowNode } from "@/types/configPanels";
 import { toast } from "sonner";
-
+import { parseWorkflowJSON } from "@/lib/workflowParser";
+import { WorkflowJSON } from "@/types/workflows";
+import { createEmptyNode } from "@/components/nodes/NodeDataStructure";
+import { Node } from "reactflow";
 interface Window {
   __addWorkflowNode?: (args: {
     type: string;
@@ -27,8 +30,6 @@ const Workflow = ({workflow}) => {
 
 
   const handleNodeClick = useCallback((node) => {
-    console.log("Node Clicked", node)
-
     const workflowNode: WorkflowNode = {
       id: node.workflowId,
       name: node?.name,
@@ -59,6 +60,30 @@ const Workflow = ({workflow}) => {
     [setNodes, setEdges]
   );
 
+  const handleAddNode = useCallback(
+    ({type}) => {
+      const newNode: Node = createEmptyNode({ type, onDelete: handleDeleteNode, onClick: handleNodeClick });
+      setNodes((nds) => [...nds, newNode]);
+      toast.success(`Added ${type}`);
+    },
+    [setNodes, handleDeleteNode, handleNodeClick ]
+  );
+
+  useEffect(() => {
+    if(workflow){
+      const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(
+        (workflow as WorkflowJSON),
+        handleDeleteNode,
+        handleNodeClick
+      );
+      setNodes(parsedNodes);
+      setEdges(parsedEdges);
+    } else {
+      setNodes([]);
+      setEdges([]);
+    }
+  },[])
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -69,17 +94,12 @@ const Workflow = ({workflow}) => {
             nodes={nodes} 
             edges={edges}
             isActive={isActive}
-            selectedNode={selectedNode}
-            configPanelOpen={configPanelOpen}
             setNodes={setNodes}
             setEdges={setEdges}
             setIsActive={setIsActive}
-            setWorkflowId={setWorkflowId}
-            setSelectedNode={setSelectedNode}
             setIsDrawerOpen={setIsDrawerOpen}
             handleNodeClick={handleNodeClick}
             handleDeleteNode={handleDeleteNode}
-            setConfigPanelOpen={setConfigPanelOpen}
           />
           <FlowEditor
             nodes={nodes}
@@ -93,9 +113,8 @@ const Workflow = ({workflow}) => {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             setSelectedNode={setSelectedNode}
-            handleNodeClick={handleNodeClick}
-            handleDeleteNode={handleDeleteNode}
             setConfigPanelOpen={setConfigPanelOpen}
+            handleAddNode={handleAddNode}
           />
           <NodeTypeDrawer
             open={isDrawerOpen}

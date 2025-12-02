@@ -1,4 +1,4 @@
-import { CsvConfigPanelProps, CsvConfig } from "@/types/configPanels";
+import { ConfigPanelProps, CsvConfig } from "@/types/configPanels";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
+export const CsvConfigPanel = ({ stateConfig, setConfig }: ConfigPanelProps) => {
   const defaultConfig: CsvConfig =  {
     filePath: "",
     encoding: "utf-8",
@@ -23,40 +23,21 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
     outputVar: "",
     nextStepId: ""
   };
-  
-  // Handle parameters as array (JSON format) or object (legacy)
-  const getInitialConfig = (): CsvConfig => {
-    if (Array.isArray(node.parameters)) {
-      const firstParam = node.parameters[0];
-      // Type guard to check if it's a CsvConfig
-      if (firstParam && 'filePath' in firstParam && 'encoding' in firstParam) {
-        return firstParam as CsvConfig;
-      }
-    }
-    return defaultConfig;
-  };
-  
-  const [stateConfig, setConfig] = useState<CsvConfig>(getInitialConfig());
-  
-  const saveConfig = () => {
-    // Update as array to match JSON format
-    onUpdate({ parameters: [{ ...stateConfig }] });
-  }
 
   const updateConfig = (updates: Partial<CsvConfig>) => {
     setConfig({ ...stateConfig, ...updates })
   };
 
   const addNullValue = () => {
-    updateConfig({ nullValues: [...stateConfig.nullValues, ""] });
+    updateConfig({ nullValues: [...stateConfig?.nullValues || [], ""] });
   };
 
   const removeNullValue = (index: number) => {
-    updateConfig({ nullValues: stateConfig.nullValues.filter((_, i) => i !== index) });
+    updateConfig({ nullValues: stateConfig?.nullValues.filter((_, i) => i !== index) });
   };
 
   const updateNullValue = (index: number, value: string) => {
-    const updated = [...stateConfig.nullValues];
+    const updated = [...stateConfig?.nullValues || []];
     updated[index] = value;
     updateConfig({ nullValues: updated });
   };
@@ -122,17 +103,6 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
           className="mt-1"
         />
       </div>
-      
-      <div>
-        <Label>Next Step ID</Label>
-        <Input
-          value={stateConfig.nextStepId || ""}
-          onChange={(e) => updateConfig({ nextStepId: e.target.value })}
-          placeholder="Next step identifier"
-          className="mt-1"
-        />
-      </div>
-
       <Card className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <Label className="font-semibold">Null Values</Label>
@@ -141,7 +111,7 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
             Add
           </Button>
         </div>
-        {stateConfig.nullValues.map((value, index) => (
+        {stateConfig.nullValues?.map((value, index) => (
           <div key={index} className="flex gap-2">
             <Input
               value={value}
@@ -162,7 +132,7 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
         <div>
           <Label className="text-xs">Escape Character</Label>
           <Input
-            value={stateConfig.parser.escape}
+            value={stateConfig?.parser?.escape}
             onChange={(e) => updateConfig({ parser: { ...stateConfig.parser, escape: e.target.value } })}
             placeholder="'"
             className="mt-1"
@@ -172,7 +142,7 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
         <div>
           <Label className="text-xs">Separator</Label>
           <Input
-            value={stateConfig.parser.separator}
+            value={stateConfig?.parser?.separator}
             onChange={(e) => updateConfig({ parser: { ...stateConfig.parser, separator: e.target.value } })}
             placeholder=";"
             className="mt-1"
@@ -182,7 +152,7 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
         <div className="flex items-center space-x-2">
           <Checkbox
             id="strict"
-            checked={stateConfig.parser.strict}
+            checked={stateConfig?.parser?.strict}
             onCheckedChange={(checked) => updateConfig({ parser: { ...stateConfig.parser, strict: checked === true } })}
           />
           <Label htmlFor="strict" className="text-xs cursor-pointer">
@@ -190,9 +160,6 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
           </Label>
         </div>
       </Card>
-      <div className="flex items-center justify-between ">
-        <Button size="sm" className="mt-1 w-full" onClick={saveConfig}>Save</Button>
-      </div>
     </div>
   );
 };

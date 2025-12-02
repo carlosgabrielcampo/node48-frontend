@@ -1,7 +1,18 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+interface ItemListInterface {
+    value: string;
+    displayName:  string;
+}
 
-export const Dropdown = ({ value, label, onValueChange, itemList }) => {
+interface DropdownInterface {
+    value: string;
+    label: string;
+    onValueChange: (value: string) => void;
+    itemList: ItemListInterface[];
+}
+
+export const SidebarDropdown = ({ value, label, onValueChange, itemList }: DropdownInterface) => {
     return (
         <div>
             <Label>{label}</Label>

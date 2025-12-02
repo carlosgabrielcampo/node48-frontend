@@ -9,6 +9,7 @@ import { MarkerType, Edge, Node } from "reactflow";
 import { WorkflowData } from "@/types/configPanels";
 import { WorkflowToolBarProps } from "@/types/workflows";
 import { createNode } from "../nodes/NodeDataStructure";
+import { exportToWorkflowJSON } from "@/lib/workflowExporter";
 export const WorkflowToolBar = ({
   setIsActive,
   isActive,
@@ -79,7 +80,6 @@ export const WorkflowToolBar = ({
   };
   const handleExport = useCallback(() => {
     // Import the exporter at the top of the function to avoid circular dependencies
-    const { exportToWorkflowJSON } = require("@/lib/workflowExporter");
     
     // Export to WorkflowJSON format
     const workflowJSON = exportToWorkflowJSON(
@@ -123,6 +123,7 @@ export const WorkflowToolBar = ({
               createNode({id: node.id, position: node.data.position || {x: 0, y: 0}, connections: node.data.connections, type: node.data.type, onDelete: handleDeleteNode, onClick: handleNodeClick})
             ));
             const importedEdges: Edge[] = workflowData.connections.map((conn) => ({
+              
               id: conn.id,
               source: conn.source.nodeId,
               target: conn.target.nodeId,
