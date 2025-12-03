@@ -5,16 +5,21 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { SidebarDropdown } from "../../layout/dropdown";
-
-
+import { SidebarInput } from "@/components/layout/input";
+import { ApiConfig } from "../../../types/configPanels"
 
 export const ConditionConfigPanel = ({ stateConfig, setConfig }: ConfigPanelProps) => {
+  
+  const updateConfig = (updates: Partial<ApiConfig>) => {
+    setConfig([{ ...stateConfig, ...updates }]);
+  };
+
   const addCondition = () => {
     const newCondition: ConditionBlock = {
       condition: [{ field: "", type: "regex", validator: "" }],
       nextStepId: "",
     };
-    setConfig([...stateConfig, newCondition]);
+    updateConfig([...stateConfig, newCondition]);
   };
 
   const removeCondition = (index: number) => {
@@ -58,48 +63,44 @@ export const ConditionConfigPanel = ({ stateConfig, setConfig }: ConfigPanelProp
             </Button>
           </div>
 
-          {condition.condition.map((rule, ruleIndex) => (
-            <div key={ruleIndex} className="space-y-2 pl-4 border-l-2 border-border">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs">Rule {ruleIndex + 1}</Label>
-                {condition.condition.length > 1 && (
-                  <Button onClick={() => removeRule(condIndex, ruleIndex)} size="sm" variant="ghost">
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                )}
-              </div>
-              
-              <div>
-                <Label className="text-xs">Field</Label>
-                <Input
-                  value={rule.field}
-                  onChange={(e) => updateRule(condIndex, ruleIndex, { field: e.target.value })}
-                  placeholder="{{csvAutorizados.DT_NASC}}"
+          {
+            condition.condition.map((rule, ruleIndex) => (
+              <div key={ruleIndex} className="space-y-2 pl-4 border-l-2 border-border">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs">Rule {ruleIndex + 1}</Label>
+                  {condition.condition.length > 1 && (
+                    <Button onClick={() => removeRule(condIndex, ruleIndex)} size="sm" variant="ghost">
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+                <SidebarInput 
+                  label={"Field"} 
+                  value={rule.field} 
+                  onChange={(e) => updateRule(condIndex, ruleIndex, { field: e.target.value })} 
+                  placeholder="{{csvAutorizados.DT_NASC}}" 
                   className="mt-1"
                 />
-              </div>
-
-              <SidebarDropdown itemList={[
-                {value: "regex", displayName: "Regex"},
-                {value: "equals", displayName: "Equals"},
-                {value: "contains", displayName: "Contains"},
-              ]} 
-                label={"Type"}
-                onValueChange={(value) => updateRule(condIndex, ruleIndex, { type: value })}
-                value={rule.type}
-              />
-
-              <div>
-                <Label className="text-xs">Validator</Label>
-                <Input
+                <SidebarDropdown 
+                  itemList={[
+                    {value: "regex", displayName: "Regex"},
+                    {value: "equals", displayName: "Equals"},
+                    {value: "contains", displayName: "Contains"},
+                  ]}
+                  label={"Type"}
+                  onValueChange={(value) => updateRule(condIndex, ruleIndex, { type: value })}
+                  value={rule.type}
+                />
+                <SidebarInput
+                  label={"Validator"} 
                   value={rule.validator}
                   onChange={(e) => updateRule(condIndex, ruleIndex, { validator: e.target.value })}
                   placeholder="/10/"
                   className="mt-1"
                 />
               </div>
-            </div>
-          ))}
+            ))
+          }
 
           <Button onClick={() => addRule(condIndex)} size="sm" variant="outline" className="w-full">
             <Plus className="h-3 w-3 mr-1" />

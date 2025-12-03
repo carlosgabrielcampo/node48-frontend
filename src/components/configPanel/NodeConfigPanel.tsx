@@ -1,59 +1,57 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { WorkflowNode, NodeConfigPanelProps, Conditionals, CsvConfig } from "@/types/configPanels";
+import { NodeConfigPanelProps } from "@/types/configPanels";
 import { parametersPanels } from "./customPanels";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { PenBox } from "lucide-react";
 export const NodeConfigPanel = ({
   node,
   open,
   onOpenChange,
   onUpdate,
 }: NodeConfigPanelProps) => {
-
-  console.log({node})
+  const [stateConfig, setStateConfig] = useState<any[]>([]);
   
-  const getInitialConfig = (): any => {
-    if (Array.isArray(node?.parameters)) {
-      const firstParam = node?.parameters[0];
-      // Type guard to check if it's a CsvConfig
-      return firstParam as any;
+  useEffect(() => {
+    if (!node) {
+      setStateConfig([]);
+      return;
     } else {
-      return []
+      setStateConfig(node.parameters);
     }
-    // return defaultConfig;
-  };
-
-  const [stateConfig, setConfig] = useState<Partial<WorkflowNode>>([]);
-  if (!node) return null;
+  }, [node?.id, open, node])
 
   const handleUpdate = () => {
-    onUpdate(node.id, stateConfig);
+    onUpdate(node.id, {parameters: stateConfig});
   };
 
-  const renderConfigPanel = () => {
-    console.log(onOpenChange)
-    if(!parametersPanels[node?.type]){
-        return (
-          <div className="text-sm text-muted-foreground">
-            No configuration available for {node?.type} nodes.
-          </div>
-        );
-    } else {
-      return parametersPanels[node?.type](stateConfig, setConfig)
+
+ const renderConfigPanel = (stateConfig, setStateConfig) => {
+    if (!parametersPanels[node.type]) {
+      return (
+        <div className="text-sm text-muted-foreground">
+          No configuration available for {node.type} nodes.
+        </div>
+      );
     }
+    return parametersPanels[node.type](stateConfig, setStateConfig);
   };
-
+  
+  if (!node) return null;
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-[500px] sm:max-w-[500px] overflow-y-auto">
         <SheetHeader>
           <SheetTitle>
-            Configure {node?.name || node?.type}
+            <div className="flex items-center gap-2">
+              {node?.name || ""}
+              <PenBox className="h-4 w-4 text-muted-foreground"/>
+            </div>
           </SheetTitle>
         </SheetHeader>
         <div className="mt-6">
           <div className="space-y-4">
-            {renderConfigPanel()}
+            {renderConfigPanel(stateConfig, setStateConfig)}
             <Button size="sm" className="mt-1 w-full" onClick={handleUpdate}>Save</Button>
           </div>
         </div>
@@ -63,16 +61,16 @@ export const NodeConfigPanel = ({
 };
 
 // const parameters = paramArray[0] || {
-  //   baseUrl: "",
-  //   endpoint: "",
-  //   method: "GET",
-  //   headers: {},
-  //   body: {},
-  //   reponseFormat: "json",
-  //   outputVar: "",
-  //   nextStepId: "",
-  //   errorStepId: ""
-  // };
+//   baseUrl: "",
+//   endpoint: "",
+//   method: "GET",
+//   headers: {},
+//   body: {},
+//   reponseFormat: "json",
+//   outputVar: "",
+//   nextStepId: "",
+//   errorStepId: ""
+// };
 
   // const defaultConfig: CsvConfig =  {
   //   filePath: "",

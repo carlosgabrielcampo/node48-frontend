@@ -22,7 +22,6 @@ interface Window {
 const Workflow = ({workflow}) => {
   const [isActive, setIsActive] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [workflowId, setWorkflowId] = useState<string | undefined>();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
@@ -30,8 +29,9 @@ const Workflow = ({workflow}) => {
 
 
   const handleNodeClick = useCallback((node) => {
+    console.log({handleNodeClick: node})
     const workflowNode: WorkflowNode = {
-      id: node.workflowId,
+      id: node.id,
       name: node?.name,
       type: node?.type,
       data: node?.data,
@@ -105,14 +105,16 @@ const Workflow = ({workflow}) => {
             nodes={nodes}
             edges={edges} 
             workflow={workflow}
-            selectedNode={selectedNode}
             configPanelOpen={configPanelOpen}
             setNodes={setNodes} 
             setEdges={setEdges}
             onNodeAdded={handleNodeAdded}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
+
+            selectedNode={selectedNode}
             setSelectedNode={setSelectedNode}
+
             setConfigPanelOpen={setConfigPanelOpen}
             handleAddNode={handleAddNode}
           />

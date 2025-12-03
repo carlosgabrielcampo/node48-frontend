@@ -17,6 +17,7 @@ export interface ApiConfig {
     timeoutMs: number;
     keys: string[];
   };
+  timeout: number;
   baseUrl: string;
   endpoint: string;
   method: string;

@@ -77,16 +77,18 @@ export const FlowEditor = ({
       ...nodes.map((n) => n.id),
       ...edges.map((e) => e.id),
     ];
+    console.log({selectedIds})
     setSelectedElements(selectedIds);
   }, []);
 
   const handleUpdateNode = useCallback((nodeId: string, updates: Partial<WorkflowNode>) => {
-    setNodes((nds) =>
-      nds.map((node: Node) =>
-        node.id === nodeId
-          ? { 
+    setNodes((nds) => {
+      const nodes = nds.map((node: Node) =>{
+        console.log({nodeid: node.id, nodeId})
+        if(node.id === nodeId){ 
+          return { 
               ...node, 
-              data: { 
+              data: {
                 ...node.data, 
                 ...updates,
                 name: updates.name || node.data.name,
@@ -94,9 +96,15 @@ export const FlowEditor = ({
                 list: updates.list !== undefined ? updates.list : node.data.list,
               }, 
             }
-          : node
-      )
-    );
+          }
+        else {
+          return node
+        }
+      })
+      
+      console.log({parameters: updates.parameters, nodes})
+      return nodes
+    });
     
     // Update selected node
     if (selectedNode?.id === nodeId) {
@@ -140,7 +148,7 @@ export const FlowEditor = ({
     },
     [selectedElements, nodes, edges, setNodes, setEdges]
   );
-  
+  console.log({nodes, edges})
   return (
     <div className="flex-1 flex flex-col" ref={reactFlowWrapper}>
       {/* Canvas */}

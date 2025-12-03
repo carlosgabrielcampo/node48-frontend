@@ -15,7 +15,7 @@ export const LoopConfigPanel = ({ stateConfig, setConfig }: ConfigPanelProps) =>
     nextStepId: "",
     fields: [],
   };
-  
+  console.log({stateConfig})
   const addConfigEntry = () => { 
     setConfig([...stateConfig, newEntry]); 
   };
@@ -65,7 +65,7 @@ export const LoopConfigPanel = ({ stateConfig, setConfig }: ConfigPanelProps) =>
         <Card key={index} className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Label className="font-medium">Config {index + 1}</Label>
+              <Label className="font-medium">{entry.name || `Config ${index + 1}`}</Label>
               <PenBox className="h-4 w-4 text-muted-foreground"/>
             </div>
             <Button onClick={() => removeConfigEntry(index)} size="sm" variant="ghost">
@@ -94,7 +94,7 @@ export const LoopConfigPanel = ({ stateConfig, setConfig }: ConfigPanelProps) =>
               {value: "raw", displayName: "Raw"},
             ]} 
             label={"Type"}
-            onValueChange={(value: "format" | "create") => updateConfigEntry(index, { type: value })}
+            onValueChange={(value: "format" | "create" | "raw") => updateConfigEntry(index, { type: value })}
             value={entry.type}
           />
 

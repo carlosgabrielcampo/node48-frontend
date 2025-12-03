@@ -15,7 +15,7 @@ export function createEmptyNode({type, onDelete, onClick}) {
 }
 
 export function createNode({ id, position, type, connections, onDelete, onClick, ...step }: NodeType){
-    return {
+    const node = {
         id: id,
         type: "custom",
         position: position,
@@ -27,4 +27,5 @@ export function createNode({ id, position, type, connections, onDelete, onClick,
             onClick,
         }
     }
+    return node
 }

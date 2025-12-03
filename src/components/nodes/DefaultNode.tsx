@@ -15,7 +15,7 @@ interface DefaultNodeData {
   nextStepId?: string;
 }
 
-export const DefaultNode = memo(({ id, data, selected }: NodeProps<DefaultNodeData>) => {
+export const DefaultNode = memo(({ id, data, selected, ...rest }: NodeProps<DefaultNodeData>) => {
   const Icon = nodeTemplates[data.type]?.icon || Cog;
   const outputHandles = Object.entries(data.connections).map(([source, target]) => {return {source, target}});;
   const nodeHeight = 80 + (outputHandles?.length > 2 ? (outputHandles?.length - 2) * 30 : 0);
@@ -53,7 +53,7 @@ export const DefaultNode = memo(({ id, data, selected }: NodeProps<DefaultNodeDa
             </div>
           </div>
           <button
-            onClick={() => { data.onClick?.(data) }}
+            onClick={() => { data.onClick?.({id, ...data}) }}
             className="h-6 w-6 rounded hover:bg-primary/10 flex items-center justify-center transition-colors flex-shrink-0"
             aria-label="Acess node settings"
           >
