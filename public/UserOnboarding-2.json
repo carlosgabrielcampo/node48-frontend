@@ -1,0 +1,160 @@
+{
+    "id": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
+    "name": "CSV FLOW",
+    "description": "string",
+    "createdAtUTC": "2025-09-03T12:00:00.000Z",
+    "updatedAtUTC": "2025-09-03T12:00:00.000Z",
+    "startStep": "7517d1af-0126-432d-9d22-cf4db2bde364",
+    "settings": {
+        "retryPolicy": "none",
+        "timeoutSeconds": "number"
+    },
+    "steps": {
+        "7517d1af-0126-432d-9d22-cf4db2bde364": {
+            "id": "7517d1af-0126-432d-9d22-cf4db2bde364",
+            "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
+            "name": "Read CSV",
+            "type": "read_csv",
+            "createdAtUTC": "2025-09-03T12:00:00.000Z",
+            "position": { "x": 0, "y": 80 },
+            "parameters": [
+                {
+                    "filePath": "_test/mock/database/Autorizados.csv",
+                    "encoding": "utf-8",
+                    "nullValues": ["", "NULL", "null"],
+                    "chunkSize": 200,
+                    "errorPolicy": "skip",
+                    "parser": {
+                        "escape": "'",
+                        "strict": true,
+                        "separator": ";"
+                    },
+                    "nextStepId": "f3018d15-7e21-4545-af5a-5157d9dd3f2b",
+                    "outputVar": "Autorizados"
+                }
+            ],
+            "connections": {
+                "f3018d15-7e21-4545-af5a-5157d9dd3f2b": "2931ca06-03d7-4bd2-b751-cdeb428c7e5f"
+            }
+        },
+        "2931ca06-03d7-4bd2-b751-cdeb428c7e5f": {
+            "id": "2931ca06-03d7-4bd2-b751-cdeb428c7e5f",
+            "name": "Loop over CSV rows",
+            "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
+            "createdAtUTC": "2025-09-03T12:00:00.000Z",
+            "position": { "x": 240, "y": 80 },
+            "type": "loop_operation",
+            "parameters": [
+                {
+                    "name": "convert",
+                    "sourceVar": "{{Autorizados}}",
+                    "outputVar": "csvAutorizados",
+                    "type": "format",
+                    "fields": [
+                        {
+                            "field": "{{Autorizados.DT_NASC}}",
+                            "type": "convert",
+                            "convertionType": "brDateFormatToDate"
+                        }
+                    ],
+                    "nextStepId": "ce6c0709-c143-484a-aada-4c0dc09abf23"
+                },
+                {
+                    "name": "create",
+                    "sourceVar": "{{Autorizados}}", 
+                    "outputVar": "csvAutorizados",
+                    "type": "create",
+                    "limit": 10,
+                    "offset": 100,
+                    "nextStepId": "29075a01-edb7-4d3e-9f3e-940335471cda"
+                },
+                {
+                    "type": "raw",
+                    "nextStepId": "a8434f7a-35dc-4658-b7df-5171d673b2e0"
+                }
+            ],
+            "connections": {
+                "ce6c0709-c143-484a-aada-4c0dc09abf23": "3760b877-ac4e-48db-8567-d062800c81cb",
+                "29075a01-edb7-4d3e-9f3e-940335471cda": "3760b877-ac4e-48db-8567-d062800c81cb",
+                "a8434f7a-35dc-4658-b7df-5171d673b2e0": ""
+            }
+        },
+        "3760b877-ac4e-48db-8567-d062800c81cb": {
+            "id": "3760b877-ac4e-48db-8567-d062800c81cb",
+            "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
+            "name": "Call External API",
+            "type": "api_call",
+            "createdAtUTC": "2025-09-03T12:00:00.000Z",
+            "position": { "x": 480, "y": 280 },
+            "list": {
+                "timeoutMs": 15000,
+                "keys": [ "{{config.method}}", "{{config.baseUrl}}", "{{config.endpoint}}" ]
+            },
+            "parameters": [
+                    {
+                        "baseUrl": "http://localhost:3009",
+                        "endpoint": "/api/webhook/status",
+                        "method": "GET",
+                        "headers": {
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer {{env.API_TOKEN}}"
+                        },
+                        "body": {
+                            "name": "{{csvAutorizados.NOME}}",
+                            "phone": "{{csvAutorizados.TELEFONE}}",
+                            "cpf": "{{csvAutorizados.CPF}}",
+                            "birthDate": "{{csvAutorizados.DT_NASC}}"
+                        },
+                        "reponseFormat": "json",
+                        "nextStepId": "88726a59-d6d1-4387-b385-00af0b636f64",
+                        "outputVar": "apiAutorizados"
+                    }
+                ],
+            "connections": {
+                "88726a59-d6d1-4387-b385-00af0b636f64": "4171ac10-ac21-4c63-bd59-bf3110218ff1",
+            }
+        },
+        "3e2a1246-2581-4bb5-a382-9e04667d17a4": {
+            "id": "3e2a1246-2581-4bb5-a382-9e04667d17a4",
+            "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
+            "createdAtUTC": "2025-09-03T12:00:00.000Z",
+            "position": { "x": 720, "y": 80 },
+            "type": "conditional_operation",
+            "parameters": [
+                {
+                    "condition": [{ "field": "{{Autorizados}}", "type": "arraySizeEquals", "validator": 100 }],
+                    "nextStepId": "d6e997f0-138b-4994-9df0-b57e4ab51d63"
+                },
+                {
+                    "condition": [{ "field": "{{Autorizados}}", "type": "arraySizeEquals", "validator": 6957 }],
+                    "nextStepId": "fbd63183-2d19-4624-85ba-19826227170f"
+                }
+            ],
+            "connections": {
+                "d6e997f0-138b-4994-9df0-b57e4ab51d63": "",
+                "fbd63183-2d19-4624-85ba-19826227170f": ""
+            }
+        },
+        "4171ac10-ac21-4c63-bd59-bf3110218ff1": {
+            "id": "4171ac10-ac21-4c63-bd59-bf3110218ff1",
+            "workflowId": "173b9358-b6f6-49f6-8bdc-9dbacadd8147",
+            "createdAtUTC": "2025-09-03T12:00:00.000Z",
+            "position": { "x": 720, "y": 280 },
+            "type": "conditional_operation",
+            "parameters": [
+                {
+                    "condition": [{ "field": "{{csvAutorizados.DT_NASC}}", "type": "regex", "validator": "/10/" }],
+                    "nextStepId": "986398ba-a852-456b-9d84-c7a260a84418"
+                },
+                {
+                    "condition": [{ "field": "{{csvAutorizados.DT_NASC}}", "type": "regex", "validator": "/11/" }],
+                    "nextStepId": "5a0db6dc-2f81-4107-8c9c-da6349eb2228"
+                }
+            ],
+            "connections": {
+                "986398ba-a852-456b-9d84-c7a260a84418": "",
+                "5a0db6dc-2f81-4107-8c9c-da6349eb2228": ""
+            }
+        }
+    }
+}

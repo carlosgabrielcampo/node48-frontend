@@ -78,29 +78,19 @@ export const WorkflowToolBar = ({
     }
   };
   const handleExport = useCallback(() => {
-    const workflowData: WorkflowData = {
-      nodes: nodes.map((node) => ({
-        id: node.id,
-        type: node.data.type,
-        name: node.data.name,
-        mainType: node.data.mainType,
-        position: node.position,
-        data: node.data
-      })),
-      connections: edges.map((edge, index) => ({
-        id: edge.id,
-        source: {
-          nodeId: edge.source,
-          outputIndex: 0,
-        },
-        target: {
-          nodeId: edge.target,
-          inputIndex: 0,
-        },
-      })),
-    };
+    // Import the exporter at the top of the function to avoid circular dependencies
+    const { exportToWorkflowJSON } = require("@/lib/workflowExporter");
+    
+    // Export to WorkflowJSON format
+    const workflowJSON = exportToWorkflowJSON(
+      nodes,
+      edges,
+      "workflow-" + Date.now(),
+      "Exported Workflow",
+      "Workflow exported from editor"
+    );
 
-    const blob = new Blob([JSON.stringify(workflowData, null, 2)], {
+    const blob = new Blob([JSON.stringify(workflowJSON, null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);

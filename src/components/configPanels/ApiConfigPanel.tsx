@@ -7,17 +7,22 @@ import { Plus, Trash2 } from "lucide-react";
 import { Dropdown } from "../layout/dropdown";
 
 export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
-  const parameters = (node.parameters as ApiConfig) || {
+  // Handle parameters as array (JSON format)
+  const paramArray = Array.isArray(node.parameters) ? node.parameters as ApiConfig[] : [];
+  const parameters = paramArray[0] || {
     baseUrl: "",
     endpoint: "",
     method: "GET",
     headers: {},
     body: {},
     reponseFormat: "json",
+    outputVar: "",
+    nextStepId: "",
+    errorStepId: ""
   };
 
   const updateConfig = (updates: Partial<ApiConfig>) => {
-    onUpdate({ parameters: { ...parameters, ...updates } });
+    onUpdate({ parameters: [{ ...parameters, ...updates }] });
   };
 
   const addHeader = () => {
@@ -89,6 +94,36 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
         onValueChange={(value) => updateConfig({ reponseFormat: value })}
         value={parameters.reponseFormat}
       />
+
+      <div>
+        <Label>Output Variable</Label>
+        <Input
+          value={parameters.outputVar || ""}
+          onChange={(e) => updateConfig({ outputVar: e.target.value })}
+          placeholder="apiResponse"
+          className="mt-1"
+        />
+      </div>
+
+      <div>
+        <Label>Next Step ID (Success)</Label>
+        <Input
+          value={parameters.nextStepId || ""}
+          onChange={(e) => updateConfig({ nextStepId: e.target.value })}
+          placeholder="Next step on success"
+          className="mt-1"
+        />
+      </div>
+
+      <div>
+        <Label>Error Step ID</Label>
+        <Input
+          value={parameters.errorStepId || ""}
+          onChange={(e) => updateConfig({ errorStepId: e.target.value })}
+          placeholder="Step to run on error"
+          className="mt-1"
+        />
+      </div>
 
       <div>
         <Label>Timeout (ms)</Label>

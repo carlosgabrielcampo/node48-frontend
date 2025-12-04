@@ -15,35 +15,54 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
     nextStepId: "",
     fields: [],
   };
-  const parameters = (node.parameters as LoopConfigEntry[]) || [];
-  const [stateConfig, setConfig] = useState(node.parameters as LoopConfigEntry[]);
-  const saveConfig = () => { onUpdate({parameters: stateConfig}) }
   
-  const addConfigEntry = () => { setConfig([...parameters, newEntry]); };
+  // Ensure parameters is always an array and type-guard to LoopConfigEntry[]
+  const getInitialConfig = (): LoopConfigEntry[] => {
+    if (Array.isArray(node.parameters)) {
+      const firstParam = node.parameters[0];
+      // Type guard to check if it's a LoopConfigEntry
+      if (firstParam && 'sourceVar' in firstParam && 'type' in firstParam) {
+        return node.parameters as LoopConfigEntry[];
+      }
+    }
+    return [];
+  };
+  
+  const [stateConfig, setConfig] = useState<LoopConfigEntry[]>(getInitialConfig());
+  
+  const saveConfig = () => { 
+    onUpdate({ parameters: stateConfig }) 
+  }
+  
+  const addConfigEntry = () => { 
+    setConfig([...stateConfig, newEntry]); 
+  };
 
-  const removeConfigEntry = (index: number) => { setConfig(parameters.filter((_, i) => i !== index)); };
+  const removeConfigEntry = (index: number) => { 
+    setConfig(stateConfig.filter((_, i) => i !== index)); 
+  };
 
   const updateConfigEntry = (index: number, updates: Partial<LoopConfigEntry>) => {
-    const updated = [...parameters];
+    const updated = [...stateConfig];
     updated[index] = { ...updated[index], ...updates };
     setConfig(updated);
   };
 
   const addField = (configIndex: number) => {
-    const updated = [...parameters];
+    const updated = [...stateConfig];
     const fields = updated[configIndex].fields || [];
     updated[configIndex].fields = [...fields, { field: "", type: "convert", convertionType: "" }];
     setConfig(updated);
   };
 
   const removeField = (configIndex: number, fieldIndex: number) => {
-    const updated = [...parameters];
+    const updated = [...stateConfig];
     updated[configIndex].fields = updated[configIndex].fields?.filter((_, i) => i !== fieldIndex);
     setConfig(updated);
   };
 
   const updateField = (configIndex: number, fieldIndex: number, updates: Partial<LoopFormatField>) => {
-    const updated = [...parameters];
+    const updated = [...stateConfig];
     const fields = updated[configIndex].fields || [];
     fields[fieldIndex] = { ...fields[fieldIndex], ...updates };
     updated[configIndex].fields = fields;
@@ -165,7 +184,7 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
         </Card>
       ))}
       <Button size="sm" className="mt-1 w-full" onClick={saveConfig}>Save</Button>
-      {parameters.length === 0 && (
+      {stateConfig.length === 0 && (
         <div className="text-sm text-muted-foreground text-center py-8">
           No configuration entries. Click "Add Config" to create one.
         </div>

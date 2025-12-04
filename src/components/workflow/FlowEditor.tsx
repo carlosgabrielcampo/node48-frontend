@@ -16,12 +16,12 @@ import { WorkflowNode } from "@/types/configPanels";
 import { v4 as uuidv4 } from 'uuid'
 import { FlowEditorProps } from "@/types/workflows";
 import { parseWorkflowJSON } from "@/lib/workflowParser";
-import { DefaultNode } from "../nodes/DefaultNode";
-import { NodeConfigPanel } from "../configPanels/NodeConfigPanel";
+import { UnifiedNode } from "../nodes/UnifiedNode";
+import { NodeConfigPanel } from "../config-panels/NodeConfigPanel";
 import { createEmptyNode } from "../nodes/NodeDataStructure";
 import { WorkflowJSON } from "@/types/workflows";
 
-const nodeTypes = { "custom": DefaultNode };
+const nodeTypes = { custom: UnifiedNode };
 
 export const FlowEditor = ({
   onNodeAdded, 
