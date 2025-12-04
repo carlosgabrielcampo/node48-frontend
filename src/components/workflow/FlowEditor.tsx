@@ -167,7 +167,7 @@ export const FlowEditor = ({
         >
           <Background className="bg-canvas" gap={20} />
           <Controls position="bottom-left" />
-          <MiniMap nodeColor="hsl(var(--primary))" className="bg-canvas"/>
+          <MiniMap nodeColor="hsl(var(--primary))" className="bg-canvas" />
         </ReactFlow>
       </div>
 

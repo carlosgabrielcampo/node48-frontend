@@ -4,6 +4,7 @@ import { parametersPanels } from "./customPanels";
 import { Button } from "../ui/button";
 import { useEffect, useRef, useState } from "react";
 import { PenBox } from "lucide-react";
+
 export const NodeConfigPanel = ({
   node,
   open,
@@ -44,7 +45,7 @@ export const NodeConfigPanel = ({
         <SheetHeader>
           <SheetTitle>
             <div className="flex items-center gap-2">
-              {node?.name || ""}
+              {node?.name || node?.type}
               <PenBox className="h-4 w-4 text-muted-foreground"/>
             </div>
           </SheetTitle>

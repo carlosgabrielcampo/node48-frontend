@@ -158,23 +158,26 @@ export const WorkflowToolBar = ({
   );
 
   return (
-    <div className="flex items-center gap-2 p-4 border-b bg-background">
+    <div className="flex items-center gap-2 p-4 border-b bg-background ">
       <Button
         onClick={onAddNode}
         size="sm"
         className="gap-2"
       >
         <Plus className="h-4 w-4" />
+        <p>Add Node</p>
       </Button>
       <Button
         onClick={handleExport}
         size="sm" variant="outline" className="gap-2">
         <Download className="h-4 w-4" />
+        <p>Export</p>
       </Button>
       <label>
         <Button size="sm" variant="outline" className="gap-2" asChild>
           <span>
             <Upload className="h-4 w-4" />
+            <p>Import</p>
           </span>
         </Button>
         <input
@@ -194,6 +197,7 @@ export const WorkflowToolBar = ({
           aria-label="Toggle workflow active state"
         />
         <Label htmlFor="workflow-active" className="text-sm cursor-pointer whitespace-nowrap">
+          {isActive ? "Active" : "Inactive"}
         </Label>
       </div>
 
@@ -205,6 +209,7 @@ export const WorkflowToolBar = ({
         aria-label="Execute workflow"
       >
         <Play />
+        {isRunning ? "Running" : "Run"}
       </Button>
       <Button
         size="sm"
@@ -213,6 +218,7 @@ export const WorkflowToolBar = ({
         aria-label="Save workflow"
       >
         <Save className="" />
+        <p>Save</p>
       </Button>
     </div>
   );

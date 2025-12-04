@@ -8,6 +8,7 @@ interface DefaultNodeData {
   type: string; // Actual node type string like "conditional_operation", "api_call", etc.
   mainType: string;
   startStep: boolean;
+  trigger: boolean;
   onDelete: (id: string) => void;
   onClick?: (data: any) => void;
   connections: any[];
@@ -21,6 +22,7 @@ export const DefaultNode = memo(({ id, data, selected, ...rest }: NodeProps<Defa
   const nodeHeight = 80 + (outputHandles?.length > 2 ? (outputHandles?.length - 2) * 30 : 0);
   return (
     <div
+      onDoubleClick={() => { data.onClick?.({id, ...data}) }}
       style={{ minHeight: `${nodeHeight}px` }}
       className={`rounded-lg border-2 bg-node-hover min-h-[100px] shadow-lg transition-all w-[200px] cursor-pointer relative ${
         selected 
@@ -29,7 +31,7 @@ export const DefaultNode = memo(({ id, data, selected, ...rest }: NodeProps<Defa
       }`}
     >
       {/* Input Handle */}
-      { !data.startStep &&
+      { !data.startStep && !data.trigger &&
           <div className="absolute bg-primary h-[50px]">
             <Handle
               type="target"
@@ -52,20 +54,6 @@ export const DefaultNode = memo(({ id, data, selected, ...rest }: NodeProps<Defa
 
             </div>
           </div>
-          <button
-            onClick={() => { data.onClick?.({id, ...data}) }}
-            className="h-6 w-6 rounded hover:bg-primary/10 flex items-center justify-center transition-colors flex-shrink-0"
-            aria-label="Acess node settings"
-          >
-            <Cog className="h-3 w-3 text-muted-foreground hover:text-primary" />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); data.onDelete(id); }}
-            className="h-6 w-6 rounded hover:bg-destructive/10 flex items-center justify-center transition-colors flex-shrink-0"
-            aria-label="Delete node"
-          >
-            <Trash2 className="h-3 w-3 text-muted-foreground hover:text-destructive" />
-          </button>
         </div>
       </div>
       <div className="flex flex-col gap-1 mb-2">
@@ -73,7 +61,9 @@ export const DefaultNode = memo(({ id, data, selected, ...rest }: NodeProps<Defa
           const totalHandles = outputHandles.length;        
           return (
             <div key={source} className="flex  relative min-w-[100%] h-[40px]  justify-center items-center">
-              <div className="rounded-lg min-w-[90%] border-2 h-[90%] border-2 items-center"/>
+              <div className="flex rounded-lg min-w-[90%] border-2 h-[90%] border-2 items-center ">
+                <p className="text-sm font-semibold text-foreground truncate p-2">{String(data.parameters?.[index].name || "").toUpperCase()}</p>
+                </div>
               <Handle
                 type="source"
                 id={source}

@@ -90,17 +90,6 @@ const Workflow = ({workflow}) => {
         <WorkflowSidebar />
         <div className="flex-1 flex flex-col transition-all duration-200">
           <WorkflowTopBar workflowName={workflow?.name || "Untitled Workflow"} />
-          <WorkflowToolBar
-            nodes={nodes} 
-            edges={edges}
-            isActive={isActive}
-            setNodes={setNodes}
-            setEdges={setEdges}
-            setIsActive={setIsActive}
-            setIsDrawerOpen={setIsDrawerOpen}
-            handleNodeClick={handleNodeClick}
-            handleDeleteNode={handleDeleteNode}
-          />
           <FlowEditor
             nodes={nodes}
             edges={edges} 
@@ -111,10 +100,8 @@ const Workflow = ({workflow}) => {
             onNodeAdded={handleNodeAdded}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
-
             selectedNode={selectedNode}
             setSelectedNode={setSelectedNode}
-
             setConfigPanelOpen={setConfigPanelOpen}
             handleAddNode={handleAddNode}
           />
@@ -122,6 +109,17 @@ const Workflow = ({workflow}) => {
             open={isDrawerOpen}
             onOpenChange={setIsDrawerOpen}
             onSelectNodeType={handleNodeAdded}
+          />
+          <WorkflowToolBar
+            nodes={nodes} 
+            edges={edges}
+            isActive={isActive}
+            setNodes={setNodes}
+            setEdges={setEdges}
+            setIsActive={setIsActive}
+            setIsDrawerOpen={setIsDrawerOpen}
+            handleNodeClick={handleNodeClick}
+            handleDeleteNode={handleDeleteNode}
           />
         </div>
       </div>

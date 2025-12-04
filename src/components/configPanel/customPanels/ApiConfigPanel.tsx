@@ -23,6 +23,20 @@ export const ApiConfigPanel = ({ stateConfig, setConfig }: ConfigPanelProps) => 
     setConfig([{ ...state, ...updates }]);
   };
 
+  const addParams = () => {
+    updateConfig({ params: { ...state.params, "": "" } });
+  };
+
+  const removeParams = (key: string) => {
+    const { [key]: _, ...rest } = state.params;
+    updateConfig({ params: rest });
+  };
+
+  const updateParams = (oldKey: string, newKey: string, value: string) => {
+    const { [oldKey]: _, ...rest } = state.params;
+    updateConfig({ params: { ...rest, [newKey]: value } });
+  };
+
   const addHeader = () => {
     updateConfig({ headers: { ...state.headers, "": "" } });
   };
@@ -113,6 +127,37 @@ export const ApiConfigPanel = ({ stateConfig, setConfig }: ConfigPanelProps) => 
         placeholder={"apiResponse"}
         className={"mt-1"}
       />
+
+      <Card className="p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <Label className="font-semibold">Params</Label>
+          <Button onClick={addParams} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-1" />
+            Add
+          </Button>
+        </div>
+        {
+          state?.params && Object.entries(state?.params)?.map(([key, value]) => (
+            <div key={key} className="flex gap-2">
+              <Input
+                value={key}
+                onChange={(e) => updateParams(key, e.target.value, value)}
+                placeholder="Key"
+                className="flex-1"
+              />
+              <Input
+                value={value}
+                onChange={(e) => updateParams(key, key, e.target.value)}
+                placeholder="Value"
+                className="flex-1"
+              />
+              <Button onClick={() => removeParams(key)} size="sm" variant="ghost">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))
+        }
+      </Card>
 
       <Card className="p-4 space-y-3">
         <div className="flex items-center justify-between">

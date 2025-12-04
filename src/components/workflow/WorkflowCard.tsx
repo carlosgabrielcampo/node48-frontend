@@ -20,7 +20,9 @@ export const WorkflowCard = ({ workflow, onClick }: WorkflowCardProps) => {
             <FileText className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg truncate">{workflow.name}</CardTitle>
+            <CardTitle className="text-lg truncate">{
+            workflow.name
+            }</CardTitle>
             {workflow.description && (
               <CardDescription className="line-clamp-2 mt-1.5">
                 {workflow.description}
