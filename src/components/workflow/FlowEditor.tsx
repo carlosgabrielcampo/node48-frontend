@@ -44,6 +44,10 @@ export const FlowEditor = ({
   const [pendingNode, setPendingNode] = useState<any>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
+  // componentDidMount: function() {
+  //     window.addEventListener('scroll', this.handleScroll);
+  // }
+
   useEffect(() => {
     if (onNodeAdded) {
       globalThis.__addWorkflowNode = (node) => {
@@ -178,7 +182,7 @@ export const FlowEditor = ({
   return (
     <div className="flex-1 flex flex-col" ref={reactFlowWrapper}>
       {/* Canvas */}
-      <div className="flex-1" onKeyDown={handleKeyDown} tabIndex={0}>
+      <div className="flex-1" onKeyDown={handleKeyDown} tabIndex={0} >
         <ReactFlow
           nodes={nodes}
           edges={edges}

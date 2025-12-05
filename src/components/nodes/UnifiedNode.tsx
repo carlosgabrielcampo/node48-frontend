@@ -70,23 +70,11 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
           type="target"
           position={Position.Left}
           id={id}
+          style={{ top: "36px" }}
           className="!bg-primary !w-3 !h-3 !border-2 !border-slate-800"
         />
 
-        {/* Expand button */}
-        {/* <button
-          onClick={toggleCollapse}
-          onKeyDown={handleKeyDown}
-          tabIndex={0}
-          aria-expanded={false}
-          aria-label="Expand node"
-          className="h-5 w-5 rounded hover:bg-slate-700 flex items-center justify-center transition-colors flex-shrink-0"
-        >
-          <ChevronRight className="h-3 w-3 text-slate-400" />
-        </button> */}
-
-        {/* Icon and short label */}
-        <Icon className="h-6 w-6 text-primary flex-shrink-0" onClick={toggleCollapse}/>
+        <Icon className="h-6 w-6 hover:text-primary/80 text-primary flex-shrink-0 transition-colors" onClick={toggleCollapse}/>
         
         <span className="text-center absolute text-xs font-medium text-white w-[80px] top-[80px] left-0 justify-center items-center">
           {nodeName}
@@ -118,7 +106,7 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
 
   return (
     <div
-      onDoubleClick={() => data.onClick?.(data)}
+      onDoubleClick={() => data.onClick?.({id, ...data})}
       style={{ minHeight: `${nodeHeight}px` }}
       className={`rounded-lg border-2 bg-slate-800 shadow-lg shadow-black/20 transition-all duration-200 ease-in-out w-[220px] cursor-pointer relative ${
         selected
@@ -131,28 +119,17 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
         type="target"
         position={Position.Left}
         id={id}
-        style={{ top: "32px" }}
+        style={{ top: "36px" }}
         className="!bg-primary !w-3 !h-3 !border-2 !border-slate-800"
       />
 
       {/* Node Header */}
       <div className="p-3 border-b border-slate-700/50" >
         <div className="flex items-center gap-2">
-          {/* Collapse button */}
-          {/* <button
-            onClick={toggleCollapse}
-            onKeyDown={handleKeyDown}
-            tabIndex={0}
-            aria-expanded={true}
-            aria-label="Collapse node"
-            className="h-6 w-6 rounded hover:bg-slate-700 flex items-center justify-center transition-colors flex-shrink-0"
-          >
-            <ChevronDown className="h-4 w-4 text-slate-400" />
-          </button> */}
 
           {/* Icon */}
-          <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <Icon className="h-4 w-4 text-primary" onClick={toggleCollapse} />
+          <div onClick={toggleCollapse} className="h-8 w-8 rounded-md hover:bg-primary/20 bg-primary/10 flex items-center justify-center flex-shrink-0 transition-colors">
+            <Icon className="h-4 w-4 text-primary"/>
           </div>
 
           {/* Title */}
@@ -160,9 +137,9 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
             <span className="text-sm font-semibold text-white truncate block">
               {nodeName}
             </span>
-            <span className="text-xs text-slate-400 truncate block">
+            {/* <span className="text-xs text-slate-400 truncate block">
               {data.type}
-            </span>
+            </span> */}
           </div>
           <div className="flex gap-1 flex-shrink-0">
             <button

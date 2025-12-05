@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Plus, Trash2, PenBox } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Dropdown } from "../layout/dropdown";
 
@@ -84,7 +84,6 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Label className="font-medium">Config {index + 1}</Label>
-              <PenBox className="h-4 w-4 text-muted-foreground"/>
             </div>
             <Button onClick={() => removeConfigEntry(index)} size="sm" variant="ghost">
               <Trash2 className="h-4 w-4" />

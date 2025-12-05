@@ -30,7 +30,7 @@ const Workflow = ({workflow}) => {
     console.log("Node Clicked", node)
 
     const workflowNode: WorkflowNode = {
-      id: node.workflowId,
+      id: node.id,
       name: node?.name,
       type: node?.type,
       data: node?.data,

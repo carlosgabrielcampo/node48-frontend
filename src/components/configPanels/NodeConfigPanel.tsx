@@ -32,8 +32,9 @@ export const NodeConfigPanel = ({
       <SheetContent className="w-[500px] sm:max-w-[500px] overflow-y-auto">
         <SheetHeader>
           <SheetTitle>
-            Configure {node?.name || node?.type}
+            <p>Configure {node?.name || node?.type}</p>
           </SheetTitle>
+          <p className="text-sm">{node.id}</p>
         </SheetHeader>
         <div className="mt-6">
           {renderConfigPanel()}
