@@ -20,8 +20,10 @@ import { UnifiedNode } from "../nodes/UnifiedNode";
 import { createEmptyNode } from "../nodes/NodeDataStructure";
 import { WorkflowJSON } from "@/types/workflows";
 import { NodeConfigPanel } from "../configPanels/NodeConfigPanel";
+import { CustomEdge } from "../edges/CustomEdge";
 
 const nodeTypes = { custom: UnifiedNode };
+const edgeTypes = { custom: CustomEdge };
 
 export const FlowEditor = ({
   onNodeAdded, 
@@ -43,10 +45,9 @@ export const FlowEditor = ({
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
   const [pendingNode, setPendingNode] = useState<any>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-
-  // componentDidMount: function() {
-  //     window.addEventListener('scroll', this.handleScroll);
-  // }
+  const [isScreenMoving, setIsScreenMoving] = useState(false);
+  const timerRef = useRef<number | null>(null);
+  const minimapDelay = 400
 
   useEffect(() => {
     if (onNodeAdded) {
@@ -68,7 +69,7 @@ export const FlowEditor = ({
       const newEdge: Edge = {
         ...connection,
         id: uuidv4(),
-        type: "smoothstep",
+        type: "custom",
         animated: false,
         style: { stroke: "hsl(var(--primary))", strokeWidth: 2 },
         markerEnd: {
@@ -99,8 +100,6 @@ export const FlowEditor = ({
     },
     [setNodes, handleDeleteNode, handleNodeClick ]
   );
-
- 
 
   const handleUpdateNode = useCallback((nodeId: string, updates: Partial<WorkflowNode>) => {
     setNodes((nds) =>
@@ -177,8 +176,18 @@ export const FlowEditor = ({
       setEdges([]);
     }
   },[])
-  
-  console.log({edges, nodes})
+
+  const hideMinimap = () => {
+    timerRef.current = window.setTimeout(() => {
+      setIsScreenMoving(false);
+      timerRef.current = null;
+    }, minimapDelay);
+  };
+  const showMinimap = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setIsScreenMoving(true);
+  };  
+
   return (
     <div className="flex-1 flex flex-col" ref={reactFlowWrapper}>
       {/* Canvas */}
@@ -191,13 +200,18 @@ export const FlowEditor = ({
           onConnect={onConnect}
           onSelectionChange={onSelectionChange}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           connectionMode={ConnectionMode.Strict}
           fitView
           attributionPosition="bottom-left"
+          onMoveStart={showMinimap}
+          onMoveEnd={hideMinimap}
+          minZoom={0.1}
+          maxZoom={1.5}
         >
           <Background className="bg-canvas" gap={20} />
           <Controls />
-          <MiniMap nodeColor="hsl(var(--primary))" className="bg-canvas"/>
+          {isScreenMoving && <MiniMap  nodeColor="hsl(var(--primary))" className="bg-canvas"/>}
         </ReactFlow>
       </div>
 

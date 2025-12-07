@@ -1,6 +1,4 @@
 import { useState, useCallback } from "react";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { WorkflowSidebar } from "@/components/workflow/WorkflowSidebar";
 import { WorkflowTopBar } from "@/components/workflow/WorkflowTopBar";
 import { FlowEditor } from "@/components/workflow/FlowEditor";
 import { WorkflowToolBar } from "@/components/workflow/WorkflowToolBar";
@@ -8,7 +6,6 @@ import { NodeTypeDrawer } from "@/components/nodes/NodeTypeDrawer";
 import { useEdgesState, useNodesState } from "reactflow";
 import { WorkflowNode } from "@/types/configPanels";
 import { toast } from "sonner";
-
 interface Window {
   __addWorkflowNode?: (args: {
     type: string;
@@ -25,10 +22,7 @@ const Workflow = ({workflow}) => {
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
   const [configPanelOpen, setConfigPanelOpen] = useState(false);
 
-
   const handleNodeClick = useCallback((node) => {
-    console.log("Node Clicked", node)
-
     const workflowNode: WorkflowNode = {
       id: node.id,
       name: node?.name,
@@ -60,51 +54,48 @@ const Workflow = ({workflow}) => {
   );
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        <WorkflowSidebar />
-        <div className="flex-1 flex flex-col transition-all duration-200">
-          <WorkflowTopBar workflowName={workflow?.name || "Untitled Workflow"} />
-          <WorkflowToolBar
-            nodes={nodes} 
-            edges={edges}
-            isActive={isActive}
-            selectedNode={selectedNode}
-            configPanelOpen={configPanelOpen}
-            setNodes={setNodes}
-            setEdges={setEdges}
-            setIsActive={setIsActive}
-            setWorkflowId={setWorkflowId}
-            setSelectedNode={setSelectedNode}
-            setIsDrawerOpen={setIsDrawerOpen}
-            handleNodeClick={handleNodeClick}
-            handleDeleteNode={handleDeleteNode}
-            setConfigPanelOpen={setConfigPanelOpen}
-          />
-          <FlowEditor
-            nodes={nodes}
-            edges={edges} 
-            workflow={workflow}
-            selectedNode={selectedNode}
-            configPanelOpen={configPanelOpen}
-            setNodes={setNodes} 
-            setEdges={setEdges}
-            onNodeAdded={handleNodeAdded}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            setSelectedNode={setSelectedNode}
-            handleNodeClick={handleNodeClick}
-            handleDeleteNode={handleDeleteNode}
-            setConfigPanelOpen={setConfigPanelOpen}
-          />
-          <NodeTypeDrawer
-            open={isDrawerOpen}
-            onOpenChange={setIsDrawerOpen}
-            onSelectNodeType={handleNodeAdded}
+    <div className="min-h-screen flex w-full bg-background">
+      <div className="flex-1 flex flex-col transition-all duration-200">
+        <WorkflowTopBar workflowName={workflow?.name || "Untitled Workflow"} />
+        <WorkflowToolBar
+          nodes={nodes} 
+          edges={edges}
+          isActive={isActive}
+          selectedNode={selectedNode}
+          configPanelOpen={configPanelOpen}
+          setNodes={setNodes}
+          setEdges={setEdges}
+          setIsActive={setIsActive}
+          setWorkflowId={setWorkflowId}
+          setSelectedNode={setSelectedNode}
+          setIsDrawerOpen={setIsDrawerOpen}
+          handleNodeClick={handleNodeClick}
+          handleDeleteNode={handleDeleteNode}
+          setConfigPanelOpen={setConfigPanelOpen}
+        />
+        <FlowEditor
+          nodes={nodes}
+          edges={edges} 
+          workflow={workflow}
+          selectedNode={selectedNode}
+          configPanelOpen={configPanelOpen}
+          setNodes={setNodes} 
+          setEdges={setEdges}
+          onNodeAdded={handleNodeAdded}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          setSelectedNode={setSelectedNode}
+          handleNodeClick={handleNodeClick}
+          handleDeleteNode={handleDeleteNode}
+          setConfigPanelOpen={setConfigPanelOpen}
+        />
+        <NodeTypeDrawer
+          open={isDrawerOpen}
+          onOpenChange={setIsDrawerOpen}
+          onSelectNodeType={handleNodeAdded}
           />
         </div>
       </div>
-    </SidebarProvider>
   );
 };
 

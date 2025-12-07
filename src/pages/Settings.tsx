@@ -10,9 +10,7 @@ export default function Settings() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full bg-background">
-        <WorkflowSidebar />
         <main className="flex-1 overflow-y-auto">
           <div className="container max-w-4xl py-8 px-6">
             <div className="mb-8">
@@ -116,6 +114,5 @@ export default function Settings() {
           </div>
         </main>
       </div>
-    </SidebarProvider>
   );
 }

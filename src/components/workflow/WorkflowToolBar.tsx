@@ -126,7 +126,7 @@ export const WorkflowToolBar = ({
               id: conn.id,
               source: conn.source.nodeId,
               target: conn.target.nodeId,
-              type: "smoothstep",
+              type: "custom",
               animated: true,
               style: { stroke: "hsl(var(--primary))", strokeWidth: 2 },
               markerEnd: {

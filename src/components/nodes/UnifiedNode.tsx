@@ -143,7 +143,7 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
           </div>
           <div className="flex gap-1 flex-shrink-0">
             <button
-              onClick={() => data.onClick?.(data)}
+              onClick={() => data.onClick?.({id, ...data})}
               className="h-6 w-6 rounded hover:bg-slate-700 flex items-center justify-center transition-colors"
               aria-label="Node settings"
             >

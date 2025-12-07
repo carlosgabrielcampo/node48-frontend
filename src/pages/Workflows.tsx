@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { WorkflowCard } from "@/components/workflow/WorkflowCard";
 import { CreateWorkflowDialog } from "@/components/workflow/CreateWorkflowDialog";
 import { workflowService } from "@/services/workflowService";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 
 const Workflows = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);

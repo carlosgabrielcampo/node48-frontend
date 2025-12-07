@@ -22,8 +22,9 @@ export const parseWorkflowJSON = (
           source: step.id,
           sourceHandle: handleId,
           target: targetId,
-          type: "smoothstep",
+          type: "custom",
           animated: false,
+          data: { label: 'A' },
           style: { 
             color: "hsl(var(--connection-line))",
             stroke: "hsl(var(--connection-line))", 
