@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createNode } from "@/components/nodes/NodeDataStructure";
 // Workflow JSON format (from backend)
 import { WorkflowJSON } from "@/types/workflows";
+import { createEdge } from "@/components/edges/EdgeDataStructure";
 
 export const parseWorkflowJSON = (
   workflowJSON: WorkflowJSON,
@@ -15,26 +16,8 @@ export const parseWorkflowJSON = (
   // Convert each step to a node
   Object.values(workflowJSON.steps).forEach((step) => {
     nodes.push(createNode({id: step.id, position: step.position, onClick, onDelete, ...step }));
-
-    Object.entries(step.connections).forEach(([handleId, targetId]) => {
-        edges.push({
-          id: uuidv4(),
-          source: step.id,
-          sourceHandle: handleId,
-          target: targetId,
-          type: "custom",
-          animated: false,
-          data: { label: 'A' },
-          style: { 
-            color: "hsl(var(--connection-line))",
-            stroke: "hsl(var(--connection-line))", 
-            strokeWidth: 2 
-          },
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            color: "hsl(var(--connection-line))",
-          },
-        });
+    Object.entries(step.connections).forEach(([handleId, targetId], index) => {
+      edges.push(createEdge({id: handleId, source: step.id, sourceHandle: handleId, target: targetId, label: String(index)}));
     });
   });
   return { nodes, edges };

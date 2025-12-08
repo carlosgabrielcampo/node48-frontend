@@ -20,10 +20,9 @@ import { UnifiedNode } from "../nodes/UnifiedNode";
 import { createEmptyNode } from "../nodes/NodeDataStructure";
 import { WorkflowJSON } from "@/types/workflows";
 import { NodeConfigPanel } from "../configPanels/NodeConfigPanel";
-import { CustomEdge } from "../edges/CustomEdge";
+import { createEdge } from "../edges/EdgeDataStructure";
 
 const nodeTypes = { custom: UnifiedNode };
-const edgeTypes = { custom: CustomEdge };
 
 export const FlowEditor = ({
   onNodeAdded, 
@@ -66,18 +65,13 @@ export const FlowEditor = ({
         toast.error("Cannot connect a node to itself");
         return;
       }
-      const newEdge: Edge = {
-        ...connection,
-        id: uuidv4(),
-        type: "custom",
-        animated: false,
-        style: { stroke: "hsl(var(--primary))", strokeWidth: 2 },
-        markerEnd: {
-          type: MarkerType.ArrowClosed,
-          color: "hsl(var(--primary))",
-        },
-      };
-
+      const newEdge = createEdge({
+        id: connection.sourceHandle,
+        source: connection.source,
+        sourceHandle: connection.sourceHandle,
+        target: connection.target,
+        label: 'aa'
+      })
       setEdges((eds) => addEdge(newEdge, eds));
       toast.success("Connection created");
     },
@@ -200,7 +194,6 @@ export const FlowEditor = ({
           onConnect={onConnect}
           onSelectionChange={onSelectionChange}
           nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
           connectionMode={ConnectionMode.Strict}
           fitView
           attributionPosition="bottom-left"

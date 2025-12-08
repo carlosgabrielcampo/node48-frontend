@@ -5,9 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Dropdown } from "../layout/dropdown";
-
-export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
+import { Dropdown } from "../../layout/dropdown";
+import { LabeledInput } from "@/components/layout/input";
+import { WorkflowNode } from "@/types/configPanels";
+export const LoopConfigPanel = ({ state, setState }: LoopConfigPanelProps) => {
   const newEntry: LoopConfigEntry = {
     sourceVar: "",
     outputVar: "",
@@ -15,60 +16,47 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
     nextStepId: "",
     fields: [],
   };
-  
   // Ensure parameters is always an array and type-guard to LoopConfigEntry[]
-  const getInitialConfig = (): LoopConfigEntry[] => {
-    if (Array.isArray(node.parameters)) {
-      const firstParam = node.parameters[0];
-      // Type guard to check if it's a LoopConfigEntry
-      if (firstParam && 'sourceVar' in firstParam && 'type' in firstParam) {
-        return node.parameters as LoopConfigEntry[];
-      }
-    }
-    return [];
-  };
-  
-  const [stateConfig, setConfig] = useState<LoopConfigEntry[]>(getInitialConfig());
-  
-  const saveConfig = () => { 
-    onUpdate({ parameters: stateConfig }) 
+
+  const saveConfig = (config: Partial<WorkflowNode>) => { 
+    setState([...config]) 
   }
   
   const addConfigEntry = () => { 
-    setConfig([...stateConfig, newEntry]); 
+    saveConfig([...state, newEntry]); 
   };
 
   const removeConfigEntry = (index: number) => { 
-    setConfig(stateConfig.filter((_, i) => i !== index)); 
+    saveConfig(state.filter((_, i) => i !== index)); 
   };
 
   const updateConfigEntry = (index: number, updates: Partial<LoopConfigEntry>) => {
-    const updated = [...stateConfig];
+    const updated = [...state];
     updated[index] = { ...updated[index], ...updates };
-    setConfig(updated);
+    saveConfig(updated);
   };
 
   const addField = (configIndex: number) => {
-    const updated = [...stateConfig];
+    const updated = [...state];
     const fields = updated[configIndex].fields || [];
     updated[configIndex].fields = [...fields, { field: "", type: "convert", convertionType: "" }];
-    setConfig(updated);
+    saveConfig(updated);
   };
 
   const removeField = (configIndex: number, fieldIndex: number) => {
-    const updated = [...stateConfig];
+    const updated = [...state];
     updated[configIndex].fields = updated[configIndex].fields?.filter((_, i) => i !== fieldIndex);
-    setConfig(updated);
+    saveConfig(updated);
   };
 
   const updateField = (configIndex: number, fieldIndex: number, updates: Partial<LoopFormatField>) => {
-    const updated = [...stateConfig];
+    const updated = [...state];
     const fields = updated[configIndex].fields || [];
     fields[fieldIndex] = { ...fields[fieldIndex], ...updates };
     updated[configIndex].fields = fields;
-    setConfig(updated);
+    saveConfig(updated);
   };
-
+  console.log({state})
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -79,7 +67,7 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
         </Button>
       </div>
 
-      {stateConfig.map((entry, index) => (
+      {state.map((entry, index) => (
         <Card key={index} className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -89,33 +77,29 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
-
-          <div>
-            <Label className="text-xs">Source Variable</Label>
-            <Input
-              value={entry.sourceVar}
+          <LabeledInput
+              label={"Source Variable"}
+              className={"mt-1"}
               onChange={(e) => updateConfigEntry(index, { sourceVar: e.target.value })}
               placeholder="{{Autorizados}}"
-              className="mt-1"
-            />
-          </div>
+              value={entry.sourceVar}
+          />
+          <LabeledInput 
+            label={"Output Variable"}
+            className={"mt-1"}
+            onChange={(e) => updateConfigEntry(index, { outputVar: e.target.value })}
+            placeholder={"csvAutorizados"}
+            value={entry.outputVar}
+          />
 
-          <div>
-            <Label className="text-xs">Output Variable</Label>
-            <Input
-              value={entry.outputVar}
-              onChange={(e) => updateConfigEntry(index, { outputVar: e.target.value })}
-              placeholder="csvAutorizados"
-              className="mt-1"
-            />
-          </div>
           
           <Dropdown itemList={[
             {value: "format", displayName: "Format"},
             {value: "create", displayName: "Create"},
+            {value: "raw", displayName: "Raw"},
           ]} 
             label={"Type"}
-            onValueChange={(value: "format" | "create") => updateConfigEntry(index, { type: value })}
+            onValueChange={(value: "format" | "create" | "raw") => updateConfigEntry(index, { type: value })}
             value={entry.type}
           />
 
@@ -182,8 +166,7 @@ export const LoopConfigPanel = ({ node, onUpdate }: LoopConfigPanelProps) => {
           )}
         </Card>
       ))}
-      <Button size="sm" className="mt-1 w-full" onClick={saveConfig}>Save</Button>
-      {stateConfig.length === 0 && (
+      {state.length === 0 && (
         <div className="text-sm text-muted-foreground text-center py-8">
           No configuration entries. Click "Add Config" to create one.
         </div>

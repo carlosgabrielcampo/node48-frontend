@@ -1,8 +1,8 @@
 import { NodeType } from '@/types/node'
-import { ApiConfigPanel } from './ApiConfigPanel'
-import { ConditionConfigPanel } from './ConditionConfigPanel'
-import { CsvConfigPanel } from './CsvConfigPanel'
-import { LoopConfigPanel } from './LoopConfigPanel'
+import { ApiConfigPanel } from './customPanels/ApiConfigPanel'
+import { ConditionConfigPanel } from './customPanels/ConditionConfigPanel'
+import { CsvConfigPanel } from './customPanels/CsvConfigPanel'
+import { LoopConfigPanel } from './customPanels/LoopConfigPanel'
 import { WorkflowNode } from '@/types/configPanels'
 import { ReactElement } from 'react'
 type PanelFactory = (
@@ -11,8 +11,8 @@ type PanelFactory = (
  ) => ReactElement
 
 export const parametersPanels: Record<string, PanelFactory>  = {
-    "conditional_operation": (node, handleUpdate) => <ConditionConfigPanel node={node} onUpdate={handleUpdate} />,
-    "api_call": (node, handleUpdate) => <ApiConfigPanel node={node} onUpdate={handleUpdate} />,
-    "loop_operation": (node, handleUpdate)  => <LoopConfigPanel node={node} onUpdate={handleUpdate} />,
-    "read_csv": (node, handleUpdate)  => <CsvConfigPanel node={node} onUpdate={handleUpdate} />
+    "conditional_operation": (state, setState) => <ConditionConfigPanel state={state} setState={setState} />,
+    "api_call": (state, setState) => <ApiConfigPanel  state={state} setState={setState} />,
+    "loop_operation": (state, setState)  => <LoopConfigPanel  state={state} setState={setState} />,
+    "read_csv": (state, setState)  => <CsvConfigPanel  state={state} setState={setState} />
 }

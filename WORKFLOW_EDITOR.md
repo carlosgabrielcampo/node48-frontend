@@ -27,6 +27,7 @@ export type NodeType = "action" | "operation" | "trigger";
 export interface WorkflowNode {
   id: string;
   name: string;
+  length: number;
   position: { x: number; y: number };
   data: []
 }

@@ -4,16 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
-import { Dropdown } from "../layout/dropdown";
+import { Dropdown } from "../../layout/dropdown";
+import { LabeledInput } from "@/components/layout/input";
 
 
 
-export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelProps) => {
+export const ConditionConfigPanel = ({ state, setState }: ConditionConfigPanelProps) => {
   // Ensure parameters is always an array of ConditionBlock
-  const conditions = (Array.isArray(node.parameters) ? node.parameters : []) as ConditionBlock[];
+  const conditions = (Array.isArray(state) ? state : []) as ConditionBlock[];
 
   const updateConditions = (newConditions: ConditionBlock[]) => {
-    onUpdate({ parameters: newConditions });
+    setState({ parameters: newConditions });
   };
 
   const addCondition = () => {
@@ -65,7 +66,7 @@ export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelPro
       {conditions.map((condition, condIndex) => (
         <Card key={condIndex} className="p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">Condition {condIndex + 1}</Label>
+            <Label className="text-sm font-medium">Config {condIndex + 1}</Label>
             <Button onClick={() => removeCondition(condIndex)} size="sm" variant="ghost">
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -81,16 +82,13 @@ export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelPro
                   </Button>
                 )}
               </div>
-              
-              <div>
-                <Label className="text-xs">Field</Label>
-                <Input
-                  value={rule.field}
-                  onChange={(e) => updateRule(condIndex, ruleIndex, { field: e.target.value })}
-                  placeholder="{{csvAutorizados.DT_NASC}}"
-                  className="mt-1"
-                />
-              </div>
+              <LabeledInput 
+                label="Field"
+                value={rule.field}
+                onChange={(e) => updateRule(condIndex, ruleIndex, { field: e.target.value })}
+                placeholder="{{csvAutorizados.DT_NASC}}"
+                className="mt-1"
+              />
 
               <Dropdown itemList={[
                 {value: "regex", displayName: "Regex"},
@@ -102,15 +100,13 @@ export const ConditionConfigPanel = ({ node, onUpdate }: ConditionConfigPanelPro
                 value={rule.type}
               />
 
-              <div>
-                <Label className="text-xs">Validator</Label>
-                <Input
-                  value={rule.validator}
-                  onChange={(e) => updateRule(condIndex, ruleIndex, { validator: e.target.value })}
-                  placeholder="/10/"
-                  className="mt-1"
-                />
-              </div>
+              <LabeledInput 
+                label="Validator"
+                value={rule.validator}
+                onChange={(e) => updateRule(condIndex, ruleIndex, { validator: e.target.value })}
+                placeholder="/10/"
+                className="mt-1"
+              />
             </div>
           ))}
 

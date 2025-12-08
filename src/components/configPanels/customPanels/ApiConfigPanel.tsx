@@ -4,17 +4,35 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
-import { Dropdown } from "../layout/dropdown";
+import { Dropdown } from "../../layout/dropdown";
+import { CodeTextarea } from "@/components/layout/textarea";
+import { useState } from "react";
+import { LabeledInput } from "@/components/layout/input";
 
-export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
+export const ApiConfigPanel = ({ state, setState }: ApiConfigPanelProps) => {
+  console.log({ApiConfigPanel: state, setState})
   // Handle parameters as array (JSON format)
-  const paramArray = Array.isArray(node.parameters) ? node.parameters as ApiConfig[] : [];
-  const parameters = paramArray[0] || {
+  const paramArray = Array.isArray(state) ? state[0] as ApiConfig[] : [];
+  const [raw, setRaw] = useState(() => JSON.stringify(paramArray.body, null, 2));
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const text = e.target.value;
+    setRaw(text);
+  
+    try {
+      const parsed = JSON.parse(text);
+      updateConfig({ body: parsed });
+    } catch (_) {
+      // ignore until the JSON becomes valid
+    }
+  };
+  const parameters = paramArray || {
     baseUrl: "",
     endpoint: "",
     method: "GET",
     headers: {},
     body: {},
+    params: {},
     reponseFormat: "json",
     outputVar: "",
     nextStepId: "",
@@ -22,7 +40,7 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
   };
 
   const updateConfig = (updates: Partial<ApiConfig>) => {
-    onUpdate({ parameters: [{ ...parameters, ...updates }] });
+    setState({ parameters: [{ ...parameters, ...updates }] });
   };
 
   const addHeader = () => {
@@ -39,18 +57,18 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
     updateConfig({ headers: { ...rest, [newKey]: value } });
   };
 
-  const addBodyField = () => {
-    updateConfig({ body: { ...parameters.body, "": "" } });
+    const addParams = () => {
+    updateConfig({ params: { ...parameters.params, "": "" } });
   };
 
-  const removeBodyField = (key: string) => {
-    const { [key]: _, ...rest } = parameters.body;
-    updateConfig({ body: rest });
+  const removeParams = (key: string) => {
+    const { [key]: _, ...rest } = parameters.params;
+    updateConfig({ params: rest });
   };
 
-  const updateBodyField = (oldKey: string, newKey: string, value: string) => {
-    const { [oldKey]: _, ...rest } = parameters.body;
-    updateConfig({ body: { ...rest, [newKey]: value } });
+  const updateParams = (oldKey: string, newKey: string, value: string) => {
+    const { [oldKey]: _, ...rest } = parameters.params;
+    updateConfig({ params: { ...rest, [newKey]: value } });
   };
 
   return (
@@ -74,6 +92,14 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
           className="mt-1"
         />
       </div>
+      <LabeledInput 
+        label={"Endpoint"}
+        value={state.list?.timeoutMs || 15000}
+        placeholder="/api/webhook/status"
+        onChange={(e) => updateConfig({ endpoint: e.target.value })}
+        className="mt-1"
+      />
+
       <Dropdown itemList={[
         {value: "GET", displayName: "GET"},
         {value: "POST", displayName: "POST"},
@@ -94,46 +120,43 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
         onValueChange={(value) => updateConfig({ reponseFormat: value })}
         value={parameters.reponseFormat}
       />
+      <LabeledInput 
+        label={"Timeout (ms)"} 
+        value={state.list?.timeoutMs || 15000}
+        onChange={(e) => updateConfig({ list: { ...state.list, timeoutMs: parseInt(e.target.value) || 15000, keys: state.list?.keys || [] } })}
+        className="mt-1"
+        type="number" 
+      />
 
-      <div>
-        <Label>Output Variable</Label>
-        <Input
-          value={parameters.outputVar || ""}
-          onChange={(e) => updateConfig({ outputVar: e.target.value })}
-          placeholder="apiResponse"
-          className="mt-1"
-        />
-      </div>
+      <Card className="p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <Label className="font-semibold">Params</Label>
+          <Button onClick={addParams} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-1" />
+            Add
+          </Button>
+        </div>
+        {parameters?.params && Object.entries(parameters?.params).map(([key, value]) => (
+          <div key={key} className="flex gap-2">
+            <Input
+              value={key}
+              onChange={(e) => updateParams(key, e.target.value, value)}
+              placeholder="Key"
+              className="flex-1"
+            />
+            <Input
+              value={value}
+              onChange={(e) => updateParams(key, key, e.target.value)}
+              placeholder="Value"
+              className="flex-1"
+            />
+            <Button onClick={() => removeParams(key)} size="sm" variant="ghost">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+      </Card>
 
-      <div>
-        <Label>Next Step ID (Success)</Label>
-        <Input
-          value={parameters.nextStepId || ""}
-          onChange={(e) => updateConfig({ nextStepId: e.target.value })}
-          placeholder="Next step on success"
-          className="mt-1"
-        />
-      </div>
-
-      <div>
-        <Label>Error Step ID</Label>
-        <Input
-          value={parameters.errorStepId || ""}
-          onChange={(e) => updateConfig({ errorStepId: e.target.value })}
-          placeholder="Step to run on error"
-          className="mt-1"
-        />
-      </div>
-
-      <div>
-        <Label>Timeout (ms)</Label>
-        <Input
-          type="number"
-          value={node.list?.timeoutMs || 15000}
-          onChange={(e) => onUpdate({ list: { ...node.list, timeoutMs: parseInt(e.target.value) || 15000, keys: node.list?.keys || [] } })}
-          className="mt-1"
-        />
-      </div>
 
       <Card className="p-4 space-y-3">
         <div className="flex items-center justify-between">
@@ -143,7 +166,7 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
             Add
           </Button>
         </div>
-        {Object.entries(parameters.headers).map(([key, value]) => (
+        {Object.entries(parameters?.headers).map(([key, value]) => (
           <div key={key} className="flex gap-2">
             <Input
               value={key}
@@ -167,30 +190,8 @@ export const ApiConfigPanel = ({ node, onUpdate }: ApiConfigPanelProps) => {
       <Card className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <Label className="font-semibold">Body</Label>
-          <Button onClick={addBodyField} size="sm" variant="outline">
-            <Plus className="h-4 w-4 mr-1" />
-            Add
-          </Button>
         </div>
-        {Object.entries(parameters.body).map(([key, value]) => (
-          <div key={key} className="flex gap-2">
-            <Input
-              value={key}
-              onChange={(e) => updateBodyField(key, e.target.value, value)}
-              placeholder="Key"
-              className="flex-1"
-            />
-            <Input
-              value={value}
-              onChange={(e) => updateBodyField(key, key, e.target.value)}
-              placeholder="Value"
-              className="flex-1"
-            />
-            <Button onClick={() => removeBodyField(key)} size="sm" variant="ghost">
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        ))}
+        <CodeTextarea value={raw} onChange={handleChange}/>
       </Card>
     </div>
   );

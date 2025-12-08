@@ -99,8 +99,8 @@ export interface WorkflowData {
 }
 
 export interface LoopConfigPanelProps {
-  node: WorkflowNode;
-  onUpdate: (updates: Partial<WorkflowNode>) => void;
+  state: WorkflowNode;
+  setState: (updates: Partial<WorkflowNode>) => void;
 }
 
 export interface NodeConfigPanelProps {
@@ -111,16 +111,16 @@ export interface NodeConfigPanelProps {
 }
 
 export interface CsvConfigPanelProps {
-  node: WorkflowNode;
-  onUpdate: (updates: Partial<WorkflowNode>) => void;
+  state: WorkflowNode;
+  setState: (updates: Partial<WorkflowNode>) => void;
 }
 
 export interface ConditionConfigPanelProps {
-  node: WorkflowNode;
-  onUpdate: (updates: Partial<WorkflowNode>) => void;
+  state: WorkflowNode;
+  setState: (updates: Partial<WorkflowNode>) => void;
 }
 
 export interface ApiConfigPanelProps {
-  node: WorkflowNode;
-  onUpdate: (updates: Partial<WorkflowNode>) => void;
+  state: WorkflowNode;
+  setState: (updates: Partial<WorkflowNode>) => void;
 }

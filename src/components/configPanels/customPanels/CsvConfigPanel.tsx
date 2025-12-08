@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
+export const CsvConfigPanel = ({ state, setState }: CsvConfigPanelProps) => {
   const defaultConfig: CsvConfig =  {
     filePath: "",
     encoding: "utf-8",
@@ -26,7 +26,7 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
   
   // Handle parameters as array (JSON format) or object (legacy)
   const getInitialConfig = (): CsvConfig => {
-    if (Array.isArray(node.parameters)) {
+    if (Array.isArray(node?.parameters)) {
       const firstParam = node.parameters[0];
       // Type guard to check if it's a CsvConfig
       if (firstParam && 'filePath' in firstParam && 'encoding' in firstParam) {
@@ -190,9 +190,6 @@ export const CsvConfigPanel = ({ node, onUpdate }: CsvConfigPanelProps) => {
           </Label>
         </div>
       </Card>
-      <div className="flex items-center justify-between ">
-        <Button size="sm" className="mt-1 w-full" onClick={saveConfig}>Save</Button>
-      </div>
     </div>
   );
 };

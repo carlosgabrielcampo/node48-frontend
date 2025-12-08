@@ -1,16 +1,25 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Edge } from 'reactflow';
+import { Edge, MarkerType } from 'reactflow';
 
-export function createEdge({ connection }: NodeType){
-      const newEdge: Edge = {
-        ...connection,
-        id: uuidv4(),
-        type: "custom",
+
+export function createEdge({ id, source, sourceHandle, target, label }: Edge){
+    return {
+        id,
+        source,
+        sourceHandle,
+        target,
+        type: "smoothstep",
         animated: false,
-        style: { stroke: "hsl(var(--primary))", strokeWidth: 2 },
-        markerEnd: {
-          type: MarkerType.ArrowClosed,
-          color: "hsl(var(--primary))",
+        
+        style: { 
+            color: "hsl(var(--connection-line))",
+            stroke: "hsl(var(--connection-line))", 
+            strokeWidth: 2
+            
         },
-      };
+        markerEnd: {
+            type: MarkerType.ArrowClosed,
+            color: "hsl(var(--connection-line))",
+        },
+    };
 }
