@@ -5,7 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
+import { LabeledInput } from "@/components/layout/input";
+import { LabeledCheckbox } from "@/components/layout/checkbox";
 
 export const CsvConfigPanel = ({ state, setState }: CsvConfigPanelProps) => {
   const defaultConfig: CsvConfig =  {
@@ -26,8 +28,8 @@ export const CsvConfigPanel = ({ state, setState }: CsvConfigPanelProps) => {
   
   // Handle parameters as array (JSON format) or object (legacy)
   const getInitialConfig = (): CsvConfig => {
-    if (Array.isArray(node?.parameters)) {
-      const firstParam = node.parameters[0];
+    if (Array.isArray(state)) {
+      const firstParam = state[0];
       // Type guard to check if it's a CsvConfig
       if (firstParam && 'filePath' in firstParam && 'encoding' in firstParam) {
         return firstParam as CsvConfig;
@@ -37,14 +39,9 @@ export const CsvConfigPanel = ({ state, setState }: CsvConfigPanelProps) => {
   };
   
   const [stateConfig, setConfig] = useState<CsvConfig>(getInitialConfig());
-  
-  const saveConfig = () => {
-    // Update as array to match JSON format
-    onUpdate({ parameters: [{ ...stateConfig }] });
-  }
 
   const updateConfig = (updates: Partial<CsvConfig>) => {
-    setConfig({ ...stateConfig, ...updates })
+    setConfig([{ ...stateConfig, ...updates }])
   };
 
   const addNullValue = () => {
@@ -63,75 +60,41 @@ export const CsvConfigPanel = ({ state, setState }: CsvConfigPanelProps) => {
 
   return (
     <div className="space-y-4">
-      <div>
-        <Label>File Path</Label>
-        <Input
-          value={stateConfig.filePath}
-          onChange={(e) => updateConfig({ filePath: e.target.value })}
-          placeholder="_test/mock/database/Autorizados.csv"
-          className="mt-1"
-        />
-      </div>
-
-      <div>
-        <Label>Encoding</Label>
-        <Input
-          value={stateConfig.encoding}
-          onChange={(e) => updateConfig({ encoding: e.target.value })}
-          placeholder="utf-8"
-          className="mt-1"
-        />
-      </div>
-
-      <div>
-        <Label>Type</Label>
-        <Input
-          value={stateConfig.type}
-          onChange={(e) => updateConfig({ type: e.target.value })}
-          placeholder="csv"
-          className="mt-1"
-        />
-      </div>
-
-      <div>
-        <Label>Chunk Size</Label>
-        <Input
-          type="number"
-          value={stateConfig.chunkSize}
-          onChange={(e) => updateConfig({ chunkSize: parseInt(e.target.value) || 200 })}
-          className="mt-1"
-        />
-      </div>
-
-      <div>
-        <Label>Error Policy</Label>
-        <Input
-          value={stateConfig.errorPolicy}
-          onChange={(e) => updateConfig({ errorPolicy: e.target.value })}
-          placeholder="skip"
-          className="mt-1"
-        />
-      </div>
-
-      <div>
-        <Label>Output Variable</Label>
-        <Input
-          value={stateConfig.outputVar || ""}
-          onChange={(e) => updateConfig({ outputVar: e.target.value })}
-          placeholder="Autorizados"
-          className="mt-1"
-        />
-      </div>
-      
-      <div>
-        <Label>Next Step ID</Label>
-        <Input
-          value={stateConfig.nextStepId || ""}
-          onChange={(e) => updateConfig({ nextStepId: e.target.value })}
-          placeholder="Next step identifier"
-          className="mt-1"
-        />
-      </div>
+      <LabeledInput 
+        label="File Path"
+        value={stateConfig.filePath}
+        onChange={(e) => updateConfig({ filePath: e.target.value })}
+        placeholder="_test/mock/database/Autorizados.csv"
+        className="mt-1"
+      />
+      <LabeledInput 
+        label="Encoding"
+        value={stateConfig.encoding}
+        onChange={(e) => updateConfig({ encoding: e.target.value })}
+        placeholder="utf-8"
+        className="mt-1"
+      />
+      <LabeledInput 
+        label="Chunk Size"
+        value={stateConfig.chunkSize}
+        onChange={(e) => updateConfig({ chunkSize: parseInt(e.target.value) || 200 })}
+        className="mt-1"
+        type="number"
+      />
+      <LabeledInput 
+        label="Error Policy"
+        value={stateConfig.errorPolicy}
+        onChange={(e) => updateConfig({ errorPolicy: e.target.value })}
+        placeholder="skip"
+        className="mt-1"
+      />
+      <LabeledInput 
+        label="Output Variable"
+        value={stateConfig.outputVar || ""}
+        onChange={(e) => updateConfig({ outputVar: e.target.value })}
+        placeholder="Autorizados"
+        className="mt-1"
+      />
 
       <Card className="p-4 space-y-3">
         <div className="flex items-center justify-between">
@@ -178,17 +141,12 @@ export const CsvConfigPanel = ({ state, setState }: CsvConfigPanelProps) => {
             className="mt-1"
           />
         </div>
-
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="strict"
-            checked={stateConfig.parser.strict}
-            onCheckedChange={(checked) => updateConfig({ parser: { ...stateConfig.parser, strict: checked === true } })}
-          />
-          <Label htmlFor="strict" className="text-xs cursor-pointer">
-            Strict Mode
-          </Label>
-        </div>
+        <LabeledCheckbox 
+          id={"strict"}
+          checked={stateConfig.parser.strict}
+          onCheckedChange={(checked) => updateConfig({ parser: { ...stateConfig.parser, strict: checked === true } })}
+          label={"Strict Mode"}
+        />
       </Card>
     </div>
   );

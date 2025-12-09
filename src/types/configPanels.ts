@@ -16,7 +16,8 @@ export interface ApiConfig {
   endpoint: string;
   method: string;
   headers: Record<string, string>;
-  body: Record<string, string>;
+  body: Record<string, any>;
+  bodyType: string;
   reponseFormat: string;
   nextStepId?: string;
   errorStepId?: string;

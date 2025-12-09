@@ -8,7 +8,7 @@ import { Dropdown } from "../../layout/dropdown";
 import { CodeTextarea } from "@/components/layout/textarea";
 import { useState } from "react";
 import { LabeledInput } from "@/components/layout/input";
-
+import { LabeledCard } from "@/components/layout/card";
 export const ApiConfigPanel = ({ state, setState }: ApiConfigPanelProps) => {
   console.log({ApiConfigPanel: state, setState})
   // Handle parameters as array (JSON format)
@@ -32,6 +32,7 @@ export const ApiConfigPanel = ({ state, setState }: ApiConfigPanelProps) => {
     method: "GET",
     headers: {},
     body: {},
+    bodyType: "raw",
     params: {},
     reponseFormat: "json",
     outputVar: "",
@@ -40,7 +41,7 @@ export const ApiConfigPanel = ({ state, setState }: ApiConfigPanelProps) => {
   };
 
   const updateConfig = (updates: Partial<ApiConfig>) => {
-    setState({ parameters: [{ ...parameters, ...updates }] });
+    setState([{ ...paramArray, ...updates }]);
   };
 
   const addHeader = () => {
@@ -71,30 +72,20 @@ export const ApiConfigPanel = ({ state, setState }: ApiConfigPanelProps) => {
     updateConfig({ params: { ...rest, [newKey]: value } });
   };
 
+
+
   return (
     <div className="space-y-4">
-      <div>
-        <Label>Base URL</Label>
-        <Input
-          value={parameters.baseUrl}
-          onChange={(e) => updateConfig({ baseUrl: e.target.value })}
-          placeholder="http://localhost:3009"
-          className="mt-1"
-        />
-      </div>
-
-      <div>
-        <Label>Endpoint</Label>
-        <Input
-          value={parameters.endpoint}
-          onChange={(e) => updateConfig({ endpoint: e.target.value })}
-          placeholder="/api/webhook/status"
-          className="mt-1"
-        />
-      </div>
+      <LabeledInput 
+        label={"Base URL"}
+        value={parameters.baseUrl}
+        placeholder="http://localhost:3009"
+        onChange={(e) => updateConfig({ baseUrl: e.target.value })}
+        className="mt-1"
+      />
       <LabeledInput 
         label={"Endpoint"}
-        value={state.list?.timeoutMs || 15000}
+        value={parameters.endpoint}
         placeholder="/api/webhook/status"
         onChange={(e) => updateConfig({ endpoint: e.target.value })}
         className="mt-1"
@@ -113,8 +104,8 @@ export const ApiConfigPanel = ({ state, setState }: ApiConfigPanelProps) => {
       />
 
       <Dropdown itemList={[
-        {value: "json", displayName: "json"},
-        {value: "text", displayName: "text"},
+        {value: "json", displayName: "JSON"},
+        {value: "text", displayName: "TEXT"},
       ]} 
         label={"Response Format"}
         onValueChange={(value) => updateConfig({ reponseFormat: value })}
@@ -127,46 +118,45 @@ export const ApiConfigPanel = ({ state, setState }: ApiConfigPanelProps) => {
         className="mt-1"
         type="number" 
       />
-
-      <Card className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <Label className="font-semibold">Params</Label>
+      <LabeledCard 
+        label={"Params"}
+        headerChildren={
           <Button onClick={addParams} size="sm" variant="outline">
             <Plus className="h-4 w-4 mr-1" />
             Add
           </Button>
-        </div>
-        {parameters?.params && Object.entries(parameters?.params).map(([key, value]) => (
-          <div key={key} className="flex gap-2">
-            <Input
-              value={key}
-              onChange={(e) => updateParams(key, e.target.value, value)}
-              placeholder="Key"
-              className="flex-1"
-            />
-            <Input
-              value={value}
-              onChange={(e) => updateParams(key, key, e.target.value)}
-              placeholder="Value"
-              className="flex-1"
-            />
-            <Button onClick={() => removeParams(key)} size="sm" variant="ghost">
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        ))}
-      </Card>
-
-
-      <Card className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <Label className="font-semibold">Headers</Label>
+        }
+        children={        
+          parameters?.params && Object.entries(parameters?.params).map(([key, value]) => (
+            <div key={key} className="flex gap-2">
+              <Input
+                value={key}
+                onChange={(e) => updateParams(key, e.target.value, value)}
+                placeholder="Key"
+                className="flex-1"
+              />
+              <Input
+                value={value}
+                onChange={(e) => updateParams(key, key, e.target.value)}
+                placeholder="Value"
+                className="flex-1"
+              />
+              <Button onClick={() => removeParams(key)} size="sm" variant="ghost">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))
+        }
+      />
+      <LabeledCard 
+        label={"Headers"}
+        headerChildren={
           <Button onClick={addHeader} size="sm" variant="outline">
             <Plus className="h-4 w-4 mr-1" />
             Add
           </Button>
-        </div>
-        {Object.entries(parameters?.headers).map(([key, value]) => (
+        }
+        cardChildren={Object.entries(parameters?.headers).map(([key, value]) => (
           <div key={key} className="flex gap-2">
             <Input
               value={key}
@@ -185,14 +175,70 @@ export const ApiConfigPanel = ({ state, setState }: ApiConfigPanelProps) => {
             </Button>
           </div>
         ))}
-      </Card>
+      />
+      <LabeledCard 
+        label={"Body"}
+        
+        headerChildren={
+          <Dropdown 
+            value={parameters.bodyType || "none"} 
+            className={"w-40"}
+            itemList={[
+              {value: "none", displayName: "none"},
+              {value: "raw", displayName: "raw"},
+              {value: "xxx-url-encoded", displayName: "xxx-url-encoded"},
+              {value: "form-data", displayName: "form-data"},
+            ]}
+            onValueChange={(value) => updateConfig({ bodyType: value })}
+        />
+      }
+        cardChildren={
+          parameters.bodyType === "raw" 
+            ? <CodeTextarea value={raw} onChange={handleChange}/> 
+            : parameters.bodyType === "xxx-url-encoded" 
+              ? parameters.bodyType === "xxx-url-encoded" && Object.entries(parameters?.body).map(([key, value]) => (
+                <div key={key} className="flex gap-2">
+                  <Input
+                    value={key}
+                    onChange={(e) => updateHeader(key, e.target.value, value)}
+                    placeholder="Key"
+                    className="flex-1"
+                  />
+                  <Input
+                    value={value}
+                    onChange={(e) => updateHeader(key, key, e.target.value)}
+                    placeholder="Value"
+                    className="flex-1"
+                  />
+                  <Button onClick={() => removeHeader(key)} size="sm" variant="ghost">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))
+              : parameters.bodyType === "form-data" 
+                ? Object.entries(parameters?.body).map(([key, value]) => (
+                    <div key={key} className="flex gap-2">
+                      <Input
+                        value={key}
+                        onChange={(e) => updateHeader(key, e.target.value, value)}
+                        placeholder="Key"
+                        className="flex-1"
+                      />
+                      <Input
+                        value={value}
+                        onChange={(e) => updateHeader(key, key, e.target.value)}
+                        placeholder="Value"
+                        className="flex-1"
+                      />
+                      <Button onClick={() => removeHeader(key)} size="sm" variant="ghost">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))
+                : <></>
+        }
+      />
 
-      <Card className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <Label className="font-semibold">Body</Label>
-        </div>
-        <CodeTextarea value={raw} onChange={handleChange}/>
-      </Card>
     </div>
   );
 };
