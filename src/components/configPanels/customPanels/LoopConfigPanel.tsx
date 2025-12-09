@@ -5,9 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Dropdown } from "../../layout/dropdown";
+import { LabeledDropdown } from "../../layout/dropdown";
 import { LabeledInput } from "@/components/layout/input";
 import { WorkflowNode } from "@/types/configPanels";
+import { LabeledCard } from "@/components/layout/card";
 export const LoopConfigPanel = ({ state, setState }: LoopConfigPanelProps) => {
   const newEntry: LoopConfigEntry = {
     sourceVar: "",
@@ -56,121 +57,119 @@ export const LoopConfigPanel = ({ state, setState }: LoopConfigPanelProps) => {
     updated[configIndex].fields = fields;
     saveConfig(updated);
   };
-  console.log({state})
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Label className="text-base font-semibold">Loop Configuration</Label>
+    <LabeledCard
+      label={"Loop Configuration"}
+      headerChildren={
         <Button onClick={addConfigEntry} size="sm" variant="outline">
           <Plus className="h-4 w-4 mr-1" />
           Add Config
         </Button>
-      </div>
-
-      {state.map((entry, index) => (
-        <Card key={index} className="p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Label className="font-medium">Config {index + 1}</Label>
-            </div>
-            <Button onClick={() => removeConfigEntry(index)} size="sm" variant="ghost">
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-          <LabeledInput
-              label={"Source Variable"}
-              className={"mt-1"}
-              onChange={(e) => updateConfigEntry(index, { sourceVar: e.target.value })}
-              placeholder="{{Autorizados}}"
-              value={entry.sourceVar}
-          />
-          <LabeledInput 
-            label={"Output Variable"}
-            className={"mt-1"}
-            onChange={(e) => updateConfigEntry(index, { outputVar: e.target.value })}
-            placeholder={"csvAutorizados"}
-            value={entry.outputVar}
-          />
-
-          
-          <Dropdown itemList={[
-            {value: "format", displayName: "Format"},
-            {value: "create", displayName: "Create"},
-            {value: "raw", displayName: "Raw"},
-          ]} 
-            label={"Type"}
-            onValueChange={(value: "format" | "create" | "raw") => updateConfigEntry(index, { type: value })}
-            value={entry.type}
-          />
-
-          {entry.type === "format" && (
-            <div className="space-y-2">
+      }
+      cardChildren={
+        state.length ? 
+          state.map((entry, index) => (
+            <Card key={index} className="p-3 space-y-4">
               <div className="flex items-center justify-between">
-                <Label className="text-xs">Fields</Label>
-                <Button onClick={() => addField(index)} size="sm" variant="outline">
-                  <Plus className="h-3 w-3 mr-1" />
-                  Add Field
+                <div className="flex items-center gap-2">
+                  <Label className="font-medium">Config {index + 1}</Label>
+                </div>
+                <Button onClick={() => removeConfigEntry(index)} size="sm" variant="ghost">
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-              {entry.fields?.map((field, fieldIndex) => (
-                <div key={fieldIndex} className="pl-4 border-l-2 border-border space-y-2">
+              <LabeledInput
+                  label={"Source Variable"}
+                  className={"mt-1"}
+                  onChange={(e) => updateConfigEntry(index, { sourceVar: e.target.value })}
+                  placeholder="{{Autorizados}}"
+                  value={entry.sourceVar}
+              />
+              <LabeledInput 
+                label={"Output Variable"}
+                className={"mt-1"}
+                onChange={(e) => updateConfigEntry(index, { outputVar: e.target.value })}
+                placeholder={"csvAutorizados"}
+                value={entry.outputVar}
+              />
+              <LabeledDropdown itemList={[
+                {value: "format", displayName: "Format"},
+                {value: "create", displayName: "Create"},
+                {value: "raw", displayName: "Raw"},
+              ]} 
+                label={"Type"}
+                onValueChange={(value: "format" | "create" | "raw") => updateConfigEntry(index, { type: value })}
+                value={entry.type}
+              />
+              {entry.type === "format" && (
+                <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs">Field {fieldIndex + 1}</Label>
-                    <Button onClick={() => removeField(index, fieldIndex)} size="sm" variant="ghost">
-                      <Trash2 className="h-3 w-3" />
+                    <Label className="text-xs">Fields</Label>
+                    <Button onClick={() => addField(index)} size="sm" variant="outline">
+                      <Plus className="h-3 w-3 mr-1" />
+                      Add Field
                     </Button>
                   </div>
-                  <Input
-                    value={field.field}
-                    onChange={(e) => updateField(index, fieldIndex, { field: e.target.value })}
-                    placeholder="{{Autorizados.DT_NASC}}"
-                  />
-                  <Input
-                    value={field.type}
-                    onChange={(e) => updateField(index, fieldIndex, { type: e.target.value })}
-                    placeholder="convert"
-                  />
-                  <Input
-                    value={field.convertionType}
-                    onChange={(e) => updateField(index, fieldIndex, { convertionType: e.target.value })}
-                    placeholder="brDateFormatToDate"
-                  />
+                  {entry.fields?.map((field, fieldIndex) => (
+                    <div key={fieldIndex} className="pl-4 border-l-2 border-border space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs">Field {fieldIndex + 1}</Label>
+                        <Button onClick={() => removeField(index, fieldIndex)} size="sm" variant="ghost">
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <Input
+                        value={field.field}
+                        onChange={(e) => updateField(index, fieldIndex, { field: e.target.value })}
+                        placeholder="{{Autorizados.DT_NASC}}"
+                      />
+                      <Input
+                        value={field.type}
+                        onChange={(e) => updateField(index, fieldIndex, { type: e.target.value })}
+                        placeholder="convert"
+                      />
+                      <Input
+                        value={field.convertionType}
+                        onChange={(e) => updateField(index, fieldIndex, { convertionType: e.target.value })}
+                        placeholder="brDateFormatToDate"
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
-
-          {entry.type === "create" && (
-            <>
-              <div>
-                <Label className="text-xs">Limit</Label>
-                <Input
-                  type="number"
-                  value={entry.limit || ""}
-                  onChange={(e) => updateConfigEntry(index, { limit: parseInt(e.target.value) || undefined })}
-                  placeholder="10"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Offset</Label>
-                <Input
-                  type="number"
-                  value={entry.offset || ""}
-                  onChange={(e) => updateConfigEntry(index, { offset: parseInt(e.target.value) || undefined })}
-                  placeholder="100"
-                  className="mt-1"
-                />
-              </div>
-            </>
-          )}
-        </Card>
-      ))}
-      {state.length === 0 && (
-        <div className="text-sm text-muted-foreground text-center py-8">
-          No configuration entries. Click "Add Config" to create one.
-        </div>
-      )}
-    </div>
+              )}
+              {entry.type === "create" && (
+                <>
+                  <div>
+                    <Label className="text-xs">Limit</Label>
+                    <Input
+                      type="number"
+                      value={entry.limit || ""}
+                      onChange={(e) => updateConfigEntry(index, { limit: parseInt(e.target.value) || undefined })}
+                      placeholder="10"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Offset</Label>
+                    <Input
+                      type="number"
+                      value={entry.offset || ""}
+                      onChange={(e) => updateConfigEntry(index, { offset: parseInt(e.target.value) || undefined })}
+                      placeholder="100"
+                      className="mt-1"
+                    />
+                  </div>
+                </>
+              )}
+            </Card>
+          ))
+        : (
+          <div className="text-sm text-muted-foreground text-center py-8">
+            No configuration entries. Click "Add Config" to create one.
+          </div>
+        )
+      }
+    />
   );
 };

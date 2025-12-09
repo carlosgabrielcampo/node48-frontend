@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
-import { Dropdown } from "../../layout/dropdown";
+import { LabeledDropdown } from "../../layout/dropdown";
 import { LabeledInput } from "@/components/layout/input";
+import { LabeledCard } from "@/components/layout/card";
 
 
 
@@ -54,74 +55,75 @@ export const ConditionConfigPanel = ({ state, setState }: ConditionConfigPanelPr
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Label className="text-base font-semibold">Conditions</Label>
+    <LabeledCard
+      label={"Set Conditions"}
+      headerChildren={
         <Button onClick={addCondition} size="sm" variant="outline">
           <Plus className="h-4 w-4 mr-1" />
           Add Condition
         </Button>
-      </div>
-
-      {conditions.map((condition, condIndex) => (
-        <Card key={condIndex} className="p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">Config {condIndex + 1}</Label>
-            <Button onClick={() => removeCondition(condIndex)} size="sm" variant="ghost">
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {condition.condition.map((rule, ruleIndex) => (
-            <div key={ruleIndex} className="space-y-2 pl-4 border-l-2 border-border">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs">Rule {ruleIndex + 1}</Label>
-                {condition.condition.length > 1 && (
-                  <Button onClick={() => removeRule(condIndex, ruleIndex)} size="sm" variant="ghost">
-                    <Trash2 className="h-3 w-3" />
+      }
+      cardChildren={
+        conditions.length 
+          ? conditions.map((condition, condIndex) => (
+              <Card key={condIndex} className="p-3 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">Config {condIndex + 1}</Label>
+                  <Button onClick={() => removeCondition(condIndex)} size="sm" variant="ghost">
+                    <Trash2 className="h-4 w-4" />
                   </Button>
-                )}
+                </div>
+
+                {condition.condition.map((rule, ruleIndex) => (
+                  <div key={ruleIndex} className="space-y-2 pl-4 border-l-2 border-border">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs">Rule {ruleIndex + 1}</Label>
+                      {condition.condition.length > 1 && (
+                        <Button onClick={() => removeRule(condIndex, ruleIndex)} size="sm" variant="ghost">
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                    <LabeledInput 
+                      label="Field"
+                      value={rule.field}
+                      onChange={(e) => updateRule(condIndex, ruleIndex, { field: e.target.value })}
+                      placeholder="{{csvAutorizados.DT_NASC}}"
+                      className="mt-1"
+                    />
+
+                    <LabeledDropdown itemList={[
+                      {value: "regex", displayName: "Regex"},
+                      {value: "equals", displayName: "Equals"},
+                      {value: "contains", displayName: "Contains"},
+                    ]} 
+                      label={"Type"}
+                      onValueChange={(value) => updateRule(condIndex, ruleIndex, { type: value })}
+                      value={rule.type}
+                    />
+
+                    <LabeledInput 
+                      label="Validator"
+                      value={rule.validator}
+                      onChange={(e) => updateRule(condIndex, ruleIndex, { validator: e.target.value })}
+                      placeholder="/10/"
+                      className="mt-1"
+                    />
+                  </div>
+                ))}
+
+                <Button onClick={() => addRule(condIndex)} size="sm" variant="outline" className="w-full">
+                  <Plus className="h-3 w-3 mr-1" />
+                  Add Rule
+                </Button>
+              </Card>
+          ))
+          : (
+              <div className="text-sm text-muted-foreground text-center py-8">
+                No conditions defined. Click "Add Condition" to create one.
               </div>
-              <LabeledInput 
-                label="Field"
-                value={rule.field}
-                onChange={(e) => updateRule(condIndex, ruleIndex, { field: e.target.value })}
-                placeholder="{{csvAutorizados.DT_NASC}}"
-                className="mt-1"
-              />
-
-              <Dropdown itemList={[
-                {value: "regex", displayName: "Regex"},
-                {value: "equals", displayName: "Equals"},
-                {value: "contains", displayName: "Contains"},
-              ]} 
-                label={"Type"}
-                onValueChange={(value) => updateRule(condIndex, ruleIndex, { type: value })}
-                value={rule.type}
-              />
-
-              <LabeledInput 
-                label="Validator"
-                value={rule.validator}
-                onChange={(e) => updateRule(condIndex, ruleIndex, { validator: e.target.value })}
-                placeholder="/10/"
-                className="mt-1"
-              />
-            </div>
-          ))}
-
-          <Button onClick={() => addRule(condIndex)} size="sm" variant="outline" className="w-full">
-            <Plus className="h-3 w-3 mr-1" />
-            Add Rule
-          </Button>
-        </Card>
-      ))}
-
-      {conditions.length === 0 && (
-        <div className="text-sm text-muted-foreground text-center py-8">
-          No conditions defined. Click "Add Condition" to create one.
-        </div>
-      )}
-    </div>
+            )
+      }
+    />
   );
 };

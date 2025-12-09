@@ -28,7 +28,7 @@ export const exportToWorkflowJSON = (
     steps[node.id] = {
       id: node.id,
       workflowId: data.workflowId || workflowId,
-      name: data.name || data.type,
+      name: data.name,
       type: data.type,
       position: node.position,
       parameters: data.parameters || [],

@@ -3,6 +3,8 @@ import { WorkflowNode, NodeConfigPanelProps } from "@/types/configPanels";
 import { Button } from "../ui/button";
 import { useEffect, useRef, useState } from "react";
 import { parametersPanels } from ".";
+import { ScrollArea } from "../ui/scroll-area";
+import { copyToClipboard } from "@/util/functions";
 
 export const NodeConfigPanel = ({
   node,
@@ -10,39 +12,25 @@ export const NodeConfigPanel = ({
   onOpenChange,
   onUpdate,
 }: NodeConfigPanelProps) => {
-  // local state holds the editable parameters array
   const [stateConfig, setStateConfig] = useState<any[]>([]);
-
-  // ref mirror for compatibility with panels that expect a ref (stateConfigRef.current)
   const configRef = useRef<any[]>(stateConfig);
 
-  // keep ref in sync with state
   useEffect(() => {
     configRef.current = stateConfig;
   }, [stateConfig]);
-
-  // Initialize or reset stateConfig when node changes or panel opens.
   useEffect(() => {
     if (!node) {
       setStateConfig([]);
       return;
     }
-
-    // if node.parameters is array, clone it to avoid mutating the original object
     const initial = Array.isArray(node.parameters) ? structuredClone(node.parameters): [];
     setStateConfig(initial);
-    // update ref immediately as well
     configRef.current = initial;
-  }, [node?.id, open]); // re-init when different node selected or panel toggles
-
-  if (!node) return null;
-
+  }, [node?.id, open]);
   const handleUpdate = () => {
-    // Prefer the ref value to ensure any external ref-based edits are captured
     const payload = configRef.current ?? stateConfig;
     onUpdate(node.id, payload);
   };
-
   const renderConfigPanel = () => {
     if (!parametersPanels[node.type]) {
       return (
@@ -55,24 +43,27 @@ export const NodeConfigPanel = ({
     return parametersPanels[node.type](stateConfig, setStateConfig);
   };
 
+  if (!node) return null;
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[500px] sm:max-w-[500px] overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>
-            Configure {node.name || node.type}
-          </SheetTitle>
-        </SheetHeader>
-
-        <div className="mt-6">
-          <div className="space-y-4">
-            {renderConfigPanel()}
-            <Button size="sm" className="mt-1 w-full" onClick={handleUpdate}>
-              Save
-            </Button>
+      <SheetContent className="w-[550px] h-full sm:max-w-[550px]">
+          <SheetHeader>
+            <SheetTitle className="h-[54px] flex flex-col">
+              <p>{node.name || "Configuration"}</p>
+              <p onClick={() => copyToClipboard(node.id)} className="text-sm hover:text-muted-foreground/60 text-muted-foreground/80">{node.id}</p>
+            </SheetTitle>
+          </SheetHeader>
+            <ScrollArea className="h-[calc(100%-80px)]">
+              <div className="space-y-4">          
+                  {renderConfigPanel()}
+              </div>
+            </ScrollArea>
+            <div className="flex w-full">
+              <Button size="sm" className="mt-1 w-[calc(100%)]" onClick={handleUpdate}>
+                Save
+              </Button>
           </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+        </SheetContent>
+      </Sheet>
   );
 };

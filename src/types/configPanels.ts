@@ -16,8 +16,8 @@ export interface ApiConfig {
   endpoint: string;
   method: string;
   headers: Record<string, string>;
-  body: Record<string, any>;
-  bodyType: string;
+  body: Record<string, string | null | number | boolean>;
+  bodyType: "none" | "raw" | "xxx-url-encoded" | "form-data";
   reponseFormat: string;
   nextStepId?: string;
   errorStepId?: string;

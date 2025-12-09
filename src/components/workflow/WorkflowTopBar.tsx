@@ -8,20 +8,20 @@ import { WorkflowTopBarProps } from "@/types/workflows";
 export const WorkflowTopBar = ({ workflowName = "Untitled Workflow" }: WorkflowTopBarProps) => {
   const navigate = useNavigate()
   return (
-    <header className="h-14 border-b bg-background flex items-center justify-between p-6 z-40">
-        <div className="flex flex-row justify-between w-[100%] ">
-          <div className="flex justify-between items-center">
+    <header className="h-14 border-b bg-background flex items-center justify-between p-4 z-40">
+        <div className="flex flex-row justify-between items-center w-[100%] gap-1">
+          <div className="">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => navigate("/workflows")}
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="" />
             </Button>
-            <div className="flex-1">
+          </div>
+            <div className="flex-1 ml-1">
               <h1 className="text-2xl font-bold">{workflowName}</h1>
             </div>
-          </div>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />

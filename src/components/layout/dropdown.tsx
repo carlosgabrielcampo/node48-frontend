@@ -1,13 +1,24 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+interface ListStructure {
+    displayName: string;
+    value: string;
+}
+interface DropdownInterface {
+    value: string;
+    label?: string;
+    onValueChange: (value: string) => void;
+    itemList: ListStructure[];
+    className?: string;
+}
 
-export const Dropdown = ({ value, label, onValueChange, itemList, className }) => {
+export const LabeledDropdown = ({ value, label, onValueChange, itemList, className }: DropdownInterface) => {
     return (
         <div >
             <Label>{label}</Label>
             <Select value={value} onValueChange={onValueChange}>
-            <SelectTrigger className={`mt-1 ${className} `} >
+            <SelectTrigger className={cn("mt-1", className)} >
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>

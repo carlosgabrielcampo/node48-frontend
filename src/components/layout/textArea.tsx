@@ -3,7 +3,7 @@ import * as React from "react";
 import { Textarea, TextareaProps } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-
+import { DoubleScrollArea } from "../ui/scroll-area";
 
 
 const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -19,24 +19,24 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
   }
 };
 
-
-
 export interface CodeTextareaProps extends TextareaProps {}
 
 export const CodeTextarea = React.forwardRef<HTMLTextAreaElement, CodeTextareaProps>(
   ({ className, ...props }, ref) => {
     return (
-      <Textarea
-        ref={ref}
-        onKeyDown={handleKeyDown}
-        className={cn(
-          "font-mono whitespace-pre resize-y tab-size-[2] leading-5",
-          "focus-visible:ring-2 focus-visible:ring-blue-500",
-          className
-        )}
-        spellCheck={false}
-        {...props}
-      />
+      <DoubleScrollArea>
+        <Textarea
+          ref={ref}
+          onKeyDown={handleKeyDown}
+          className={cn(
+            "font-mono whitespace-pre resize-y tab-size-[2] leading-5",
+            "focus-visible:ring-2 focus-visible:ring-blue-500", 
+            className
+          )}
+          spellCheck={false}
+          {...props}
+        />
+      </DoubleScrollArea>
     );
   }
 );
