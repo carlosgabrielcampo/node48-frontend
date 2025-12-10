@@ -9,7 +9,8 @@ export const exportToWorkflowJSON = (
   edges: Edge[],
   workflowId: string,
   workflowName: string,
-  workflowDescription?: string
+  workflowDescription?: string,
+  createdAtUTC?: Date
 ): WorkflowJSON => {
   const steps: Record<string, WorkflowStep> = {};
   
@@ -33,7 +34,7 @@ export const exportToWorkflowJSON = (
       position: node.position,
       parameters: data.parameters || [],
       connections,
-      createdAtUTC: data.createdAtUTC || new Date().toISOString(),
+      createdAtUTC: data.createdAtUTC,
       ...(data.list && { list: data.list })
     };
   });
@@ -47,8 +48,6 @@ export const exportToWorkflowJSON = (
     name: workflowName,
     description: workflowDescription,
     startStep: startNode?.id || (nodes[0]?.id || ""),
-    createdAtUTC: new Date().toISOString(),
-    updatedAtUTC: new Date().toISOString(),
     settings: {
       retryPolicy: "none",
       timeoutSeconds: "number"

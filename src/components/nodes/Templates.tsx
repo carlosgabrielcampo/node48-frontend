@@ -78,7 +78,7 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
   },
   "loop_operation": {
     type: "loop_operation",
-    name: "Loop",
+    name: "Loop Operation",
     description: "Iterate over data with format or create operations",
     icon: RefreshCcw,
   },

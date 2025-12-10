@@ -9,11 +9,14 @@ import { MarkerType, Edge, Node } from "reactflow";
 import { WorkflowData } from "@/types/configPanels";
 import { WorkflowToolBarProps } from "@/types/workflows";
 import { createNode } from "../nodes/NodeDataStructure";
+import { exportToWorkflowJSON } from "@/lib/workflowExporter";
+import { workflowService } from "@/services/workflowService";
 export const WorkflowToolBar = ({
   setIsActive,
   isActive,
   setIsDrawerOpen,
   nodes,
+  workflow,
   setNodes,
   edges,
   setEdges,
@@ -28,20 +31,26 @@ export const WorkflowToolBar = ({
   const onAddNode = useCallback(() => { 
     setIsDrawerOpen(true); 
   }, []);
+
   const onSave = async () => {
+    console.log(workflow)
+    const workflowJSON = exportToWorkflowJSON(
+      nodes,
+      edges,
+      "workflow-" + workflow.id,
+      workflow.name,
+      workflow.description,
+      workflow.createdAtUTC
+    );
+    console.log(workflowJSON)
+    workflowService.saveWorkflow(workflowJSON)
     // Simulating API call - replace with actual endpoint
     await new Promise((resolve) => setTimeout(resolve, 500));
-  };
-  const onRun = async () => {
-    // Simulating API call - replace with actual endpoint
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  };
-  const onToggleActive = async (active: boolean) => {
-    // Simulating API call - replace with actual endpoint
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    setIsActive(active);
-  };
+  }
+
+
   const handleSave = async () => {
+    console.log("aaaaa")
     setIsSaving(true);
     try {
       await onSave();
@@ -52,11 +61,22 @@ export const WorkflowToolBar = ({
     } finally {
       setIsSaving(false);
     }
+  }
+
+  const onRun = async () => {
+    // Simulating API call - replace with actual endpoint
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   };
-  const handleRun = async () => {
+  const onToggleActive = async (active: boolean) => {
+    // Simulating API call - replace with actual endpoint
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    setIsActive(active);
+  };
+  const handleRun = () => {
+    console.log("aadwad")
     setIsRunning(true);
     try {
-      await onRun();
+      onRun();
       toast.success("Workflow executed successfully");
     } catch (error) {
       toast.error("Failed to execute workflow");
@@ -77,17 +97,15 @@ export const WorkflowToolBar = ({
       setIsToggling(false);
     }
   };
-  const handleExport = useCallback(() => {
-    // Import the exporter at the top of the function to avoid circular dependencies
-    const { exportToWorkflowJSON } = require("@/lib/workflowExporter");
-    
+  const handleExport = useCallback(() => {    
     // Export to WorkflowJSON format
     const workflowJSON = exportToWorkflowJSON(
       nodes,
       edges,
-      "workflow-" + Date.now(),
-      "Exported Workflow",
-      "Workflow exported from editor"
+      "workflow-" + workflow.id,
+      workflow.name,
+      workflow.description,
+      workflow.createdAt
     );
 
     const blob = new Blob([JSON.stringify(workflowJSON, null, 2)], {
@@ -100,7 +118,7 @@ export const WorkflowToolBar = ({
     a.click();
     URL.revokeObjectURL(url);
     toast.success("Workflow exported");
-  }, [nodes, edges]);
+  }, [nodes, edges, workflow.id, workflow.name]);
 
   const handleImport = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {

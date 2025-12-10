@@ -60,6 +60,7 @@ const Workflow = ({workflow}) => {
         <WorkflowToolBar
           nodes={nodes} 
           edges={edges}
+          workflow={workflow}
           isActive={isActive}
           selectedNode={selectedNode}
           configPanelOpen={configPanelOpen}

@@ -4,7 +4,9 @@ import { Button } from "../ui/button";
 import { useEffect, useRef, useState } from "react";
 import { parametersPanels } from ".";
 import { ScrollArea } from "../ui/scroll-area";
-import { copyToClipboard } from "@/util/functions";
+import { copyToClipboard } from "@/lib/utils";
+import { nodeTemplates } from "../nodes/Templates";
+
 
 export const NodeConfigPanel = ({
   node,
@@ -15,9 +17,8 @@ export const NodeConfigPanel = ({
   const [stateConfig, setStateConfig] = useState<any[]>([]);
   const configRef = useRef<any[]>(stateConfig);
 
-  useEffect(() => {
-    configRef.current = stateConfig;
-  }, [stateConfig]);
+  useEffect(() => { configRef.current = stateConfig }, [stateConfig]);
+
   useEffect(() => {
     if (!node) {
       setStateConfig([]);
@@ -27,10 +28,9 @@ export const NodeConfigPanel = ({
     setStateConfig(initial);
     configRef.current = initial;
   }, [node?.id, open]);
-  const handleUpdate = () => {
-    const payload = configRef.current ?? stateConfig;
-    onUpdate(node.id, payload);
-  };
+
+  const handleUpdate = () => { onUpdate(node.id, stateConfig); }
+
   const renderConfigPanel = () => {
     if (!parametersPanels[node.type]) {
       return (
@@ -49,7 +49,7 @@ export const NodeConfigPanel = ({
       <SheetContent className="w-[550px] h-full sm:max-w-[550px]">
           <SheetHeader>
             <SheetTitle className="h-[54px] flex flex-col">
-              <p>{node.name || "Configuration"}</p>
+              <p>{nodeTemplates[node?.type]?.name || "Configuration"}</p>
               <p onClick={() => copyToClipboard(node.id)} className="text-sm hover:text-muted-foreground/60 text-muted-foreground/80">{node.id}</p>
             </SheetTitle>
           </SheetHeader>

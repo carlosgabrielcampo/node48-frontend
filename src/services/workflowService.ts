@@ -6,9 +6,6 @@ export interface Workflow {
   id: string;
   name: string;
   description?: string;
-  createdAtUTC: string;
-  updatedAtUTC: string;
-  path: string;
 }
 
 // Mock API functions
@@ -35,16 +32,11 @@ export const workflowService = {
     try {
       await new Promise((resolve) => setTimeout(resolve, 400));
       const now = new Date().toISOString();
-      const response = await fetch('http://localhost:4014/v1/workflows');
-      const mockWorkflows = await response.json();
+      const currentWorflows = await workflowService.getWorkflows();
 
       const newWorkflow: Workflow = {
-          id: uuidv4(),
           name: data.name,
           description: data.description,
-          createdAtUTC: now,
-          updatedAtUTC: now,
-          path: `./src/test/${data.name}.json`
         };
         mockWorkflows.push(newWorkflow);
         return newWorkflow;
@@ -53,6 +45,18 @@ export const workflowService = {
       console.error(error)
     }
   
+  },
+
+  saveWorkflow: async (workflow: Workflow): Promise<void> => {
+    const rawResponse = await fetch(`http://localhost:4014/v1/workflow/${workflow.id}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(workflow)
+    });
+    console.log({rawResponse})
   },
 
   deleteWorkflow: async (id: string): Promise<void> => {

@@ -198,6 +198,7 @@ export const FlowEditor = ({
           fitView
           attributionPosition="bottom-left"
           onMoveStart={showMinimap}
+          onClick={hideMinimap}
           onMoveEnd={hideMinimap}
           minZoom={0.1}
           maxZoom={1.5}

@@ -50,6 +50,7 @@ export interface WorkflowToolBarProps {
   setIsDrawerOpen: Dispatch<SetStateAction<boolean>>;
   handleNodeClick: any;
   handleDeleteNode: any;
+  workflow: any;
 }
 
 export interface WorkflowStep {
