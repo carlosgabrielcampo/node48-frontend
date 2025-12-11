@@ -29,13 +29,17 @@ export const NodeConfigPanel = ({
     configRef.current = initial;
   }, [node?.id, open]);
 
-  const handleUpdate = () => { onUpdate(node.id, stateConfig); }
+  const handleUpdate = () => { 
+    if (node) {
+      onUpdate(node.id, stateConfig); 
+    }
+  }
 
   const renderConfigPanel = () => {
-    if (!parametersPanels[node.type]) {
+    if (!node || !parametersPanels[node.type]) {
       return (
         <div className="text-sm text-muted-foreground">
-          No configuration available for {node.type} nodes.
+          No configuration available for {node?.type || 'unknown'} nodes.
         </div>
       );
     }

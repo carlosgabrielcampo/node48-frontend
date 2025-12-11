@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { EnvProvider } from "@/contexts/EnvContext";
+import { WorkflowEditorProvider } from "@/contexts/WorkflowEditorContext";
 import Index from "./pages/Index";
 import Workflows from "./pages/Workflows";
 import WorkflowDetail from "./pages/WorkflowDetail";
@@ -23,29 +25,30 @@ const SidebarLayout: React.FC = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <TooltipProvider>
-        
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route element={<SidebarLayout />}>
-              <Route path="/" element={<Workflows />} />
-              <Route path="/templates" element={<Index />} />
-              <Route path="/workflows" element={<Workflows />} />
-              <Route path="/personal" element={<Index />} />
-              <Route path="/projects" element={<Index />} />
-              <Route path="/settings" element={<Settings />} />
-            </Route>
-            <Route>
-              <Route path="/workflows/:id" element={<WorkflowDetail />} />
-            </Route>
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-        
-      </TooltipProvider>
+      <EnvProvider>
+        <WorkflowEditorProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route element={<SidebarLayout />}>
+                  <Route path="/" element={<Workflows />} />
+                  <Route path="/templates" element={<Index />} />
+                  <Route path="/workflows" element={<Workflows />} />
+                  <Route path="/personal" element={<Index />} />
+                  <Route path="/projects" element={<Index />} />
+                  <Route path="/settings" element={<Settings />} />
+                </Route>
+                <Route>
+                  <Route path="/workflows/:id" element={<WorkflowDetail />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </WorkflowEditorProvider>
+      </EnvProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );

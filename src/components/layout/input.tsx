@@ -5,11 +5,12 @@ import { ReactNode } from "react";
 interface LabeledInputInterface {
     label: string; 
     value: any;
-    onChange: (value) => void
-    placeholder: string;
-    className: string;
+    onChange: (value: any) => void
+    placeholder?: string;
+    className?: string;
     children?: ReactNode;
-    props?: any;
+    type?: string;
+    [key: string]: any;
 }
 
 export const LabeledInput = ({label, value, onChange, placeholder, className, children, ...props}: LabeledInputInterface) => {
