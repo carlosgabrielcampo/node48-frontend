@@ -37,7 +37,7 @@ export const WorkflowToolBar = ({
     const workflowJSON = exportToWorkflowJSON(
       nodes,
       edges,
-      "workflow-" + workflow.id,
+      workflow.id,
       workflow.name,
       workflow.description,
       workflow.createdAtUTC
@@ -102,10 +102,10 @@ export const WorkflowToolBar = ({
     const workflowJSON = exportToWorkflowJSON(
       nodes,
       edges,
-      "workflow-" + workflow.id,
+      workflow.id,
       workflow.name,
       workflow.description,
-      workflow.createdAt
+      workflow.createdAtUTC
     );
 
     const blob = new Blob([JSON.stringify(workflowJSON, null, 2)], {
