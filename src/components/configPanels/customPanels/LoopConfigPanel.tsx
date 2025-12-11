@@ -4,11 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
 import { LabeledDropdown } from "../../layout/dropdown";
 import { LabeledInput } from "@/components/layout/input";
-import { WorkflowNode } from "@/types/configPanels";
 import { LabeledCard } from "@/components/layout/card";
+
 export const LoopConfigPanel = ({ state, setState }: LoopConfigPanelProps) => {
   const newEntry: LoopConfigEntry = {
     sourceVar: "",
@@ -17,37 +16,32 @@ export const LoopConfigPanel = ({ state, setState }: LoopConfigPanelProps) => {
     nextStepId: "",
     fields: [],
   };
-  // Ensure parameters is always an array and type-guard to LoopConfigEntry[]
 
-  const saveConfig = (config: Partial<WorkflowNode>) => { 
-    setState([...config]) 
-  }
-  
   const addConfigEntry = () => { 
-    saveConfig([...state, newEntry]); 
+    setState([...state, newEntry]); 
   };
 
   const removeConfigEntry = (index: number) => { 
-    saveConfig(state.filter((_, i) => i !== index)); 
+    setState(state.filter((_, i) => i !== index)); 
   };
 
   const updateConfigEntry = (index: number, updates: Partial<LoopConfigEntry>) => {
     const updated = [...state];
     updated[index] = { ...updated[index], ...updates };
-    saveConfig(updated);
+    setState(updated);
   };
 
   const addField = (configIndex: number) => {
     const updated = [...state];
     const fields = updated[configIndex].fields || [];
     updated[configIndex].fields = [...fields, { field: "", type: "convert", convertionType: "" }];
-    saveConfig(updated);
+    setState(updated);
   };
 
   const removeField = (configIndex: number, fieldIndex: number) => {
     const updated = [...state];
     updated[configIndex].fields = updated[configIndex].fields?.filter((_, i) => i !== fieldIndex);
-    saveConfig(updated);
+    setState(updated);
   };
 
   const updateField = (configIndex: number, fieldIndex: number, updates: Partial<LoopFormatField>) => {
@@ -55,7 +49,7 @@ export const LoopConfigPanel = ({ state, setState }: LoopConfigPanelProps) => {
     const fields = updated[configIndex].fields || [];
     fields[fieldIndex] = { ...fields[fieldIndex], ...updates };
     updated[configIndex].fields = fields;
-    saveConfig(updated);
+    setState(updated);
   };
 
   return (

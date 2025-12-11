@@ -1,13 +1,12 @@
-import { NodeType } from '@/types/node'
 import { ApiConfigPanel } from './customPanels/ApiConfigPanel'
 import { ConditionConfigPanel } from './customPanels/ConditionConfigPanel'
 import { CsvConfigPanel } from './customPanels/CsvConfigPanel'
 import { LoopConfigPanel } from './customPanels/LoopConfigPanel'
-import { WorkflowNode } from '@/types/configPanels'
 import { ReactElement } from 'react'
+
 type PanelFactory = (
-    node: WorkflowNode,
-    handleUpdate: (updates: Partial<WorkflowNode>) => void
+    state: any[],
+    setState: (updates: any[]) => void
  ) => ReactElement
 
 export const parametersPanels: Record<string, PanelFactory>  = {

@@ -1,6 +1,5 @@
 import { ConditionConfigPanelProps, ConditionBlock, ConditionRule } from "@/types/configPanels";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
@@ -8,14 +7,12 @@ import { LabeledDropdown } from "../../layout/dropdown";
 import { LabeledInput } from "@/components/layout/input";
 import { LabeledCard } from "@/components/layout/card";
 
-
-
 export const ConditionConfigPanel = ({ state, setState }: ConditionConfigPanelProps) => {
   // Ensure parameters is always an array of ConditionBlock
   const conditions = (Array.isArray(state) ? state : []) as ConditionBlock[];
 
   const updateConditions = (newConditions: ConditionBlock[]) => {
-    setState({ parameters: newConditions });
+    setState(newConditions);
   };
 
   const addCondition = () => {

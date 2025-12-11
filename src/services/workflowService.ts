@@ -1,4 +1,3 @@
-import fs from 'fs'
 import { v4 as uuidv4 } from 'uuid'
 
 // Mock workflow service
@@ -6,6 +5,8 @@ export interface Workflow {
   id: string;
   name: string;
   description?: string;
+  createdAtUTC?: string;
+  updatedAtUTC?: string;
 }
 
 // Mock API functions
@@ -14,17 +15,18 @@ export const workflowService = {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 300));
     const response = await fetch('http://localhost:4014/v1/workflows');
-    const mockWorkflows = await response.json();
-    return [...mockWorkflows];
+    const workflows = await response.json();
+    return [...workflows];
   },
 
   getWorkflow: async (id: string): Promise<Workflow | null> => {
     try {
       const response = await fetch(`http://localhost:4014/v1/workflow/${id}`);
-      const mockWorkflows = await response.json();
-      return mockWorkflows || null;
+      const workflow = await response.json();
+      return workflow || null;
     } catch (error) {
       console.error(error)
+      return null;
     }
   },
 
@@ -32,19 +34,20 @@ export const workflowService = {
     try {
       await new Promise((resolve) => setTimeout(resolve, 400));
       const now = new Date().toISOString();
-      const currentWorflows = await workflowService.getWorkflows();
 
       const newWorkflow: Workflow = {
-          name: data.name,
-          description: data.description,
-        };
-        mockWorkflows.push(newWorkflow);
-        return newWorkflow;
-
+        id: uuidv4(),
+        name: data.name,
+        description: data.description,
+        createdAtUTC: now,
+        updatedAtUTC: now,
+      };
+      
+      return newWorkflow;
     } catch (error) {
       console.error(error)
+      throw error;
     }
-  
   },
 
   saveWorkflow: async (workflow: Workflow): Promise<void> => {
@@ -61,8 +64,8 @@ export const workflowService = {
 
   deleteWorkflow: async (id: string): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
-    const response = await fetch('http://localhost:4014/v1/workflows');
-    let mockWorkflows = await response.json();
-    mockWorkflows = mockWorkflows.filter((w) => w.id !== id);
+    await fetch(`http://localhost:4014/v1/workflow/${id}`, {
+      method: 'DELETE',
+    });
   },
 };

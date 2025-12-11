@@ -1,118 +1,164 @@
 import { useTheme } from "@/contexts/ThemeContext";
+import { useEnv } from "@/contexts/EnvContext";
+import { useWorkflowEditor } from "@/contexts/WorkflowEditorContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Moon, Sun, Monitor } from "lucide-react";
+import { Moon, Sun, Monitor, Plus, Download, Upload, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { WorkflowSidebar } from "@/components/workflow/WorkflowSidebar";
+import { Switch } from "@/components/ui/switch";
+import { EnvKeyEditor } from "@/components/env/EnvKeyEditor";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { useState, useRef } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
+  const { projectEnvs, createProjectEnv, updateProjectEnv, deleteProjectEnv, setProjectDefault, exportEnvs, importEnvs } = useEnv();
+  const { autosaveEnabled, setAutosaveEnabled } = useWorkflowEditor();
+  
+  const [newEnvName, setNewEnvName] = useState("");
+  const [newEnvDialogOpen, setNewEnvDialogOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCreateEnv = async () => {
+    if (!newEnvName.trim()) return;
+    await createProjectEnv({ name: newEnvName.trim(), values: {} });
+    setNewEnvName("");
+    setNewEnvDialogOpen(false);
+  };
+
+  const handleExport = async () => {
+    const json = await exportEnvs();
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "environments.json";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Environments exported");
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    try {
+      await importEnvs(text);
+    } catch {
+      toast.error("Invalid JSON file");
+    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   return (
-      <div className="flex min-h-screen w-full bg-background">
-        <main className="flex-1 overflow-y-auto">
-          <div className="container max-w-4xl py-8 px-6">
-            <div className="mb-8">
-              <h1 className="text-4xl font-bold text-foreground mb-2">Settings</h1>
-              <p className="text-muted-foreground">Manage your application preferences</p>
-            </div>
-
-            <div className="space-y-6">
-              {/* Appearance Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Appearance</CardTitle>
-                  <CardDescription>
-                    Customize how the application looks and feels
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label className="text-base font-semibold mb-3 block">Theme Mode</Label>
-                    <div className="grid grid-cols-3 gap-3">
-                      <Button
-                        variant={theme === "dark" ? "default" : "outline"}
-                        className="flex flex-col items-center gap-2 h-auto py-4"
-                        onClick={() => setTheme("dark")}
-                      >
-                        <Moon className="h-5 w-5" />
-                        <span className="text-sm">Dark</span>
-                      </Button>
-                      <Button
-                        variant={theme === "light" ? "default" : "outline"}
-                        className="flex flex-col items-center gap-2 h-auto py-4"
-                        onClick={() => setTheme("light")}
-                      >
-                        <Sun className="h-5 w-5" />
-                        <span className="text-sm">Light</span>
-                      </Button>
-                      <Button
-                        variant={theme === "system" ? "default" : "outline"}
-                        className="flex flex-col items-center gap-2 h-auto py-4"
-                        onClick={() => setTheme("system")}
-                      >
-                        <Monitor className="h-5 w-5" />
-                        <span className="text-sm">System</span>
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-3">
-                      {theme === "system"
-                        ? "Follows your system preferences"
-                        : `Currently using ${theme} mode`}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* General Section - Placeholder */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>General</CardTitle>
-                  <CardDescription>General application settings</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <Label className="text-sm font-medium mb-2 block">Language</Label>
-                      <Button variant="outline" className="w-full justify-start" disabled>
-                        English (US)
-                      </Button>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Coming soon
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Workflow Preferences - Placeholder */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Workflow Preferences</CardTitle>
-                  <CardDescription>
-                    Default settings for workflow editor
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <Label className="text-sm font-medium mb-2 block">
-                        Auto-save
-                      </Label>
-                      <Button variant="outline" disabled>
-                        Enabled
-                      </Button>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Coming soon
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+    <div className="flex min-h-screen w-full bg-background">
+      <main className="flex-1 overflow-y-auto">
+        <div className="container max-w-4xl py-8 px-6">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-foreground mb-2">Settings</h1>
+            <p className="text-muted-foreground">Manage your application preferences</p>
           </div>
-        </main>
-      </div>
+
+          <div className="space-y-6">
+            {/* Appearance Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Appearance</CardTitle>
+                <CardDescription>Customize how the application looks</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label className="text-base font-semibold mb-3 block">Theme Mode</Label>
+                  <div className="grid grid-cols-3 gap-3">
+                    <Button variant={theme === "dark" ? "default" : "outline"} className="flex flex-col items-center gap-2 h-auto py-4" onClick={() => setTheme("dark")}>
+                      <Moon className="h-5 w-5" /><span className="text-sm">Dark</span>
+                    </Button>
+                    <Button variant={theme === "light" ? "default" : "outline"} className="flex flex-col items-center gap-2 h-auto py-4" onClick={() => setTheme("light")}>
+                      <Sun className="h-5 w-5" /><span className="text-sm">Light</span>
+                    </Button>
+                    <Button variant={theme === "system" ? "default" : "outline"} className="flex flex-col items-center gap-2 h-auto py-4" onClick={() => setTheme("system")}>
+                      <Monitor className="h-5 w-5" /><span className="text-sm">System</span>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Environment Management */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Environment Profiles</CardTitle>
+                  <CardDescription>Manage project-level environment variables</CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={handleExport}><Download className="h-4 w-4 mr-1" />Export</Button>
+                  <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}><Upload className="h-4 w-4 mr-1" />Import</Button>
+                  <input type="file" ref={fileInputRef} accept=".json" className="hidden" onChange={handleImport} />
+                  <Dialog open={newEnvDialogOpen} onOpenChange={setNewEnvDialogOpen}>
+                    <DialogTrigger asChild><Button size="sm"><Plus className="h-4 w-4 mr-1" />New</Button></DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader><DialogTitle>Create Environment</DialogTitle></DialogHeader>
+                      <div className="py-4">
+                        <Label>Name</Label>
+                        <Input value={newEnvName} onChange={(e) => setNewEnvName(e.target.value)} placeholder="e.g., Production" className="mt-1" />
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setNewEnvDialogOpen(false)}>Cancel</Button>
+                        <Button onClick={handleCreateEnv} disabled={!newEnvName.trim()}>Create</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {projectEnvs.map((env) => (
+                  <Card key={env.id} className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{env.name}</span>
+                        {env.isDefault && <Badge>Default</Badge>}
+                      </div>
+                      <div className="flex gap-2">
+                        {!env.isDefault && <Button variant="outline" size="sm" onClick={() => setProjectDefault(env.id)}><Star className="h-4 w-4" /></Button>}
+                        <Button variant="destructive" size="sm" onClick={() => deleteProjectEnv(env.id)}><Trash2 className="h-4 w-4" /></Button>
+                      </div>
+                    </div>
+                    <EnvKeyEditor values={env.values} onChange={(values) => updateProjectEnv(env.id, { values })} />
+                  </Card>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Workflow Preferences */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Workflow Preferences</CardTitle>
+                <CardDescription>Default settings for workflow editor</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-sm font-medium">Auto-save</Label>
+                    <p className="text-xs text-muted-foreground">Automatically save changes after 2 seconds of inactivity</p>
+                  </div>
+                  <Switch checked={autosaveEnabled} onCheckedChange={setAutosaveEnabled} />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
+    </div>
   );
 }

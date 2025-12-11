@@ -95,7 +95,7 @@ export const FlowEditor = ({
     [setNodes, handleDeleteNode, handleNodeClick ]
   );
 
-  const handleUpdateNode = useCallback((nodeId: string, updates: Partial<WorkflowNode>) => {
+  const handleUpdateNode = useCallback((nodeId: string, parameters: any[]) => {
     setNodes((nds) =>
       nds.map((node: Node) =>
         node.id === nodeId
@@ -103,10 +103,7 @@ export const FlowEditor = ({
               ...node, 
               data: { 
                 ...node.data, 
-                ...updates,
-                name: updates.name || node.data.name,
-                parameters: updates.parameters !== undefined ? updates.parameters : node.data.parameters,
-                list: updates.list !== undefined ? updates.list : node.data.list,
+                parameters,
               }, 
             }
           : node
@@ -115,7 +112,7 @@ export const FlowEditor = ({
     
     // Update selected node
     if (selectedNode?.id === nodeId) {
-      setSelectedNode((prev) => prev ? { ...prev, ...updates } : null);
+      setSelectedNode((prev) => prev ? { ...prev, parameters } : null);
     }
     
     toast.success("Node updated");

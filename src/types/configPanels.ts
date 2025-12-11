@@ -19,6 +19,7 @@ export interface ApiConfig {
   body: Record<string, string | null | number | boolean>;
   bodyType: "none" | "raw" | "xxx-url-encoded" | "form-data";
   reponseFormat: string;
+  params?: Record<string, string>;
   nextStepId?: string;
   errorStepId?: string;
   outputVar?: string;
@@ -34,7 +35,7 @@ export interface LoopFormatField {
 export interface LoopConfigEntry {
   sourceVar: string;
   outputVar: string;
-  type: "format" | "create";
+  type: "format" | "create" | "raw";
   nextStepId: string;
   fields?: LoopFormatField[];
   limit?: number;
@@ -99,29 +100,30 @@ export interface WorkflowData {
   connections: WorkflowConnection[];
 }
 
+// Config panel props - state is the parameters array
 export interface LoopConfigPanelProps {
-  state: WorkflowNode;
-  setState: (updates: Partial<WorkflowNode>) => void;
+  state: LoopConfigEntry[];
+  setState: (updates: LoopConfigEntry[]) => void;
 }
 
 export interface NodeConfigPanelProps {
   node: WorkflowNode | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpdate: (nodeId: string, updates: Partial<WorkflowNode>) => void;
+  onUpdate: (nodeId: string, updates: any[]) => void;
 }
 
 export interface CsvConfigPanelProps {
-  state: WorkflowNode;
-  setState: (updates: Partial<WorkflowNode>) => void;
+  state: CsvConfig[];
+  setState: (updates: CsvConfig[]) => void;
 }
 
 export interface ConditionConfigPanelProps {
-  state: WorkflowNode;
-  setState: (updates: Partial<WorkflowNode>) => void;
+  state: ConditionBlock[];
+  setState: (updates: ConditionBlock[]) => void;
 }
 
 export interface ApiConfigPanelProps {
-  state: WorkflowNode;
-  setState: (updates: Partial<WorkflowNode>) => void;
+  state: ApiConfig[];
+  setState: (updates: ApiConfig[]) => void;
 }
