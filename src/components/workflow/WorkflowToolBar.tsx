@@ -1,8 +1,8 @@
-import { useCallback, useState, Dispatch, SetStateAction } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Save, Play, Download, Plus, Upload, Cog } from "lucide-react";
+import { Save, Play, Download, Plus, Upload, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
 import { MarkerType, Edge, Node } from "reactflow";
@@ -11,7 +11,8 @@ import { WorkflowToolBarProps } from "@/types/workflows";
 import { createNode } from "../nodes/NodeDataStructure";
 import { exportToWorkflowJSON } from "@/lib/workflowExporter";
 import { workflowService } from "@/services/workflowService";
-
+import { WorkflowEnvModal } from "@/components/env/WorkflowEnvModal";
+import { EnvSelector } from "@/components/env/EnvSelector";
 export const WorkflowToolBar = ({
   setIsActive,
   isActive,
@@ -28,6 +29,7 @@ export const WorkflowToolBar = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
+  const [envModalOpen, setEnvModalOpen] = useState(false);
   const getWorkflowJSON = () => exportToWorkflowJSON(
     nodes,
     edges,
@@ -183,7 +185,11 @@ export const WorkflowToolBar = ({
         />
       </label>
       <div className="flex-1" />
-      <div className="flex items-center gap-2 px-3 py-1 border-r border-border">
+      
+      {/* Environment Selector */}
+      <EnvSelector workflowId={workflow.id} />
+      
+      <div className="flex items-center gap-2 px-3 py-1 border-x border-border">
         <Switch
           id="workflow-active"
           checked={isActive}
@@ -198,10 +204,10 @@ export const WorkflowToolBar = ({
         <Button
           variant="outline"
           size="sm"
-          disabled={isRunning}
-          aria-label="Execute workflow"
+          onClick={() => setEnvModalOpen(true)}
+          aria-label="Workflow environment settings"
         >
-          <Cog />
+          <Settings2 className="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
@@ -221,6 +227,13 @@ export const WorkflowToolBar = ({
           <Save className="" />
         </Button>
       </div>
+      
+      {/* Workflow Environment Modal */}
+      <WorkflowEnvModal
+        open={envModalOpen}
+        onOpenChange={setEnvModalOpen}
+        workflowId={workflow.id}
+      />
     </div>
   );
 };
