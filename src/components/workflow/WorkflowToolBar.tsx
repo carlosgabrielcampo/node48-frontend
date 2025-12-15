@@ -95,9 +95,7 @@ export const WorkflowToolBar = ({
     }
   };
   const handleExport = useCallback(() => {    
-    // Export to WorkflowJSON format
-
-
+    const workflowJSON = getWorkflowJSON();
     const blob = new Blob([JSON.stringify(workflowJSON, null, 2)], {
       type: "application/json",
     });
