@@ -4,32 +4,34 @@ import { Input } from "@/components/ui/input";
 import { Plus, Trash2 } from "lucide-react";
 import { LabeledDropdown } from "../../layout/dropdown";
 import { CodeTextarea } from "@/components/layout/textArea";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { LabeledInput } from "@/components/layout/input";
 import { LabeledCard } from "@/components/layout/card";
 
 export const ApiConfigPanel = ({ state, setState }: ApiConfigPanelProps) => {
-  const defaultConfig: ApiConfig = {
-    baseUrl: "",
-    endpoint: "",
-    method: "GET",
-    headers: {},
-    body: {},
-    bodyType: "none",
-    params: {},
-    reponseFormat: "json",
-    outputVar: "",
-  };
 
   // Ensure we have at least one config
-  const configs = state.length > 0 ? state : [defaultConfig];
+  const configs = useMemo(() => {
+    const defaultConfig: ApiConfig =  {
+      baseUrl: "",
+      endpoint: "",
+      method: "GET",
+      headers: {},
+      body: {},
+      bodyType: "none",
+      params: {},
+      reponseFormat: "json",
+      outputVar: "",
+    }
+    return state.length > 0 ? state : [defaultConfig]
+  }, [state])
   const [raw, setRaw] = useState(() => JSON.stringify(configs[0]?.body || {}, null, 2));
 
   useEffect(() => {
     if (configs[0]?.body) {
       setRaw(JSON.stringify(configs[0].body, null, 2));
     }
-  }, []);
+  }, [configs]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;

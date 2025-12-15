@@ -8,20 +8,22 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 0 0% 96%;
     --foreground: 222 47% 11%;
 
-    --card: 0 0% 100%;
+    --card: 0 0% 96%;
     --card-foreground: 222 47% 11%;
 
-    --popover: 0 0% 100%;
+    --popover: 0 0% 96%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 221 83% 40%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 343 92% 60%;
+    --primary-foreground: 0 0% 96%;
+    --primary-text-color: 222 47% 11%;
 
-    --secondary: 217 91% 60%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 339 91% 60%;
+    --secondary-foreground: 0 0% 96%;
+    --secondary-text-color: 215 22% 34;
 
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
@@ -30,30 +32,31 @@ All colors MUST be HSL.
     --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 0 0% 96%;
+
 
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 221 83% 40%;
+    --ring: 339 91% 60%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 100%;
+    --sidebar-background: 0 0% 96%;
     --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 221 83% 40%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary: 339 91% 60%;
+    --sidebar-primary-foreground: 0 0% 96%;
     --sidebar-accent: 210 40% 96%;
     --sidebar-accent-foreground: 222 47% 11%;
     --sidebar-border: 214 32% 91%;
-    --sidebar-ring: 221 83% 40%;
+    --sidebar-ring: 339 91% 60%;
 
     /* Custom workflow tokens */
     --canvas-background: 0 0% 98%;
     --canvas-grid: 220 13% 91%;
-    --node-background: 0 0% 100%;
+    --node-background: 0 0% 96%;
     --node-border: 214 32% 91%;
     --node-hover: 210 40% 98%;
-    --connection-line: 217 91% 60%;
+    --connection-line: 339 91% 60%;
   }
 
   .dark {
@@ -66,11 +69,13 @@ All colors MUST be HSL.
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 343 92% 60%;
+    --primary-foreground: 0 0% 96%;
+    --primary-text-color: 0 0% 96%;
 
-    --secondary: 221 83% 40%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 339 83% 40%;
+    --secondary-foreground: 0 0% 96%;
+    --secondary-text-color: 215 22% 64%;
 
     --muted: 217 33% 18%;
     --muted-foreground: 215 20% 65%;
@@ -81,25 +86,26 @@ All colors MUST be HSL.
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
+
     --border: 217 33% 18%;
     --input: 217 33% 18%;
-    --ring: 217 91% 60%;
+    --ring: 339 91% 60%;
 
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary: 339 91% 60%;
+    --sidebar-primary-foreground: 0 0% 96%;
     --sidebar-accent: 217 33% 18%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 217 33% 18%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-ring: 339 91% 60%;
 
     --canvas-background: 222 47% 8%;
     --canvas-grid: 217 33% 18%;
     --node-background: 222 47% 11%;
     --node-border: 217 33% 18%;
     --node-hover: 217 33% 15%;
-    --connection-line: 217 91% 60%;
+    --connection-line: 339 91% 60%;
   }
 }
 

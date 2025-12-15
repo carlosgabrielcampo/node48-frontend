@@ -32,20 +32,32 @@ const defaultProjectEnvs: EnvProfile[] = [
 ];
 
 // Local storage helpers
-const getFromStorage = <T>(key: string, defaultValue: T): T => {
+const getFromStorage = async <T>(key: string, defaultValue: T): Promise<T> => {
   try {
-    const stored = localStorage.getItem(key);
-    return stored ? JSON.parse(stored) : defaultValue;
-  } catch {
+    const response = await fetch(`http://localhost:4014/v1/envs/${key}`);
+    const envs = await response.json();
+    return envs ||[];
+  } catch (error) {
+    console.error(error)
     return defaultValue;
   }
 };
 
-const saveToStorage = <T>(key: string, value: T): void => {
+const saveToStorage = async <T>(key: string, value: T): Promise<void> => {
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    console.log({key, value})
+    const response = await fetch(`http://localhost:4014/v1/envs/${key}`, { 
+      method: "POST", 
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(value)
+    });
+    if(response.status === 201) console.log("Env saved")
+    else console.error("Failed to save");
   } catch (e) {
-    console.error("Failed to save to localStorage:", e);
+    console.error("Failed to save");
   }
 };
 

@@ -8,18 +8,15 @@ import ReactFlow, {
   Edge,
   Node,
   ConnectionMode,
-  MarkerType,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { toast } from "sonner";
-import { WorkflowNode } from "@/types/configPanels";
-import { v4 as uuidv4 } from 'uuid'
 import { FlowEditorProps } from "@/types/workflows";
 import { parseWorkflowJSON } from "@/lib/workflowParser";
 import { UnifiedNode } from "../nodes/UnifiedNode";
 import { createEmptyNode } from "../nodes/NodeDataStructure";
 import { WorkflowJSON } from "@/types/workflows";
-import { NodeConfigPanel } from "../configPanels/NodeConfigPanel";
+import { NodeConfigPanel } from "../configPanels/NodePanel";
 import { createEdge } from "../edges/EdgeDataStructure";
 
 const nodeTypes = { custom: UnifiedNode };

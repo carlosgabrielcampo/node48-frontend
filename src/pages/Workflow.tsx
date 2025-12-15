@@ -21,7 +21,6 @@ const Workflow = ({workflow}) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
   const [configPanelOpen, setConfigPanelOpen] = useState(false);
-
   const handleNodeClick = useCallback((node) => {
     const workflowNode: WorkflowNode = {
       id: node.id,
@@ -36,14 +35,12 @@ const Workflow = ({workflow}) => {
     setSelectedNode(workflowNode);
     setConfigPanelOpen(true);
   }, [setConfigPanelOpen, setSelectedNode]);
-
   const handleNodeAdded = useCallback((node) => {
     if ((window as Window).__addWorkflowNode) {
       (window as Window).__addWorkflowNode(node);
     }
     setIsDrawerOpen(false);
   }, []);
-  
   const handleDeleteNode = useCallback(
     (nodeId: string) => {
       setNodes((nds) => nds.filter((node) => node.id !== nodeId));
@@ -54,7 +51,7 @@ const Workflow = ({workflow}) => {
   );
 
   return (
-    <div className="min-h-screen flex w-full bg-background">
+    <div className="min-h-screen flex min-w-screen bg-background">
       <div className="flex-1 flex flex-col transition-all duration-200">
         <WorkflowTopBar workflowName={workflow?.name || "Untitled Workflow"} />
         <WorkflowToolBar

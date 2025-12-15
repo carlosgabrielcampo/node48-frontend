@@ -39,11 +39,9 @@ const App = () => (
                   <Route path="/personal" element={<Index />} />
                   <Route path="/projects" element={<Index />} />
                   <Route path="/settings" element={<Settings />} />
-                </Route>
-                <Route>
                   <Route path="/workflows/:id" element={<WorkflowDetail />} />
+                  <Route path="*" element={<NotFound />} />
                 </Route>
-                <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
           </TooltipProvider>

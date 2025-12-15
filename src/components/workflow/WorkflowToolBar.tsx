@@ -2,7 +2,7 @@ import { useCallback, useState, Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Save, Play, Download, Plus, Upload } from "lucide-react";
+import { Save, Play, Download, Plus, Upload, Cog } from "lucide-react";
 import { toast } from "sonner";
 import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
 import { MarkerType, Edge, Node } from "reactflow";
@@ -11,6 +11,7 @@ import { WorkflowToolBarProps } from "@/types/workflows";
 import { createNode } from "../nodes/NodeDataStructure";
 import { exportToWorkflowJSON } from "@/lib/workflowExporter";
 import { workflowService } from "@/services/workflowService";
+
 export const WorkflowToolBar = ({
   setIsActive,
   isActive,
@@ -27,6 +28,14 @@ export const WorkflowToolBar = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
+  const getWorkflowJSON = () => exportToWorkflowJSON(
+    nodes,
+    edges,
+    workflow.id,
+    workflow.name,
+    workflow.description,
+    workflow.createdAtUTC
+  );
 
   const onAddNode = useCallback(() => { 
     setIsDrawerOpen(true); 
@@ -34,23 +43,12 @@ export const WorkflowToolBar = ({
 
   const onSave = async () => {
     console.log(workflow)
-    const workflowJSON = exportToWorkflowJSON(
-      nodes,
-      edges,
-      workflow.id,
-      workflow.name,
-      workflow.description,
-      workflow.createdAtUTC
-    );
-    console.log(workflowJSON)
-    workflowService.saveWorkflow(workflowJSON)
-    // Simulating API call - replace with actual endpoint
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    const workflowJSON = getWorkflowJSON();    
+    const savedWorkflow = await workflowService.saveWorkflow(workflowJSON)
+    console.log({savedWorkflow})
+    if(savedWorkflow.status !== 200) throw Error("failed to save")
   }
-
-
   const handleSave = async () => {
-    console.log("aaaaa")
     setIsSaving(true);
     try {
       await onSave();
@@ -62,7 +60,6 @@ export const WorkflowToolBar = ({
       setIsSaving(false);
     }
   }
-
   const onRun = async () => {
     // Simulating API call - replace with actual endpoint
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -99,14 +96,7 @@ export const WorkflowToolBar = ({
   };
   const handleExport = useCallback(() => {    
     // Export to WorkflowJSON format
-    const workflowJSON = exportToWorkflowJSON(
-      nodes,
-      edges,
-      workflow.id,
-      workflow.name,
-      workflow.description,
-      workflow.createdAtUTC
-    );
+
 
     const blob = new Blob([JSON.stringify(workflowJSON, null, 2)], {
       type: "application/json",
@@ -206,24 +196,33 @@ export const WorkflowToolBar = ({
         <Label htmlFor="workflow-active" className="text-sm cursor-pointer whitespace-nowrap">
         </Label>
       </div>
-
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleRun}
-        disabled={isRunning}
-        aria-label="Execute workflow"
-      >
-        <Play />
-      </Button>
-      <Button
-        size="sm"
-        onClick={handleSave}
-        disabled={isSaving}
-        aria-label="Save workflow"
-      >
-        <Save className="" />
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={isRunning}
+          aria-label="Execute workflow"
+        >
+          <Cog />
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRun}
+          disabled={isRunning}
+          aria-label="Execute workflow"
+        >
+          <Play />
+        </Button>
+        <Button
+          size="sm"
+          onClick={handleSave}
+          disabled={isSaving}
+          aria-label="Save workflow"
+        >
+          <Save className="" />
+        </Button>
+      </div>
     </div>
   );
 };

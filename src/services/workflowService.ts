@@ -1,3 +1,4 @@
+import { Http2ServerResponse } from 'http2';
 import { v4 as uuidv4 } from 'uuid'
 
 // Mock workflow service
@@ -13,7 +14,6 @@ export interface Workflow {
 export const workflowService = {
   getWorkflows: async (): Promise<Workflow[]> => {
     // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
     const response = await fetch('http://localhost:4014/v1/workflows');
     const workflows = await response.json();
     return [...workflows];
@@ -21,7 +21,7 @@ export const workflowService = {
 
   getWorkflow: async (id: string): Promise<Workflow | null> => {
     try {
-      const response = await fetch(`http://localhost:4014/v1/workflow/${id}`);
+      const response = await fetch(`http://localhost:4014/v1/workflows/${id}`);
       const workflow = await response.json();
       return workflow || null;
     } catch (error) {
@@ -32,9 +32,7 @@ export const workflowService = {
 
   createWorkflow: async (data: { name: string; description?: string }): Promise<Workflow> => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 400));
       const now = new Date().toISOString();
-
       const newWorkflow: Workflow = {
         id: uuidv4(),
         name: data.name,
@@ -50,21 +48,19 @@ export const workflowService = {
     }
   },
 
-  saveWorkflow: async (workflow: Workflow): Promise<void> => {
-    const rawResponse = await fetch(`http://localhost:4014/v1/workflow/${workflow.id}`, {
-      method: 'POST',
+  saveWorkflow: async (workflow: Workflow): Promise<Response> => {
+    return await fetch(`http://localhost:4014/v1/workflows/${workflow.id}`, {
+      method: 'PATCH',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(workflow)
     });
-    console.log({rawResponse})
   },
 
   deleteWorkflow: async (id: string): Promise<void> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    await fetch(`http://localhost:4014/v1/workflow/${id}`, {
+    await fetch(`http://localhost:4014/v1/workflows/${id}`, {
       method: 'DELETE',
     });
   },

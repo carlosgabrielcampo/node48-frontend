@@ -59,10 +59,10 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
     return (
       <div
         onDoubleClick={() => data.onClick?.({id, ...data})}
-        className={`justify-center rounded-lg border-2 bg-slate-800 shadow-lg transition-all duration-200 ease-in-out cursor-pointer relative flex items-center gap-2 px-3 py-2 min-w-[80px] h-[80px] ${
+        className={`justify-center rounded-lg border-2 bg-card shadow-lg transition-all duration-200 ease-in-out cursor-pointer relative flex items-center gap-2 px-3 py-2 min-w-[80px] h-[80px] ${
           selected
             ? "border-primary shadow-xl ring-2 ring-primary/20"
-            : "border-slate-700 hover:border-primary/50"
+            : " hover:border-primary/50"
         }`}
       >
         {/* Input Handle - centered */}
@@ -71,12 +71,12 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
           position={Position.Left}
           id={id}
           style={{ top: "36px" }}
-          className="!bg-primary !w-3 !h-3 !border-2 !border-slate-800"
+          className="!bg-primary !w-2 !h-2 !border-0 !border-slate-800"
         />
 
         <Icon className="h-6 w-6 hover:text-primary/80 text-primary flex-shrink-0 transition-colors" onClick={toggleCollapse}/>
         
-        <span className="text-center absolute text-xs font-medium text-white w-[80px] top-[80px] left-0 justify-center items-center">
+        <span className="text-center absolute text-xs font-medium text-primary-text-color w-[80px] top-[80px] left-0 justify-center items-center">
           {nodeName}
         </span>
         {/* Output Handles - stacked vertically centered */}
@@ -93,7 +93,7 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
               id={handle.source}
               position={Position.Right}
               style={{ top: `calc(50% + ${offset}px)` }}
-              className="!bg-primary !w-3 !h-3 !border-2 !border-slate-800"
+              className="!bg-primary !w-2 !h-2 !border-0 !border-slate-800"
             />
           );
         })}
@@ -108,10 +108,10 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
     <div
       onDoubleClick={() => data.onClick?.({id, ...data})}
       style={{ minHeight: `${nodeHeight}px` }}
-      className={`rounded-lg border-2 bg-slate-800 shadow-lg shadow-black/20 transition-all duration-200 ease-in-out w-[220px] cursor-pointer relative ${
+      className={`rounded-lg border-2 bg-card shadow-lg shadow-black/20 transition-all duration-200 ease-in-out w-[220px] cursor-pointer relative ${
         selected
           ? "border-primary shadow-xl ring-2 ring-primary/20"
-          : "border-slate-700 hover:border-primary/50"
+          : "hover:border-primary/50"
       }`}
     >
       {/* Input Handle */}
@@ -120,7 +120,7 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
         position={Position.Left}
         id={id}
         style={{ top: "36px" }}
-        className="!bg-primary !w-3 !h-3 !border-2 !border-slate-800"
+        className="!bg-primary !w-2 !h-2 !border-0 !border-slate-800"
       />
 
       {/* Node Header */}
@@ -134,7 +134,7 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
 
           {/* Title */}
           <div className="flex-1 min-w-0">
-            <span className="text-sm font-semibold text-white truncate block">
+            <span className="text-sm font-semibold text-primary-text truncate block">
               {nodeName}
             </span>
             {/* <span className="text-xs text-slate-400 truncate block">
@@ -166,8 +166,8 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
                 <span className="text-xs font-medium text-slate-500 bg-slate-700/50 rounded px-1.5 py-0.5">
                   {index + 1}
                 </span>
-                <span className="text-xs text-slate-400 truncate">
-                  {handle.source ? `${handle.source}` : "Output"}
+                <span className="text-xs text-secondary-text truncate">
+                  {`${handle.source}`}
                 </span>
               </div>
             </div>
@@ -177,7 +177,7 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
               type="source"
               id={handle.source}
               position={Position.Right}
-              className="!bg-primary !w-3 !h-3 !border-2 !border-slate-800 !relative !transform-none !top-auto !right-auto"
+              className="!bg-primary !w-2 !h-2 !relative !border-0 !border-slate-800 !transform-none !top-auto !right-auto"
               style={{ position: "relative", right: "-12px" }}
             />
           </div>
