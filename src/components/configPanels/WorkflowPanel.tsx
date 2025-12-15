@@ -7,9 +7,8 @@ import { ScrollArea } from "../ui/scroll-area";
 import { copyToClipboard } from "@/lib/utils";
 import { nodeTemplates } from "../nodes/Templates";
 
-
 export const WorkflowPanel = ({
-  workflow,
+  node,
   open,
   onOpenChange,
   onUpdate,
