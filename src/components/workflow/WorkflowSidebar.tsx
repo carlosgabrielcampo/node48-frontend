@@ -36,8 +36,8 @@ export const WorkflowSidebar = () => {
                   size="icon"
                   onClick={toggleSidebar}
                   className={`
-                    transition-all duration-300 ease-in-out
-                    top-4 h-8 w-8 left-3 rounded-lg border-sidebar-border bg-sidebar-background shadow-sm hover:bg-primary/20 z-99 transition-transform duration-200
+                    transition-all duration-700 ease-in-out
+                    top-4 h-8 w-8 left-3 rounded-lg border-sidebar-border bg-sidebar-background shadow-sm hover:bg-primary/20 z-99 
                   `}
                   aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
                 >
@@ -48,7 +48,8 @@ export const WorkflowSidebar = () => {
                 </Button>
                 <Button
                   onClick={toggleSidebar}
-                  className={`bg-sidebar-background text-sidebar-accent-foreground hover:bg-primary/20 ${!open ? "opacity-0 scale-105" : "opacity-100 scale-100"}`}
+                  className={`transition-all duration-700 ease-in-out transition-transform 
+                    bg-sidebar-background text-sidebar-accent-foreground hover:bg-primary/20 ${!open ? "opacity-0 scale-105" : "opacity-100 scale-100"}`}
                 >
                   <PanelLeft className="absolute w-10"/>
                 </Button>
@@ -69,12 +70,6 @@ export const WorkflowSidebar = () => {
                   src="/favicon.ico"
                   className="h-8 w-8 p-1"
                   />
-              </Button>
-              <Button
-                  onClick={toggleSidebar}
-                  className={`absolute ${!open ? "opacity-0 scale-105" : "opacity-100 scale-100"}`}
-                >
-                  <PanelLeft className="absolute w-10"/>
               </Button>
               </div>
           }
