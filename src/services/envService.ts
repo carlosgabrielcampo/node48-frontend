@@ -65,7 +65,7 @@ export const envService = {
   // Project-level env profiles
   getProjectEnvs: async (): Promise<EnvProfile[]> => {
     await new Promise((r) => setTimeout(r, 100));
-    const envs = getFromStorage<EnvProfile[]>(STORAGE_KEY_PROJECT_ENVS, []);
+    const envs = await getFromStorage<EnvProfile[]>(STORAGE_KEY_PROJECT_ENVS, []);
     if (envs.length === 0) {
       saveToStorage(STORAGE_KEY_PROJECT_ENVS, defaultProjectEnvs);
       return defaultProjectEnvs;
@@ -114,13 +114,13 @@ export const envService = {
   // Workflow-level env profiles
   getWorkflowEnvs: async (workflowId: UUID): Promise<WorkflowEnvMetadata> => {
     await new Promise((r) => setTimeout(r, 100));
-    const allWorkflowEnvs = getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
+    const allWorkflowEnvs = await getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
     return allWorkflowEnvs[workflowId] || { workflowId, envProfiles: [], activeEnvId: null };
   },
 
   createWorkflowEnv: async (workflowId: UUID, data: Omit<EnvProfile, "id" | "scope" | "workflowId" | "createdAtUTC">): Promise<EnvProfile> => {
     await new Promise((r) => setTimeout(r, 100));
-    const allWorkflowEnvs = getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
+    const allWorkflowEnvs = await getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
     const workflowMeta = allWorkflowEnvs[workflowId] || { workflowId, envProfiles: [], activeEnvId: null };
     
     const newEnv: EnvProfile = {
@@ -139,7 +139,7 @@ export const envService = {
 
   updateWorkflowEnv: async (workflowId: UUID, envId: UUID, updates: Partial<EnvProfile>): Promise<EnvProfile | null> => {
     await new Promise((r) => setTimeout(r, 100));
-    const allWorkflowEnvs = getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
+    const allWorkflowEnvs = await getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
     const workflowMeta = allWorkflowEnvs[workflowId];
     if (!workflowMeta) return null;
     
@@ -152,7 +152,7 @@ export const envService = {
   },
 
   deleteWorkflowEnv: async (workflowId: UUID, envId: UUID): Promise<boolean> => {
-    const allWorkflowEnvs = getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
+    const allWorkflowEnvs = await getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
     const workflowMeta = allWorkflowEnvs[workflowId];
     if (!workflowMeta) return false;
     
@@ -163,7 +163,7 @@ export const envService = {
   },
 
   setWorkflowActiveEnv: async (workflowId: UUID, envId: UUID | null): Promise<void> => {
-    const allWorkflowEnvs = getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
+    const allWorkflowEnvs = await getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
     const workflowMeta = allWorkflowEnvs[workflowId] || { workflowId, envProfiles: [], activeEnvId: null };
     workflowMeta.activeEnvId = envId;
     allWorkflowEnvs[workflowId] = workflowMeta;
@@ -172,7 +172,7 @@ export const envService = {
 
   // Global active environment (project-wide)
   getGlobalActiveEnv: async (): Promise<UUID | null> => {
-    return getFromStorage<UUID | null>(STORAGE_KEY_ACTIVE_ENV, null);
+    return await getFromStorage<UUID | null>(STORAGE_KEY_ACTIVE_ENV, null);
   },
 
   setGlobalActiveEnv: async (envId: UUID | null): Promise<void> => {
