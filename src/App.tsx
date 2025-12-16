@@ -27,6 +27,16 @@ const SidebarLayout: React.FC = () => {
   );
 };
 
+const ProtectedRoutes : React.FC = () => {
+    return (
+      <ProtectedRoute>
+        <Outlet />
+      </ProtectedRoute>
+    )
+};
+
+
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
@@ -41,16 +51,17 @@ const App = () => (
                   {/* Public routes */}
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
-                  
                   {/* Protected routes */}
                   <Route element={<SidebarLayout />}>
-                    <Route path="/" element={<ProtectedRoute><Workflows /></ProtectedRoute>} />
-                    <Route path="/templates" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                    <Route path="/workflows" element={<ProtectedRoute><Workflows /></ProtectedRoute>} />
-                    <Route path="/personal" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                    <Route path="/projects" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                    <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                    <Route path="/workflows/:id" element={<ProtectedRoute><WorkflowDetail /></ProtectedRoute>} />
+                    <Route element={<ProtectedRoutes />} >
+                      <Route path="/" element={<Workflows />} />
+                      <Route path="/templates" element={<Index />} />
+                      <Route path="/workflows" element={<Workflows />} />
+                      <Route path="/personal" element={<Index />} />
+                      <Route path="/projects" element={<Index />} />
+                      <Route path="/settings" element={<Settings />} />
+                      <Route path="/workflows/:id" element={<WorkflowDetail />} />
+                    </Route>
                     <Route path="*" element={<NotFound />} />
                   </Route>
                 </Routes>

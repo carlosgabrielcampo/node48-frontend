@@ -15,6 +15,8 @@ export interface FlowEditorProps {
   configPanelOpen: any;
   handleNodeClick: any;
   handleDeleteNode: any;
+  setPendingChanges: Dispatch<SetStateAction<boolean>>,
+
 }
 
 export interface CreateWorkflowDialogProps {

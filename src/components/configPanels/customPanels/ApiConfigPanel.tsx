@@ -152,8 +152,9 @@ export const ApiConfigPanel = ({ state, setState }: ApiConfigPanelProps) => {
                   </Button>
                 }
                 cardChildren={
-                  parameters?.params && Object.entries(parameters.params).map(([key, value]) => (
+                  parameters?.params && Object.entries(parameters.params).map(([key, value], i) => (
                     <div key={key} className="flex gap-2">
+                      {console.log({key, value, i, params: parameters.params}, parameters.params)}
                       <Input
                         value={key}
                         onChange={(e) => updateParams(index, key, e.target.value, value)}

@@ -1,5 +1,4 @@
-import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog"
-import { Dialog, DialogContent, DialogFooter, DialogHeader } from "../ui/dialog"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog"
 import { cn } from "@/lib/utils"
 interface ClassInterface {
     contentClass: string;
@@ -21,7 +20,7 @@ export const DialogLayout = ({dialogTitle, dialogDescription, dialogFooter, dial
         <Dialog open={open} onOpenChange={handleClose}>
             <DialogContent className={cn("flex flex-col", classes?.contentClass)}>
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
+                    <DialogTitle>
                         {dialogTitle}
                     </DialogTitle>
                     <DialogDescription>

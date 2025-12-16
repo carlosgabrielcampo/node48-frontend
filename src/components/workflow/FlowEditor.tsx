@@ -94,24 +94,29 @@ export const FlowEditor = ({
 
   const handleUpdateNode = useCallback((nodeId: string, parameters: any[]) => {
     setNodes((nds) =>
-      nds.map((node: Node) =>
-        node.id === nodeId
-          ? { 
-              ...node, 
+      nds.map((node: Node) =>{
+         if(node.id === nodeId) {
+            if(JSON.stringify(node.data.parameters) != JSON.stringify(parameters)){
+              setPendingChanges(true)
+            }
+            return ({
+            ...node, 
               data: { 
                 ...node.data, 
                 parameters,
-              }, 
-            }
-          : node
-      )
+              }
+            })
+          } else {
+            return node
+          }
+      })
     );
     
     // Update selected node
     if (selectedNode?.id === nodeId) {
       setSelectedNode((prev) => prev ? { ...prev, parameters } : null);
-    }    
-  }, [setNodes, selectedNode, setSelectedNode]);
+    }
+  }, [setNodes, selectedNode, setSelectedNode, setPendingChanges]);
 
   // Handle pending node addition
   useEffect(() => {

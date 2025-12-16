@@ -1,12 +1,12 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { WorkflowNode, NodeConfigPanelProps } from "@/types/configPanels";
-import { Button } from "../ui/button";
-import { useEffect, useRef, useState } from "react";
+import { NodeConfigPanelProps } from "@/types/configPanels";
+import { useEffect, useState } from "react";
 import { parametersPanels } from ".";
 import { ScrollArea } from "../ui/scroll-area";
 import { copyToClipboard } from "@/lib/utils";
 import { nodeTemplates } from "../nodes/Templates";
 import { DialogLayout } from "../layout/dialog";
+import { Cog } from "lucide-react";
+
 
 
 export const NodeConfigPanel = ({
@@ -43,19 +43,21 @@ export const NodeConfigPanel = ({
 
     return parametersPanels[node.type](stateConfig, setStateConfig);
   };
-
+  
   if (!node) return null;
+  const Icon = nodeTemplates[node?.type]?.icon || Cog;
   return (
     <DialogLayout 
       open={open} 
       handleClose={() => { onOpenChange(!open); handleUpdate(); }} 
       dialogTitle={
-        <div>
-          <p className="text-lg font-semibold leading-none  cursor-default tracking-tight"> {nodeTemplates[node?.type]?.name || "Configuration"}</p>
+        <div className="flex gap-2">
+          <Icon/>
+          <div>
+            {nodeTemplates[node?.type]?.name || "Configuration"}
+            <p onClick={() => copyToClipboard(node.id)} className="text-sm hover:text-muted-foreground/60 text-muted-foreground/80 cursor-pointer">{node.id}</p>
+          </div>
         </div>
-      }
-      dialogDescription={
-          <p onClick={() => copyToClipboard(node.id)} className="text-sm hover:text-muted-foreground/60 text-muted-foreground/80 cursor-pointer">{node.id}</p>
       }
       dialogContent={
         <ScrollArea className="h-[calc(100%)]">

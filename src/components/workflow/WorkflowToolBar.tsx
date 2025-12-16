@@ -65,17 +65,17 @@ export const WorkflowToolBar = ({
   }
   const onRun = async () => {
     // Simulating API call - replace with actual endpoint
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 10000));
   };
   const onToggleActive = async (active: boolean) => {
     // Simulating API call - replace with actual endpoint
     await new Promise((resolve) => setTimeout(resolve, 300));
     setIsActive(active);
   };
-  const handleRun = () => {
+  const handleRun = async () => {
     setIsRunning(true);
     try {
-      onRun();
+      await onRun();
       toast.success("Workflow executed successfully");
     } catch (error) {
       toast.error("Failed to execute workflow");
@@ -160,6 +160,7 @@ export const WorkflowToolBar = ({
   return (
     <div className="flex items-center gap-2 p-4 border-b bg-background">
       <Button
+        variant="default"
         onClick={onAddNode}
         size="sm"
         className="gap-2"
@@ -212,17 +213,19 @@ export const WorkflowToolBar = ({
           onClick={handleRun}
           disabled={isRunning}
           aria-label="Execute workflow"
+          className={`${isRunning ? "text-white bg-green-500 disabled:opacity-80" : "" }`}
         >
-          <Play />
+          <Play className="h-4 w-4"/>
         </Button>
         <Button
+          variant="default"
           size="sm"
           onClick={handleSave}
           disabled={isSaving}
           aria-label="Save workflow"
-          className={`${pendingChanges ? "bg-yellow-500 hover:bg-yellow-400" : "" }`}
+          className={`${pendingChanges ? "text-muted bg-yellow-500 hover:bg-yellow-500/90" : "bg-primary" }`}
         >
-            <Save name="user" className="size-2" />
+            <Save className="h-4 w-4"/>
         </Button>
       </div>
       

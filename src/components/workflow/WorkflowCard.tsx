@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button'
 import { WorkflowCardProps } from "@/types/workflows";
 
 export const WorkflowCard = ({ workflow, onClick }: WorkflowCardProps) => {
-  const createdDate = workflow.createdAtUTC || workflow.updatedAtUTC || new Date().toISOString();
-  const formattedDate = formatDistanceToNow(new Date(createdDate), {
+  const updateDate = workflow.updatedAtUTC || workflow.updatedAtUTC || new Date().toISOString();
+  const formattedDate = formatDistanceToNow(new Date(updateDate), {
     addSuffix: true,
   });
 
@@ -49,7 +49,7 @@ export const WorkflowCard = ({ workflow, onClick }: WorkflowCardProps) => {
       <CardContent>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" />
-          <span>Created {formattedDate}</span>
+          <span>Updated {formattedDate}</span>
         </div>
       </CardContent>
     </Card>
