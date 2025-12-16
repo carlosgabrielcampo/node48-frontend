@@ -20,6 +20,7 @@ const Workflow = ({workflow}) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
+  const [pendingChanges, setPendingChanges] = useState(false)
   const [configPanelOpen, setConfigPanelOpen] = useState(false);
   const handleNodeClick = useCallback((node) => {
     const workflowNode: WorkflowNode = {
@@ -60,6 +61,7 @@ const Workflow = ({workflow}) => {
           workflow={workflow}
           isActive={isActive}
           selectedNode={selectedNode}
+          pendingChanges={pendingChanges}
           configPanelOpen={configPanelOpen}
           setNodes={setNodes}
           setEdges={setEdges}
@@ -69,6 +71,7 @@ const Workflow = ({workflow}) => {
           setIsDrawerOpen={setIsDrawerOpen}
           handleNodeClick={handleNodeClick}
           handleDeleteNode={handleDeleteNode}
+          setPendingChanges={setPendingChanges}
           setConfigPanelOpen={setConfigPanelOpen}
         />
         <FlowEditor
@@ -77,7 +80,7 @@ const Workflow = ({workflow}) => {
           workflow={workflow}
           selectedNode={selectedNode}
           configPanelOpen={configPanelOpen}
-          setNodes={setNodes} 
+          setNodes={setNodes}
           setEdges={setEdges}
           onNodeAdded={handleNodeAdded}
           onNodesChange={onNodesChange}
@@ -86,6 +89,7 @@ const Workflow = ({workflow}) => {
           handleNodeClick={handleNodeClick}
           handleDeleteNode={handleDeleteNode}
           setConfigPanelOpen={setConfigPanelOpen}
+          setPendingChanges={setPendingChanges}
         />
         <NodeTypeDrawer
           open={isDrawerOpen}

@@ -45,6 +45,8 @@ export interface WorkflowToolBarProps {
   selectedNode: any;
   setConfigPanelOpen: any;
   configPanelOpen: any;
+  pendingChanges: boolean,
+  setPendingChanges: Dispatch<SetStateAction<boolean>>,
   setWorkflowId: (id: string) => void;
   setIsActive: Dispatch<SetStateAction<boolean>>;
   setIsDrawerOpen: Dispatch<SetStateAction<boolean>>;

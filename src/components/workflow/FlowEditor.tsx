@@ -35,7 +35,8 @@ export const FlowEditor = ({
   setConfigPanelOpen,
   configPanelOpen,
   handleNodeClick,
-  handleDeleteNode
+  handleDeleteNode,
+  setPendingChanges
 }: FlowEditorProps) => {
 
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
@@ -109,9 +110,7 @@ export const FlowEditor = ({
     // Update selected node
     if (selectedNode?.id === nodeId) {
       setSelectedNode((prev) => prev ? { ...prev, parameters } : null);
-    }
-    
-    toast.success("Node updated");
+    }    
   }, [setNodes, selectedNode, setSelectedNode]);
 
   // Handle pending node addition
@@ -185,6 +184,7 @@ export const FlowEditor = ({
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          
           onSelectionChange={onSelectionChange}
           nodeTypes={nodeTypes}
           connectionMode={ConnectionMode.Strict}

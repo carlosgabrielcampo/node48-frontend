@@ -147,7 +147,7 @@ export const UnifiedNode = memo(({ id, data, selected }: NodeProps<UnifiedNodeDa
               className="h-6 w-6 rounded hover:bg-slate-700 flex items-center justify-center transition-colors"
               aria-label="Node settings"
             >
-              <Cog className="h-3 w-3 text-slate-400 hover:text-primary" />
+              <Cog className="h-4 w-4 text-slate-400 hover:text-primary" />
             </button>
           </div>
         </div>

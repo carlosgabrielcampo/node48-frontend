@@ -16,13 +16,15 @@ import { EnvSelector } from "@/components/env/EnvSelector";
 export const WorkflowToolBar = ({
   setIsActive,
   isActive,
-  setIsDrawerOpen,
   nodes,
   workflow,
   setNodes,
   edges,
   setEdges,
+  pendingChanges,
+  setPendingChanges,
   handleNodeClick,
+  setIsDrawerOpen,
   handleDeleteNode
 }: WorkflowToolBarProps) => {
 
@@ -52,6 +54,7 @@ export const WorkflowToolBar = ({
     setIsSaving(true);
     try {
       await onSave();
+      setPendingChanges(false)
       toast.success("Workflow saved successfully");
     } catch (error) {
       toast.error("Failed to save workflow");
@@ -182,10 +185,7 @@ export const WorkflowToolBar = ({
         />
       </label>
       <div className="flex-1" />
-      
-      {/* Environment Selector */}
-      <EnvSelector workflowId={workflow.id} />
-      
+            
       <div className="flex h-8 items-center gap-2 px-3 py-1 border-x border-border">
         <Switch
           id="workflow-active"
@@ -220,12 +220,9 @@ export const WorkflowToolBar = ({
           onClick={handleSave}
           disabled={isSaving}
           aria-label="Save workflow"
-          className="h-9 w-10"
+          className={`${pendingChanges ? "bg-yellow-500 hover:bg-yellow-400" : "" }`}
         >
-          <div className="flex justify-center items-center">
             <Save name="user" className="size-2" />
-            <CircleAlert size={""} className="text-yellow-500" />
-          </div>
         </Button>
       </div>
       
