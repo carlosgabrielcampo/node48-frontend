@@ -122,11 +122,11 @@
             "type": "conditional_operation",
             "parameters": [
                 {
-                    "condition": [{ "field": "{{Autorizados}}", "type": "arraySizeEquals", "validator": 100 }],
+                    "condition": [{ "field": "{{Autorizados}}", "type": "array_size_equals", "validator": 100 }],
                     "nextStepId": "d6e997f0-138b-4994-9df0-b57e4ab51d63"
                 },
                 {
-                    "condition": [{ "field": "{{Autorizados}}", "type": "arraySizeEquals", "validator": 6957 }],
+                    "condition": [{ "field": "{{Autorizados}}", "type": "array_size_equals", "validator": 6957 }],
                     "nextStepId": "fbd63183-2d19-4624-85ba-19826227170f"
                 }
             ],

@@ -45,7 +45,6 @@ const getFromStorage = async <T>(key: string, defaultValue: T): Promise<T> => {
 
 const saveToStorage = async <T>(key: string, value: T): Promise<void> => {
   try {
-    console.log({key, value})
     const response = await fetch(`http://localhost:4014/v1/envs/${key}`, { 
       method: "POST", 
       headers: {

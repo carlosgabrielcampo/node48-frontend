@@ -100,7 +100,7 @@ export default function Register() {
                   className="pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-primary focus:ring-primary"
                   {...register("name")}
                   aria-invalid={!!errors.name}
-                  aria-describedby={errors.name ? "name-error" : undefined}
+                  aria-describedby={errors.name ? "name-error" : ""}
                 />
               </div>
               {errors.name && (
@@ -124,7 +124,7 @@ export default function Register() {
                   className="pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-primary focus:ring-primary"
                   {...register("email")}
                   aria-invalid={!!errors.email}
-                  aria-describedby={errors.email ? "email-error" : undefined}
+                  aria-describedby={errors.email ? "email-error" : ""}
                 />
               </div>
               {errors.email && (
@@ -148,7 +148,7 @@ export default function Register() {
                   className="pl-10 pr-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-primary focus:ring-primary"
                   {...register("password")}
                   aria-invalid={!!errors.password}
-                  aria-describedby={errors.password ? "password-error" : undefined}
+                  aria-describedby={errors.password ? "password-error" : ""}
                 />
                 <button
                   type="button"
@@ -180,7 +180,7 @@ export default function Register() {
                   className="pl-10 pr-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-primary focus:ring-primary"
                   {...register("confirmPassword")}
                   aria-invalid={!!errors.confirmPassword}
-                  aria-describedby={errors.confirmPassword ? "confirm-error" : undefined}
+                  aria-describedby={errors.confirmPassword ? "confirm-error" : ""}
                 />
                 <button
                   type="button"

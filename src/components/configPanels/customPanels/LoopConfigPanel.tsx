@@ -87,14 +87,14 @@ export const LoopConfigPanel = ({ state, setState }: LoopConfigPanelProps) => {
                 placeholder={"csvAutorizados"}
                 value={entry.outputVar}
               />
-              <LabeledDropdown itemList={[
-                {value: "format", displayName: "Format"},
-                {value: "create", displayName: "Create"},
-                {value: "raw", displayName: "Raw"},
+              <LabeledDropdown itemsList={[
+                {itemProperties: {value: "format"}, itemDisplay: "Format"},
+                {itemProperties: {value: "create"}, itemDisplay: "Create"},
+                {itemProperties: {value: "raw"}, itemDisplay: "Raw"},
               ]} 
                 label={"Type"}
-                onValueChange={(value: "format" | "create" | "raw") => updateConfigEntry(index, { type: value })}
-                value={entry.type}
+                onSelect={(value) => updateConfigEntry(index, { type: value })}
+                header={entry.type}
               />
               {entry.type === "format" && (
                 <div className="space-y-2">

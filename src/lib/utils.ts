@@ -6,6 +6,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const copyToClipboard = (value) => {
-    console.log(value)
     navigator.clipboard.writeText(value)
 }

@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Save, Play, Download, Plus, Upload, Settings2 } from "lucide-react";
+import { Save, Play, Download, Plus, Upload, Settings2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
 import { MarkerType, Edge, Node } from "reactflow";
@@ -44,10 +44,8 @@ export const WorkflowToolBar = ({
   }, []);
 
   const onSave = async () => {
-    console.log(workflow)
     const workflowJSON = getWorkflowJSON();    
     const savedWorkflow = await workflowService.saveWorkflow(workflowJSON)
-    console.log({savedWorkflow})
     if(savedWorkflow.status !== 200) throw Error("failed to save")
   }
   const handleSave = async () => {
@@ -72,7 +70,6 @@ export const WorkflowToolBar = ({
     setIsActive(active);
   };
   const handleRun = () => {
-    console.log("aadwad")
     setIsRunning(true);
     try {
       onRun();
@@ -189,7 +186,7 @@ export const WorkflowToolBar = ({
       {/* Environment Selector */}
       <EnvSelector workflowId={workflow.id} />
       
-      <div className="flex items-center gap-2 px-3 py-1 border-x border-border">
+      <div className="flex h-8 items-center gap-2 px-3 py-1 border-x border-border">
         <Switch
           id="workflow-active"
           checked={isActive}
@@ -223,8 +220,12 @@ export const WorkflowToolBar = ({
           onClick={handleSave}
           disabled={isSaving}
           aria-label="Save workflow"
+          className="h-9 w-10"
         >
-          <Save className="" />
+          <div className="flex justify-center items-center">
+            <Save name="user" className="size-2" />
+            <CircleAlert size={""} className="text-yellow-500" />
+          </div>
         </Button>
       </div>
       

@@ -71,7 +71,7 @@ export const ConditionConfigPanel = ({ state, setState }: ConditionConfigPanelPr
                   </Button>
                 </div>
 
-                {condition.condition.map((rule, ruleIndex) => (
+                {condition?.condition?.map((rule, ruleIndex) => (
                   <div key={ruleIndex} className="space-y-2 pl-4 border-l-2 border-border">
                     <div className="flex items-center justify-between">
                       <Label className="text-xs">Rule {ruleIndex + 1}</Label>
@@ -89,14 +89,14 @@ export const ConditionConfigPanel = ({ state, setState }: ConditionConfigPanelPr
                       className="mt-1"
                     />
 
-                    <LabeledDropdown itemList={[
-                      {value: "regex", displayName: "Regex"},
-                      {value: "equals", displayName: "Equals"},
-                      {value: "contains", displayName: "Contains"},
+                    <LabeledDropdown itemsList={[
+                      {itemProperties: {value: "regex"}, itemDisplay: "Regex"},
+                      {itemProperties: {value: "equals"}, itemDisplay: "Equals"},
+                      {itemProperties: {value: "contains"}, itemDisplay: "Contains"},
                     ]} 
                       label={"Type"}
-                      onValueChange={(value) => updateRule(condIndex, ruleIndex, { type: value })}
-                      value={rule.type}
+                      onSelect={(value) => updateRule(condIndex, ruleIndex, { type: value })}
+                      header={rule.type}
                     />
 
                     <LabeledInput 

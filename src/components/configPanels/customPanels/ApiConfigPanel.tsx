@@ -114,30 +114,30 @@ export const ApiConfigPanel = ({ state, setState }: ApiConfigPanelProps) => {
               onChange={(e) => updateConfig(index, { endpoint: e.target.value })}
               className="mt-1"
             />
-            <LabeledDropdown itemList={[
-              {value: "GET", displayName: "GET"},
-              {value: "POST", displayName: "POST"},
-              {value: "PUT", displayName: "PUT"},
-              {value: "PATCH", displayName: "PATCH"},
-              {value: "DELETE", displayName: "DELETE"},
+            <LabeledDropdown  itemsList={[
+              {itemProperties: {value: "GET"}, itemDisplay: "GET"},
+              {itemProperties: {value: "POST"}, itemDisplay: "POST"},
+              {itemProperties: {value: "PUT"}, itemDisplay: "PUT"},
+              {itemProperties: {value: "PATCH"}, itemDisplay: "PATCH"},
+              {itemProperties: {value: "DELETE"}, itemDisplay: "DELETE"},
             ]} 
               label={"Method"}
-              onValueChange={(value) => updateConfig(index, { method: value })}
-              value={parameters.method}
+              onSelect={(value) => updateConfig(index, { method: value })}
+              header={parameters.method}
             />
-            <LabeledDropdown itemList={[
-              {value: "json", displayName: "JSON"},
-              {value: "text", displayName: "TEXT"},
+            <LabeledDropdown itemsList={[
+              {itemProperties: {value: "json"}, itemDisplay: "JSON"},
+              {itemProperties: {value: "text"}, itemDisplay: "TEXT"},
             ]} 
               label={"Response Format"}
-              onValueChange={(value) => updateConfig(index, { reponseFormat: value })}
-              value={parameters.reponseFormat}
+              onSelect={(value) => updateConfig(index, { reponseFormat: value })}
+              header={parameters.reponseFormat}
             />
             <LabeledInput 
               label={"OutputVar"}
               value={parameters.outputVar || ""}
               placeholder="apiAuthorized"
-              onChange={(e) => updateConfig(index, { outputVar: e.target.value })}
+              onSelect={(value) => updateConfig(index, { outputVar: value })}
               className="mt-1"
             />
             <LabeledCard 
@@ -201,17 +201,19 @@ export const ApiConfigPanel = ({ state, setState }: ApiConfigPanelProps) => {
             <LabeledCard 
               label={"Body"}
               headerChildren={
-                <LabeledDropdown 
-                  value={parameters.bodyType || "none"} 
-                  className={"w-40"}
-                  itemList={[
-                    {value: "none", displayName: "none"},
-                    {value: "raw", displayName: "raw"},
-                    {value: "xxx-url-encoded", displayName: "xxx-url-encoded"},
-                    {value: "form-data", displayName: "form-data"},
-                  ]}
-                  onValueChange={(value: "none" | "raw" | "xxx-url-encoded" | "form-data") => updateConfig(index, { bodyType: value })}
-                />
+                <div>
+                  <LabeledDropdown 
+                    header={parameters.bodyType || "none"} 
+                    className={"w-40"}
+                    itemsList={[
+                      {itemProperties: {value: "none"}, itemDisplay: "none"},
+                      {itemProperties: {value: "raw"}, itemDisplay: "raw"},
+                      {itemProperties: {value: "xxx-url-encoded"}, itemDisplay: "xxx-url-encoded"},
+                      {itemProperties: {value: "form-data"}, itemDisplay: "form-data"},
+                    ]}
+                    onSelect={(value: "none" | "raw" | "xxx-url-encoded" | "form-data") => updateConfig(index, { bodyType: value })}
+                  />
+                </div>
               }
               cardChildren={
                 parameters.bodyType === "raw" 

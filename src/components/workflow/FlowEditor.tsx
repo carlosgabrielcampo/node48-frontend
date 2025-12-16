@@ -48,7 +48,6 @@ export const FlowEditor = ({
   useEffect(() => {
     if (onNodeAdded) {
       globalThis.__addWorkflowNode = (node) => {
-      console.log({node})
         setPendingNode(node); 
       };
     }

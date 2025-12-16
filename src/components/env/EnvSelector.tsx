@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Check, Settings, Globe, Workflow, AlertTriangle } from "lucide-react";
+import { ChevronDown, Check, Settings, Globe, Workflow, AlertTriangle, CircleAlert  } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useWorkflowEditor } from "@/contexts/WorkflowEditorContext";
 import { Badge } from "@/components/ui/badge";
@@ -53,9 +53,9 @@ export const EnvSelector = ({ workflowId }: EnvSelectorProps) => {
           <span className="max-w-[100px] truncate">
             {activeEnv?.name || "No Env"}
           </span>
-          {(hasWorkflowOverride || deviatesFromDefault) && (
-            <AlertTriangle className="h-3 w-3 text-yellow-500" />
-          )}
+          {/* {(hasWorkflowOverride || deviatesFromDefault) && (
+            <CircleAlert className="h-3 w-3 text-red-500" />
+          )} */}
           {isDirty && <Badge variant="destructive" className="h-2 w-2 p-0 rounded-full" />}
           <ChevronDown className="h-4 w-4" />
         </Button>
