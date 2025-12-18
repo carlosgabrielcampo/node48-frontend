@@ -14,15 +14,13 @@ export interface ConditionBlock {
 export interface ApiConfig {
   baseUrl: string;
   endpoint: string;
-  method: string;
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  responseFormat: "json" | "text";
+  outputVar: string;
+  params: Record<string, string>;
   headers: Record<string, string>;
-  body: Record<string, string | null | number | boolean>;
   bodyType: "none" | "raw" | "xxx-url-encoded" | "form-data";
-  reponseFormat: string;
-  params?: Record<string, string>;
-  nextStepId?: string;
-  errorStepId?: string;
-  outputVar?: string;
+  body: unknown;
 }
 
 // Loop node types

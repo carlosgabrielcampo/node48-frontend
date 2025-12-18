@@ -9,7 +9,7 @@ import { WorkflowEditorProvider } from "@/contexts/WorkflowEditorContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
-import Workflows from "./pages/Workflows";
+import WorkflowsPage from "./pages/Workflows";
 import WorkflowDetail from "./pages/WorkflowDetail";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -54,9 +54,9 @@ const App = () => (
                   {/* Protected routes */}
                   <Route element={<SidebarLayout />}>
                     <Route element={<ProtectedRoutes />} >
-                      <Route path="/" element={<Workflows />} />
-                      <Route path="/templates" element={<Index />} />
-                      <Route path="/workflows" element={<Workflows />} />
+                      <Route path="/" element={<Index />} />
+                      {/* <Route path="/templates" element={<Index />} /> */}
+                      <Route path="/workflows" element={<WorkflowsPage />} />
                       <Route path="/personal" element={<Index />} />
                       <Route path="/projects" element={<Index />} />
                       <Route path="/settings" element={<Settings />} />

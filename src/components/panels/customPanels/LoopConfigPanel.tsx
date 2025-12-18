@@ -1,4 +1,4 @@
-import { LoopConfigEntry, LoopFormatField, LoopConfigPanelProps } from "@/types/configPanels";
+import { LoopConfigEntry, LoopFormatField, LoopConfigPanelProps } from "@/types/panels";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -93,7 +93,7 @@ export const LoopConfigPanel = ({ state, setState }: LoopConfigPanelProps) => {
                 {itemProperties: {value: "raw"}, itemDisplay: "Raw"},
               ]} 
                 label={"Type"}
-                onSelect={(value) => updateConfigEntry(index, { type: value })}
+                onSelect={({value}) => updateConfigEntry(index, { type: value })}
                 header={entry.type}
               />
               {entry.type === "format" && (

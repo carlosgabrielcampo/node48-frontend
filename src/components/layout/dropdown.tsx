@@ -3,24 +3,27 @@ import { Button } from "../ui/button";
 import { ChevronDown } from "lucide-react";
 import React from "react";
 import { Label } from "../ui/label";
+interface ItemProperties {
+    value: any;
+}
+
 interface ListStructure {
-    itemProperties: React;
+    itemProperties: ItemProperties;
     itemDisplay: string;
 }
 
 interface DropdownInterface {
-    value: string;
     label?: string;
-    onSelect: (value: string) => void;
+    onSelect: ({value}: {value: string}) => void;
     itemsList: ListStructure[];
     menuLabel?: string;
-    header: React;
-    dropdownExtra: ListStructure[];
+    header: React.ReactElement;
+    dropdownExtra?: ListStructure[];
 }
 
 const Item = ({itemProperties, onSelect, itemDisplay}) => {
     return (
-        <DropdownMenuItem onSelect={() => onSelect(itemProperties.value)} className={"w-30"}>
+        <DropdownMenuItem onSelect={() => onSelect(itemProperties)} className={"w-30"}>
             {String(itemDisplay).toUpperCase()}
         </DropdownMenuItem>
     )
@@ -30,7 +33,7 @@ const MenuItems = ({itemsList, onSelect}) => {
     return (
         itemsList?.length && itemsList
             .map(({itemProperties, itemDisplay}) => (
-                <Item itemProperties={itemProperties} onSelect={onSelect} itemDisplay={itemDisplay}  />
+                <Item key={itemDisplay} itemProperties={itemProperties} onSelect={onSelect} itemDisplay={itemDisplay}  />
             ))
     )
 }

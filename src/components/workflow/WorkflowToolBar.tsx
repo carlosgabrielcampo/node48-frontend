@@ -6,7 +6,7 @@ import { Save, Play, Download, Plus, Upload, Settings2, CircleAlert } from "luci
 import { toast } from "sonner";
 import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
 import { MarkerType, Edge, Node } from "reactflow";
-import { WorkflowData } from "@/types/configPanels";
+import { WorkflowData } from "@/types/panels";
 import { WorkflowToolBarProps } from "@/types/workflows";
 import { createNode } from "../nodes/NodeDataStructure";
 import { exportToWorkflowJSON } from "@/lib/workflowExporter";
@@ -158,36 +158,40 @@ export const WorkflowToolBar = ({
   );
 
   return (
-    <div className="flex items-center gap-2 p-4 border-b bg-background">
-      <Button
-        variant="default"
-        onClick={onAddNode}
-        size="sm"
-        className="gap-2"
-      >
-        <Plus className="h-4 w-4" />
-      </Button>
-      <Button
-        onClick={handleExport}
-        size="sm" variant="outline" className="gap-2">
-        <Download className="h-4 w-4" />
-      </Button>
-      <label>
-        <Button size="sm" variant="outline" className="gap-2" asChild>
-          <span>
-            <Upload className="h-4 w-4" />
-          </span>
+    <div className="w-full flex items-center justify-between h-16 gap-2 p-4 border-b bg-background overflow-hidden">
+      <div>
+        <Button
+          variant="default"
+          onClick={onAddNode}
+          size="sm"
+          className="gap-2"
+        >
+          <Plus className="h-4 w-4" />
         </Button>
-        <input
-          type="file"
-          accept=".json"
-          onChange={handleImport}
-          className="hidden"
-        />
-      </label>
-      <div className="flex-1" />
-            
-      <div className="flex h-8 items-center gap-2 px-3 py-1 border-x border-border">
+        <Button
+          onClick={handleExport}
+          size="sm" variant="outline" className="gap-2">
+          <Download className="h-4 w-4" />
+        </Button>
+        <label>
+          <Button size="sm" variant="outline" className="gap-2" asChild>
+            <span>
+              <Upload className="h-4 w-4" />
+            </span>
+          </Button>
+          <input
+            type="file"
+            accept=".json"
+            onChange={handleImport}
+            className="hidden"
+          />
+        </label>
+      </div>
+      <div>
+        <h1 className="text-lg font-bold overflow-hidden">{workflow.name}</h1>
+      </div>
+      <div className="flex items-center">
+        <div className="flex h-8 items-center gap-2 px-3 py-1 border-x mx-2 border-border">
         <Switch
           id="workflow-active"
           checked={isActive}
@@ -195,38 +199,37 @@ export const WorkflowToolBar = ({
           disabled={isToggling}
           aria-label="Toggle workflow active state"
         />
-        <Label htmlFor="workflow-active" className="text-sm cursor-pointer whitespace-nowrap">
-        </Label>
-      </div>
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setEnvModalOpen(true)}
-          aria-label="Workflow environment settings"
-        >
-          <Settings2 className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleRun}
-          disabled={isRunning}
-          aria-label="Execute workflow"
-          className={`${isRunning ? "text-white bg-green-500 disabled:opacity-80" : "" }`}
-        >
-          <Play className="h-4 w-4"/>
-        </Button>
-        <Button
-          variant="default"
-          size="sm"
-          onClick={handleSave}
-          disabled={isSaving}
-          aria-label="Save workflow"
-          className={`${pendingChanges ? "text-muted bg-yellow-500 hover:bg-yellow-500/90" : "bg-primary" }`}
-        >
-            <Save className="h-4 w-4"/>
-        </Button>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setEnvModalOpen(true)}
+            aria-label="Workflow environment settings"
+          >
+            <Settings2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRun}
+            disabled={isRunning}
+            aria-label="Execute workflow"
+            className={`${isRunning ? "text-muted bg-green-500 disabled:opacity-100" : "" }`}
+          >
+            <Play className="h-4 w-4"/>
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleSave}
+            disabled={isSaving}
+            aria-label="Save workflow"
+            className={`${pendingChanges ? "text-muted bg-yellow-500 hover:bg-yellow-500/90" : "bg-primary" }`}
+          >
+              <Save className="h-4 w-4"/>
+          </Button>
+        </div>
       </div>
       
       {/* Workflow Environment Modal */}

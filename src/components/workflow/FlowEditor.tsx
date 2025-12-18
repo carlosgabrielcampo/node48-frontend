@@ -8,6 +8,7 @@ import ReactFlow, {
   Edge,
   Node,
   ConnectionMode,
+  useReactFlow,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { toast } from "sonner";
@@ -16,8 +17,10 @@ import { parseWorkflowJSON } from "@/lib/workflowParser";
 import { UnifiedNode } from "../nodes/UnifiedNode";
 import { createEmptyNode } from "../nodes/NodeDataStructure";
 import { WorkflowJSON } from "@/types/workflows";
-import { NodeConfigPanel } from "../configPanels/NodePanel";
+import { NodeConfigPanel } from "../panels/NodePanel";
 import { createEdge } from "../edges/EdgeDataStructure";
+import { Button } from "@/components/ui/button";
+import { Maximize, ZoomIn, ZoomOut } from "lucide-react";
 
 const nodeTypes = { custom: UnifiedNode };
 
@@ -179,6 +182,23 @@ export const FlowEditor = ({
     setIsScreenMoving(true);
   };  
 
+  function FlowControls() {
+  const { zoomIn, zoomOut, fitView } = useReactFlow();
+  return (
+    <div className="absolute bottom-4 left-4 flex gap-2 z-50">
+      <Button size="icon" onClick={() => zoomIn()} variant="outline">
+        <ZoomIn />
+      </Button>
+      <Button size="icon" onClick={() => zoomOut()} variant="outline">
+        <ZoomOut />
+      </Button>
+      <Button size="icon" onClick={() => fitView()} variant="outline">
+        <Maximize />
+      </Button>
+    </div>
+  );
+}
+
   return (
     <div className="flex-1 flex flex-col" ref={reactFlowWrapper}>
       {/* Canvas */}
@@ -189,7 +209,6 @@ export const FlowEditor = ({
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          
           onSelectionChange={onSelectionChange}
           nodeTypes={nodeTypes}
           connectionMode={ConnectionMode.Strict}
@@ -202,7 +221,7 @@ export const FlowEditor = ({
           maxZoom={1.5}
         >
           <Background className="bg-canvas" gap={20} />
-          <Controls />
+          <FlowControls />
           {isScreenMoving && <MiniMap  nodeColor="hsl(var(--primary))" className="bg-canvas"/>}
         </ReactFlow>
       </div>

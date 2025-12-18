@@ -1,5 +1,5 @@
-import { NodeConfigPanelProps } from "@/types/configPanels";
-import { useEffect, useState } from "react";
+import { NodeConfigPanelProps } from "@/types/panels";
+import { useEffect, useRef, useState } from "react";
 import { parametersPanels } from ".";
 import { ScrollArea } from "../ui/scroll-area";
 import { copyToClipboard } from "@/lib/utils";
@@ -16,6 +16,11 @@ export const NodeConfigPanel = ({
   onUpdate,
 }: NodeConfigPanelProps) => {
   const [stateConfig, setStateConfig] = useState<any[]>([]);
+  const commitRef = useRef<null | ((prev: any[]) => any[])>(null);
+
+  const registerCommit = (fn: (prev: any[]) => any[]) => {
+    commitRef.current = fn;
+  };
 
   useEffect(() => {
     if (!node) {
@@ -26,12 +31,6 @@ export const NodeConfigPanel = ({
     setStateConfig(initial);
   }, [node?.id, open]);
 
-  const handleUpdate = () => { 
-    if (node) {
-      onUpdate(node.id, stateConfig); 
-    }
-  }
-
   const renderConfigPanel = () => {
     if (!node || !parametersPanels[node.type]) {
       return (
@@ -41,7 +40,7 @@ export const NodeConfigPanel = ({
       );
     }
 
-    return parametersPanels[node.type](stateConfig, setStateConfig);
+    return parametersPanels[node.type](stateConfig, setStateConfig, registerCommit, open, nodeTemplates?.[node?.type].defaultPanelInfo || []);
   };
   
   if (!node) return null;
@@ -49,7 +48,16 @@ export const NodeConfigPanel = ({
   return (
     <DialogLayout 
       open={open} 
-      handleClose={() => { onOpenChange(!open); handleUpdate(); }} 
+      handleClose={() => {
+        const nextState =
+          commitRef.current
+            ? commitRef.current(stateConfig)
+            : stateConfig;
+
+        onUpdate(node.id, nextState);
+        onOpenChange(false);
+      }}
+
       dialogTitle={
         <div className="flex gap-2">
           <Icon/>

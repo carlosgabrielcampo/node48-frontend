@@ -1,10 +1,9 @@
 import { useState, useCallback } from "react";
-import { WorkflowTopBar } from "@/components/workflow/WorkflowTopBar";
 import { FlowEditor } from "@/components/workflow/FlowEditor";
 import { WorkflowToolBar } from "@/components/workflow/WorkflowToolBar";
 import { NodeTypeDrawer } from "@/components/nodes/NodeTypeDrawer";
 import { useEdgesState, useNodesState } from "reactflow";
-import { WorkflowNode } from "@/types/configPanels";
+import { WorkflowNode } from "@/types/panels";
 import { toast } from "sonner";
 interface Window {
   __addWorkflowNode?: (args: {
@@ -54,7 +53,6 @@ const Workflow = ({workflow}) => {
   return (
     <div className="min-h-screen flex min-w-screen bg-background">
       <div className="flex-1 flex flex-col transition-all duration-200">
-        <WorkflowTopBar workflowName={workflow?.name || "Untitled Workflow"} />
         <WorkflowToolBar
           nodes={nodes} 
           edges={edges}
@@ -95,7 +93,7 @@ const Workflow = ({workflow}) => {
           open={isDrawerOpen}
           onOpenChange={setIsDrawerOpen}
           onSelectNodeType={handleNodeAdded}
-          />
+        />
         </div>
       </div>
   );

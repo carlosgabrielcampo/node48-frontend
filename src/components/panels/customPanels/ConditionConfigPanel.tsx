@@ -1,4 +1,4 @@
-import { ConditionConfigPanelProps, ConditionBlock, ConditionRule } from "@/types/configPanels";
+import { ConditionConfigPanelProps, ConditionBlock, ConditionRule } from "@/types/panels";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
@@ -95,7 +95,7 @@ export const ConditionConfigPanel = ({ state, setState }: ConditionConfigPanelPr
                         {itemProperties: {value: "contains"}, itemDisplay: "Contains"},
                       ]} 
                         label={"Type"}
-                        onSelect={(value) => updateRule(condIndex, ruleIndex, { type: value })}
+                        onSelect={({value}) => updateRule(condIndex, ruleIndex, { type: value })}
                         header={rule.type}
                       />
   

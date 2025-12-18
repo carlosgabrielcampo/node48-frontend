@@ -10,17 +10,21 @@ export const parseWorkflowJSON = (
   onDelete: (id: string) => void,
   onClick: (id: string) => void
 ): { nodes: Node[]; edges: Edge[] } => {
-  const nodes: Node[] = [];
-  const edges: Edge[] = [];
-
-  // Convert each step to a node
-  Object.values(workflowJSON.steps).forEach((step) => {
-    nodes.push(createNode({id: step.id, position: step.position, onClick, onDelete, ...step }));
-    Object.entries(step.connections).forEach(([handleId, targetId], index) => {
-      edges.push(createEdge({id: handleId, source: step.id, sourceHandle: handleId, target: targetId, label: String(index)}));
+  try {
+    const nodes: Node[] = [];
+    const edges: Edge[] = [];
+  
+    // Convert each step to a node
+    Object.values(workflowJSON?.steps)?.forEach((step) => {
+      nodes.push(createNode({id: step.id, position: step.position, onClick, onDelete, ...step }));
+      Object.entries(step.connections).forEach(([handleId, targetId], index) => {
+        edges.push(createEdge({id: handleId, source: step.id, sourceHandle: handleId, target: targetId, label: String(index)}));
+      });
     });
-  });
-  return { nodes, edges };
+    return { nodes, edges };
+  } catch (error) {
+    return { nodes: [], edges: []}
+  }
 };
 
 export const isWorkflowJSON = (data: any): data is WorkflowJSON => {

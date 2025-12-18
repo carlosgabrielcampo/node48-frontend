@@ -15,9 +15,9 @@ import {
 import { Button } from "@/components/ui/button";
 const navItems = [
   { title: "Overview", url: "/", icon: LayoutDashboard },
-  { title: "Personal", url: "/personal", icon: User },
+  // { title: "Personal", url: "/personal", icon: User },
   { title: "Workflows", url: "/workflows", icon: Workflow },
-  { title: "Templates", url: "/templates", icon: FileText },
+  // { title: "Templates", url: "/templates", icon: FileText },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
@@ -27,17 +27,17 @@ export const WorkflowSidebar = () => {
   return (
     <Sidebar collapsible="icon" className="transition-all duration-200 ease-in-out border-r border-sidebar-border">
       <SidebarHeader>
-        <div className={`h-8 w-full flex justify-center items-center`}>
+        <div className={`h-12 w-full flex justify-center items-center`}>
           { open 
             ? 
-              <div className={`w-full flex justify-between items-center`}>
+              <div className={`w-full flex justify-between items-center `}>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={toggleSidebar}
                   className={`
                     transition-all duration-700 ease-in-out
-                    top-4 h-8 w-8 left-3 rounded-lg border-sidebar-border bg-sidebar-background shadow-sm hover:bg-primary/20 z-99 
+                    top-4 h-8 w-8 left-3 rounded-lg bg-sidebar-background shadow-sm hover:bg-primary/20 z-99
                   `}
                   aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
                 >
@@ -49,7 +49,7 @@ export const WorkflowSidebar = () => {
                 <Button
                   onClick={toggleSidebar}
                   className={`transition-all duration-700 ease-in-out transition-transform 
-                    bg-sidebar-background text-sidebar-accent-foreground hover:bg-primary/20 ${!open ? "opacity-0 scale-105" : "opacity-100 scale-100"}`}
+                    bg-sidebar-background  hover:bg-primary/20 ${!open ? "opacity-0 scale-105" : "opacity-100 scale-100"}`}
                 >
                   <PanelLeft className="absolute w-10"/>
                 </Button>
@@ -62,7 +62,7 @@ export const WorkflowSidebar = () => {
                 onClick={toggleSidebar}
                 className={`
                   transition-all duration-300 ease-in-out
-                  top-4 h-8 w-8 left-3 rounded-lg border-sidebar-border bg-sidebar-background shadow-sm hover:bg-primary/20 z-99 transition-transform duration-200
+                  top-4 h-8 w-8 left-3 rounded-lg bg-sidebar-background  hover:bg-primary/20 z-99 transition-transform duration-200
                 `}
                  aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
                 >

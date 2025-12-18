@@ -8,7 +8,7 @@ import { CreateWorkflowDialog } from "@/components/workflow/CreateWorkflowDialog
 import { workflowService } from "@/services/workflowService";
 import { useToast } from "@/hooks/useToast";
 
-const Workflows = () => {
+const WorkflowsPage = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -109,4 +109,4 @@ const Workflows = () => {
   );
 };
 
-export default Workflows;
+export default WorkflowsPage;

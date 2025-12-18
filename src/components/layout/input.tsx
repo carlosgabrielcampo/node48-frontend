@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 interface LabeledInputInterface {
     label: string; 
     value: any;
-    onChange: (value: any) => void
+    onChange?: (value: any) => void
     placeholder?: string;
     className?: string;
     children?: ReactNode;
