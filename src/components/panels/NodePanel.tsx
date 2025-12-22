@@ -15,46 +15,25 @@ export const NodeConfigPanel = ({
   onOpenChange,
   onUpdate,
 }: NodeConfigPanelProps) => {
-  const [stateConfig, setStateConfig] = useState<any[]>([]);
-  const commitRef = useRef<null | ((prev: any[]) => any[])>(null);
+  const [draft, setDraft] = useState<any[]>([]);
+  const commitRefs = useRef<Array<(prev: any[]) => any[]>>([]);
+  const nodeType = nodeTemplates?.[node?.type]
+  useEffect(() => node?.parameters && setDraft(node?.parameters), [node?.parameters])
 
   const registerCommit = (fn: (prev: any[]) => any[]) => {
-    commitRef.current = fn;
-  };
-
-  useEffect(() => {
-    if (!node) {
-      setStateConfig([]);
-      return;
+    
+    if (!commitRefs.current.includes(fn)) {
+      commitRefs.current.push(fn);
     }
-    const initial = Array.isArray(node.parameters) ? structuredClone(node.parameters): [];
-    setStateConfig(initial);
-  }, [node?.id, open]);
-
-  const renderConfigPanel = () => {
-    if (!node || !parametersPanels[node.type]) {
-      return (
-        <div className="text-sm text-muted-foreground">
-          No configuration available for {node?.type || 'unknown'} nodes.
-        </div>
-      );
-    }
-
-    return parametersPanels[node.type](stateConfig, setStateConfig, registerCommit, open, nodeTemplates?.[node?.type].defaultPanelInfo || []);
   };
   
   if (!node) return null;
   const Icon = nodeTemplates[node?.type]?.icon || Cog;
   return (
-    <DialogLayout 
+    <DialogLayout
       open={open} 
       handleClose={() => {
-        const nextState =
-          commitRef.current
-            ? commitRef.current(stateConfig)
-            : stateConfig;
-
-        onUpdate(node.id, nextState);
+        onUpdate(node.id, draft);
         onOpenChange(false);
       }}
 
@@ -63,14 +42,25 @@ export const NodeConfigPanel = ({
           <Icon/>
           <div>
             {nodeTemplates[node?.type]?.name || "Configuration"}
-            <p onClick={() => copyToClipboard(node.id)} className="text-sm hover:text-muted-foreground/60 text-muted-foreground/80 cursor-pointer">{node.id}</p>
+            <p onClick={() => copyToClipboard(node.id)} className="text-sm hover:text-muted-foreground/60 text-muted-foreground/80 cursor-pointer">
+              {node.id}
+            </p>
           </div>
         </div>
       }
       dialogContent={
         <ScrollArea className="h-[calc(100%)]">
           <div className="space-y-4">          
-              {renderConfigPanel()}
+          {
+            parametersPanels[node.type]({
+              open,
+              registerCommit,
+              draft: draft,
+              setDraft: setDraft,
+              panelInfo: nodeType.panelInfo || [],
+              panelFormat: nodeType.panelFormat
+            })
+          }
           </div>
         </ScrollArea>
       }

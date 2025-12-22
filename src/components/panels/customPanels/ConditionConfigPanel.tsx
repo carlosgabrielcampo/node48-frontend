@@ -54,13 +54,13 @@ export const ConditionConfigPanel = ({ state, setState }: ConditionConfigPanelPr
   return (
       <LabeledCard
         label={"Set Conditions"}
-        headerChildren={
+        header={
           <Button onClick={addCondition} size="sm" variant="outline">
             <Plus className="h-4 w-4 mr-1" />
             Add Config
           </Button>
         }
-        cardChildren={
+      > {
           conditions.length 
             ? conditions.map((condition, condIndex) => (
                 <Card key={condIndex} className="p-3 space-y-4">
@@ -89,7 +89,7 @@ export const ConditionConfigPanel = ({ state, setState }: ConditionConfigPanelPr
                         className="mt-1"
                       />
   
-                      <LabeledDropdown itemsList={[
+                      <LabeledDropdown options={[
                         {itemProperties: {value: "regex"}, itemDisplay: "Regex"},
                         {itemProperties: {value: "equals"}, itemDisplay: "Equals"},
                         {itemProperties: {value: "contains"}, itemDisplay: "Contains"},
@@ -120,7 +120,6 @@ export const ConditionConfigPanel = ({ state, setState }: ConditionConfigPanelPr
                   No conditions defined. Click "Add Condition" to create one.
                 </div>
               )
-        }
-      />
+      }</LabeledCard>
   );
 };

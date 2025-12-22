@@ -1,49 +1,51 @@
 import assert from 'assert'
-import { ApiConfigPanel } from './customPanels/ApiConfigPanel'
+import { ApiConfigPanel, ConfigPanel } from './customPanels/ApiConfigPanel'
 import { ConditionConfigPanel } from './customPanels/ConditionConfigPanel'
 import { CsvConfigPanel } from './customPanels/CsvConfigPanel'
 import { LoopConfigPanel } from './customPanels/LoopConfigPanel'
-import React, { Dispatch, SetStateAction } from 'react'
 
-type PanelFactory = (
-    state: any[],
-    setState: (updates: any[]) => void,
-    registerCommit: (fn: () => void) => void,
-    open: boolean,
+interface PanelFactory {
+    draft: any[];
+    setDraft: (updates: any[]) => void;
+    registerCommit: (fn: () => void) => void;
+    open: boolean;
     defaultObject: any
-) => JSX.Element
+}
 
 export const parametersPanels: Record<string, PanelFactory>  = {
-    "conditional_operation": (state, setState, registerCommit, open, defaultPanelInfo) => 
+    "conditional_operation": ({draft, setDraft, registerCommit, open, panelInfo, panelFormat}: PanelFactory) => 
         <ConditionConfigPanel 
-            state={state} 
-            setState={setState} 
-            registerCommit={registerCommit} 
             open={open}
-            defaultPanelInfo={defaultPanelInfo}
-        />,
-    "api_call": (state, setState, registerCommit, open, defaultPanelInfo) => 
-        <ApiConfigPanel  
-            state={state} 
-            setState={setState} 
+            draft={draft} 
+            setDraft={setDraft} 
+            panelInfo={panelInfo}
+            panelFormat={panelFormat}
             registerCommit={registerCommit} 
-            open={open}
-            defaultPanelInfo={defaultPanelInfo}
         />,
-    "loop_operation": (state, setState, registerCommit, open, defaultPanelInfo)  => 
+    "api_call": ({draft, setDraft, registerCommit, open, panelInfo, panelFormat}: PanelFactory) => 
+        <ConfigPanel  
+            open={open}
+            draft={draft}
+            setDraft={setDraft} 
+            panelInfo={panelInfo}
+            panelFormat={panelFormat}
+            registerCommit={registerCommit} 
+        />,
+    "loop_operation": ({draft, setDraft, registerCommit, open, panelInfo, panelFormat}: PanelFactory)  => 
         <LoopConfigPanel  
-            state={state} 
-            setState={setState} 
+            draft={draft} 
+            setDraft={setDraft} 
             registerCommit={registerCommit} 
             open={open}
-            defaultPanelInfo={defaultPanelInfo}
+            panelInfo={panelInfo}
         />,
-    "read_csv": (state, setState, registerCommit, open, defaultPanelInfo) => 
+    "read_csv": ({draft, setDraft, registerCommit, open, panelInfo, panelFormat}: PanelFactory) => 
         <CsvConfigPanel  
-            state={state} 
-            setState={setState} 
+            draft={draft} 
+            setDraft={setDraft} 
             registerCommit={registerCommit} 
             open={open}
-            defaultPanelInfo={defaultPanelInfo}
+            panelInfo={panelInfo}
         />
+    
 }

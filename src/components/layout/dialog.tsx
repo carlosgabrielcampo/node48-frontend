@@ -7,8 +7,8 @@ interface ClassInterface {
 interface DialogLayoutInterface {
     dialogTitle?: React.ReactNode;
     dialogDescription?: React.ReactNode;
-    dialogFooter: React.ReactNode;
-    dialogContent: React.ReactNode;
+    dialogFooter?: React.ReactNode;
+    dialogContent?: React.ReactNode;
     open: boolean;
     handleClose: () => void;
     classes: ClassInterface;

@@ -14,8 +14,9 @@ interface ListStructure {
 
 interface DropdownInterface {
     label?: string;
+    children: React.ReactElement
     onSelect: ({value}: {value: string}) => void;
-    itemsList: ListStructure[];
+    options: ListStructure[];
     menuLabel?: string;
     header: React.ReactElement;
     dropdownExtra?: ListStructure[];
@@ -29,16 +30,16 @@ const Item = ({itemProperties, onSelect, itemDisplay}) => {
     )
 }
 
-const MenuItems = ({itemsList, onSelect}) => {
+const MenuItems = ({options, onSelect}) => {
     return (
-        itemsList?.length && itemsList
-            .map(({itemProperties, itemDisplay}) => (
-                <Item key={itemDisplay} itemProperties={itemProperties} onSelect={onSelect} itemDisplay={itemDisplay}  />
+        options?.length && options
+            .map(({itemProperties, display}) => (
+                <Item key={display} itemProperties={itemProperties} onSelect={onSelect} itemDisplay={display}  />
             ))
     )
 }
 
-const MenuContent = ({menuLabel, itemsList, onSelect}) => {
+const MenuContent = ({menuLabel, options, onSelect}) => {
     return (
         <>
             {
@@ -48,43 +49,39 @@ const MenuContent = ({menuLabel, itemsList, onSelect}) => {
                     </DropdownMenuLabel>
                 )
             } 
-            { itemsList?.length && <MenuItems itemsList={itemsList} onSelect={onSelect}/> }
+            { options?.length && <MenuItems options={options} onSelect={onSelect}/> }
         </>
-    
     )
 }
 
 const ExtraContent = ({ dropdownExtra }) => {
     return (
-        dropdownExtra?.length && dropdownExtra.map(({label, itemsList, onSelect}) =>
+        dropdownExtra?.length && dropdownExtra.map(({label, options, onSelect}) =>
             <>
                 <DropdownMenuSeparator />
-                <MenuContent menuLabel={label} itemsList={itemsList} onSelect={onSelect} />
+                <MenuContent menuLabel={label} options={options} onSelect={onSelect} />
             </>
         )
     )
 }
 
-export const LabeledDropdown = ({ onSelect, itemsList, header, menuLabel, dropdownExtra, className, label }: DropdownInterface) => {
-    return (
-        < div className={"h-full w-full"}>
-        {label && <Label className="text-xs">{label}</Label>}
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild >
-                <Button variant="outline" size="sm" className="justify-between gap-2 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
-                    <div className="flex w-full justify-between">
-                        <p className="overflow-hidden">{ String(header).toUpperCase() }</p>
-                        <ChevronDown className="ml-2 h-4 w-4"/>
-                    </div>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="min-w-[var(--radix-popper-anchor-width)]">
-                <MenuContent menuLabel={menuLabel} itemsList={itemsList} onSelect={onSelect} />
-                <ExtraContent dropdownExtra={dropdownExtra} />
-            </DropdownMenuContent>
-        </DropdownMenu>
-        </div>
-    )
-}
+export const LabeledDropdown = ({...props}: DropdownInterface) => 
+<div className={"h-full w-full"} key={props.label}>
+    {props.label && <Label className="text-xs">{props.label}</Label>}
+    <DropdownMenu>
+        <DropdownMenuTrigger asChild >
+            <Button variant="outline" size="sm" className="justify-between gap-2 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
+                <div className="flex w-full justify-between">
+                    <p className="overflow-hidden">{ String(props.header).toUpperCase() }</p>
+                    <ChevronDown className="ml-2 h-4 w-4"/>
+                </div>
+            </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="min-w-[var(--radix-popper-anchor-width)]">
+            <MenuContent menuLabel={props.menuLabel} options={props.options} onSelect={props.onSelect} />
+            <ExtraContent dropdownExtra={props.dropdownExtra} />
+        </DropdownMenuContent>
+    </DropdownMenu>
+</div>
 
 LabeledDropdown.displayName = "LabeledDropdown"

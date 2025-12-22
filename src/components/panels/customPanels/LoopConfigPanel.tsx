@@ -55,14 +55,14 @@ export const LoopConfigPanel = ({ state, setState }: LoopConfigPanelProps) => {
   return (
     <LabeledCard
       label={"Loop Configuration"}
-      headerChildren={
+      header={
         <Button onClick={addConfigEntry} size="sm" variant="outline">
           <Plus className="h-4 w-4 mr-1" />
           Add Config
         </Button>
       }
-      cardChildren={
-        state.length ? 
+    >
+      {state.length ? 
           state.map((entry, index) => (
             <Card key={index} className="p-3 space-y-4">
               <div className="flex items-center justify-between">
@@ -87,7 +87,7 @@ export const LoopConfigPanel = ({ state, setState }: LoopConfigPanelProps) => {
                 placeholder={"csvAutorizados"}
                 value={entry.outputVar}
               />
-              <LabeledDropdown itemsList={[
+              <LabeledDropdown options={[
                 {itemProperties: {value: "format"}, itemDisplay: "Format"},
                 {itemProperties: {value: "create"}, itemDisplay: "Create"},
                 {itemProperties: {value: "raw"}, itemDisplay: "Raw"},
@@ -164,6 +164,6 @@ export const LoopConfigPanel = ({ state, setState }: LoopConfigPanelProps) => {
           </div>
         )
       }
-    />
+      </LabeledCard>
   );
 };
