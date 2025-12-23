@@ -8,14 +8,14 @@ interface DialogLayoutInterface {
     dialogTitle?: React.ReactNode;
     dialogDescription?: React.ReactNode;
     dialogFooter?: React.ReactNode;
-    dialogContent?: React.ReactNode;
+    children?: React.ReactNode;
     open: boolean;
     handleClose: () => void;
     classes: ClassInterface;
 }
 
 
-export const DialogLayout = ({dialogTitle, dialogDescription, dialogFooter, dialogContent, open, handleClose, classes}: DialogLayoutInterface) => {
+export const DialogLayout = ({dialogTitle, dialogDescription, dialogFooter, children, open, handleClose, classes}: DialogLayoutInterface) => {
     return (
         <Dialog open={open} onOpenChange={handleClose}>
             <DialogContent className={cn("flex flex-col", classes?.contentClass)}>
@@ -27,7 +27,7 @@ export const DialogLayout = ({dialogTitle, dialogDescription, dialogFooter, dial
                         {dialogDescription}
                     </DialogDescription>
                 </DialogHeader>
-                {dialogContent}
+                {children}
                 <DialogFooter>
                     {dialogFooter}
                 </DialogFooter>

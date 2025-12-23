@@ -1,223 +1,100 @@
-import { ApiConfigPanelProps, ApiConfig } from "@/types/panels";
-import { LabeledDropdown } from "../../layout/dropdown";
-import { CodeTextarea } from "@/components/layout/textArea";
 import { KeyValueInput, LabeledInput } from "@/components/layout/input";
+import { CodeTextarea } from "@/components/layout/textArea";
+import { LabeledDropdown } from "../../layout/dropdown";
 import { LabeledCard } from "@/components/layout/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
-import { UUID } from "crypto";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-
-interface ObjectRow {
-  id: UUID,
-  key: string,
-  value: string
-}
 
 type RendererProps = {
   draft: Record<string, any>;
-  schema: Record<string, any>;
+  schema?: Record<string, any>;
   setDraft?: (v: Record<string, any>) => void;
-  addOption?: (v: Record<string, any>) => void;
-  removeOption?: (v: Record<string, any>) => void;
-  registerCommit: (bind: string, v: Record<string, any>) => void;
+  commit?: (bind: string, v: Record<string, any>) => void;
+  position: any[];
 };
 
-type ChildrenRender = {
-  draft: Record<string, any>;
-  children: Record<string, any>;
-  setDraft?: (v: Record<string, any>) => void;
-  addOption?: (v: Record<string, any>) => void;
-  removeOption?: (v: Record<string, any>) => void;
-  registerCommit: (bind: string, v: Record<string, any>) => void;
-};
-
-const ChildrenRender = ({draft, setDraft, children, addOption, removeOption, registerCommit, open}: ChildrenRender) => 
-  children?.length && children.map((child: any, i: number) => (
-      <RenderSchema
-        schema={child}
-        draft={draft}
-        setDraft={setDraft}
-        addOption={addOption}
-        removeOption={removeOption}
-        registerCommit={registerCommit}
-      />
-    )
+export const ChildrenRender = ({draft, setDraft, schema, commit, position}: RendererProps) =>
+  schema?.length && schema.map((child: any, i: number) =>
+    <RenderSchema 
+      schema={child} 
+      draft={draft} 
+      setDraft={setDraft} 
+      commit={commit}
+      position={position}
+    />
 )
 
-export function RenderSchema({ schema, draft, setDraft, addOption, removeOption, registerCommit }: RendererProps) {
+export function RenderSchema({ schema, draft, setDraft, commit, position }: RendererProps) {
+  console.log(position)
   if (!schema) return null;
-  const childrenRenderObject = schema.children 
-    ? <ChildrenRender
-        draft={draft}
-        setDraft={setDraft}
-        addOption={addOption}
-        children={schema.children}
-        removeOption={removeOption}
-        registerCommit={registerCommit}
-      />
-    : <></>
+  const {header, bind, label, placeholder, component, children, options, menuLabel, dropdownExtra, switch: switcher, format, type } = schema
+  const draftValue = draft[bind] ?? ""
 
-  const headRenderObject = schema.header 
-    ? <ChildrenRender
-      draft={draft}
-      setDraft={setDraft}
-      addOption={addOption}
-      children={schema.header}
-      removeOption={removeOption}
-      registerCommit={registerCommit}
-    />
-    : <></>
+  if(format === "array"){
+    return draftValue.map((child, index) => {
+      const updateDraft = (patch) => {
+        draft[bind] = draftValue.map((p, i) => i === index ? { ...p, ...patch } : p )
+        setDraft(draft)
+      }
+      child.render_id = uuidv4()
+      return <ChildrenRender draft={child} setDraft={updateDraft} schema={children} commit={commit} position={[...position, [bind, index]]} />
+    })
+  }
+
+  const childrenRender = children ? <ChildrenRender draft={draft} setDraft={setDraft} schema={children} commit={commit} position={position} /> : <></>
+  const headRender = header ? <ChildrenRender draft={draft} setDraft={setDraft} schema={header} commit={commit} position={position} /> : <></>
   
-  switch (schema.component) {
+  switch (component) {
     case "LabeledInput": {
-      return (
-        <LabeledInput
-          key={schema.label}
-          label={schema.label}
-          placeholder={schema.placeholder}
-          value={draft?.[schema.bind] ?? ""}
-          onChange={({target: {value}}) => setDraft({ ...draft, [schema?.bind]: value })}
-          registerCommit={registerCommit}
-        >
-          {childrenRenderObject}
-        </LabeledInput>
-      );
+      const onChange = ({target: {value}}) => setDraft({ ...draft, [bind]: value })
+      return <LabeledInput label={label} placeholder={placeholder} value={draftValue} onChange={onChange} commit={commit}>
+        {childrenRender}
+      </LabeledInput>
     }
+
     case "LabeledDropdown": {
-      return (
-        <LabeledDropdown
-          label={schema.label}
-          options={schema.options}
-          menuLabel={schema.menuLabel}
-          header={draft?.[schema.bind]}
-          dropdownExtra={schema.dropdownExtra}
-          onSelect={({value}) => setDraft({ ...draft, [schema.bind]: value })}
-          registerCommit={registerCommit}
-        >
-          {childrenRenderObject}
-        </LabeledDropdown>
-      );
+      const onSelect = ({value}) => setDraft({ ...draft, [bind]: value })
+      return <LabeledDropdown label={label} options={options} menuLabel={menuLabel} header={draftValue} dropdownExtra={dropdownExtra} onSelect={onSelect}>
+          {childrenRender}
+      </LabeledDropdown>
     }
+
     case "LabeledCard": {
-      return (
-        <LabeledCard label={schema.label} header={headRenderObject}>{childrenRenderObject}</LabeledCard>
-      );
+      return <LabeledCard label={label} header={headRender}>{childrenRender}</LabeledCard>
     }
+
     case "CodeTextarea": {
-      return (
-        <CodeTextarea
-          state={draft}
-          key={schema.bind}
-          bind={schema.bind}
-          setDraft={setDraft}
-          value={draft?.[schema.bind]}
-          registerCommit={registerCommit}
-        > 
-          {childrenRenderObject}
-        </CodeTextarea>
-      );
+      return <CodeTextarea state={draft} bind={bind} setDraft={setDraft} value={draftValue} commit={commit}>{childrenRender}</CodeTextarea>
     }
-    case "KeyValueList": {
-      return <KeyValueInput
-          bind={schema.bind}
-          value={draft?.[schema.bind]} 
-          registerCommit={registerCommit} 
-        />
-    }
+
+    case "KeyValueList":
+      return <KeyValueInput bind={bind} value={draftValue} commit={commit} />
+
     case "AddOptions": {
-      return (
-        <Button onClick={addOption} size="sm" variant="outline">
-            <Plus className="h-4 w-4" />
-            {schema.label}
-        </Button>
-      )
+      let addOption = () => {}
+      if(type === "new_default") addOption = () => {
+        console.log({[type]: draft, bind})
+      }
+      if(type === "new_array") addOption = () => {
+        const lastElement = draft[bind].at(-1)
+        setDraft(draft[bind].push(lastElement))
+      }
+      return <Button size="sm" variant="outline" onClick={addOption}><Plus className="h-4 w-4" />{label}</Button>
     }
+
     case "DeleteButton": {
-      return (
-        <Button onClick={() => removeOption(draft.nextStepId)} size="sm" variant="ghost">
-            <Trash2 className="h-4 w-4"  />
-        </Button>
-      )
+      const removeOption = () => draft[bind].filter((e) => console.log(e))
+      return <Button size="sm" variant="ghost" onClick={removeOption}><Trash2 className="h-4 w-4" /></Button>
     }
+
     case "SwitchableChildren": {
-      const schemaSelected = schema.switch.find((e) => e.key === draft?.[schema.bind])
-      return (
-        <RenderSchema
-          draft={draft} 
-          setDraft={setDraft} 
-          addOption={addOption}
-          schema={schemaSelected}
-          removeOption={removeOption}
-          registerCommit={registerCommit}
-        />
-      )
+      const schemaSelected = switcher.find((e) => e.key === draftValue)
+      return <RenderSchema draft={draft} setDraft={setDraft} schema={schemaSelected} commit={commit} position={position}/>
     }
+
     default:
       return <></>;
   }
 }
 
-export const ConfigPanel = ({open, draft, setDraft, registerCommit, panelInfo, panelFormat}: ApiConfigPanelProps) => {
-  const [panelConfig, setPanelConfig] = useState([]) 
-  useEffect(
-    () => {
-      console.log({panelConfig})
-      if(panelConfig?.length){
-        setDraft(prev => prev.map((e, i) => {
-          return panelConfig[i]
-              ? { ...e, ...panelConfig[i] }
-              : e
-        }))
-      }
-    },
-    [open]
-  )
-
-  const addOption = () => {
-    panelInfo.nextStepId = uuidv4()
-    const updated = [...draft, panelInfo];
-    setDraft(updated);
-  }
-  const removeOption = (id) => {
-    const arrayFilter = draft.filter((e) => e.nextStepId !== id)
-    let updated
-    if(!arrayFilter.length){
-      toast.error("You need at least one configuration panel")
-      updated = draft
-    } else {
-      updated = [...draft.filter((e) => e.nextStepId !== id)];
-    }
-    setDraft(updated);
-  }
-
-  return (
-    draft?.length
-      ? draft?.map((_v, index) => {
-        const setState = (patch) => setDraft(prev => prev.map((p, i) => i === index ? { ...p, ...patch } : p ))
-        const updateConfigEntry = (bind: Partial<LoopConfigEntry>, value: any) => {
-          console.log({bind, value})
-          setDraft(prev =>
-            prev.map((e, i) =>
-              i === index ? { ...e, [bind]: value } : e
-            )
-          );
-        };
-        return (
-          <RenderSchema
-            schema={panelFormat} 
-            draft={draft?.[index]}
-            setDraft={setState}
-            addOption={addOption}
-            removeOption={removeOption}
-            registerCommit={updateConfigEntry}
-          />
-        )
-    })
-    : <div className="text-sm text-muted-foreground">
-        No configuration available.
-      </div>
-  )
-}

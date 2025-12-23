@@ -1,6 +1,6 @@
 import { Label } from "../ui/label"
 import { Input } from "../ui/input"
-import { ReactNode, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Trash2 } from "lucide-react";
 import { v4 as uuid } from "uuid";
@@ -36,10 +36,11 @@ const objectFromArray = (array) => {
     return Object.fromEntries(array.map((e) => [e.key, e.value]))
 }
 
-export const KeyValueInput = ({bind, value, registerCommit}) => {
-    const [inputValue, setValue] = useState(Object.entries(value ?? {}).map(([key, value]) => ({ id: uuid(), key, value })))
+export const KeyValueInput = ({bind, value, commit}) => {
+    const [inputValue, setValue] = useState([])
     const [newDraft, setNewDraft] = useState({key: "", value: ""})
-
+    
+    useEffect(() => setValue(Object.entries(value ?? {}).map(([key, value]) => ({ id: uuid(), key, value }))), [value])
     const keyRef = useRef<HTMLInputElement | null>(null);
     const valueRef = useRef<HTMLInputElement | null>(null);
 
@@ -47,7 +48,7 @@ export const KeyValueInput = ({bind, value, registerCommit}) => {
         if (!newDraft.key || !newDraft.value) return;
         setValue(prev => {
             const updatedDraft = [...prev, { id: uuid(), key: newDraft.key, value: newDraft.value } ]
-            registerCommit(bind, objectFromArray(updatedDraft))
+            commit(bind, objectFromArray(updatedDraft))
             return updatedDraft
         });
 
@@ -57,14 +58,14 @@ export const KeyValueInput = ({bind, value, registerCommit}) => {
 
     const removeParams = (id: string) => {
         const updatedInput = inputValue.filter((e) => e.id !== id)
-        registerCommit(bind, objectFromArray(updatedInput))
+        commit(bind, objectFromArray(updatedInput))
         setValue(updatedInput);
     }
     
     const updateParam = (index, patch: Partial<ObjectRow>) => {
         setValue(prev => {
             const updatedInput = prev.map((p, i) => i === index ? { ...p, ...patch } : p )
-            registerCommit(bind, objectFromArray(updatedInput))
+            commit(bind, objectFromArray(updatedInput))
             return updatedInput
         })
     }

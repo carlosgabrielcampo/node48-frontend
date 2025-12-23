@@ -49,12 +49,12 @@ const App = () => (
               <BrowserRouter>
                 <Routes>
                   {/* Public routes */}
+                  <Route path="/" element={<Login />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   {/* Protected routes */}
                   <Route element={<SidebarLayout />}>
                     <Route element={<ProtectedRoutes />} >
-                      <Route path="/" element={<Index />} />
                       <Route path="/templates" element={<Index />} />
                       <Route path="/personal" element={<Index />} />
                       <Route path="/projects" element={<Index />} />

@@ -88,8 +88,78 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
     name: "Condition",
     description: "Advanced conditional logic with multiple rules",
     icon: Network,
-    panelInfo: [{}],
-    panelFormat: {}
+    panelInfo: {
+      "condition": [
+          {
+              "field": "",
+              "type": "equals",
+              "validator": ""
+          }
+      ],
+    },
+    panelFormat: {
+      "title": "Set Conditions",
+      "header": [{
+        "component": "AddOptions",
+        "label": "New Condition",
+        "type": "new_default",
+      }],
+      children: [
+        {
+          component: "LabeledCard",
+          label: "Condition",
+          "header": [{
+            "component": "AddOptions",
+            "label": "New Rule",
+            "type": "new_array",
+            "bind": "condition"
+          },{
+            "component": "DeleteButton",
+            "type": "delete",
+            "bind": "condition"
+          }],
+          children: [{
+            bind: "condition",
+            format: "array",
+            children: [{
+              label: "Rule",
+              component: "LabeledCard",
+              bind: "condition",
+              header: [{ 
+                component: "DeleteButton"
+              }],
+              children: [
+                {
+                  component: "LabeledInput",
+                  label: "Field",
+                  bind: "field",
+                  placeholder: "{{csvAutorizados.DT_NASC}}",
+                  valueType: "string"
+                },
+                {
+                  component: "LabeledDropdown",
+                  label: "Type",
+                  bind: "type",
+                  options: [
+                    { itemProperties: { value: "regex" }, display: "Regex" },
+                    { itemProperties: { value: "equals" }, display: "Equals" },
+                    { itemProperties: { value: "contains" }, display: "Contains" }
+                  ]
+                },
+                {
+                  component: "LabeledInput",
+                  label: "Validator",
+                  bind: "validator",
+                  placeholder: "/10/",
+                  valueType: "string"
+                }
+              ]
+            }, 
+          ]
+          }]
+        }
+      ]
+    }
   },
   "api_call": {
     type: "api_call",
@@ -110,18 +180,7 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
       }
     ,
     panelFormat: {
-        "component": "LabeledCard",
-        "label": "API Configuration",
-        "format": "single",
-        "type": "container",
-        "header": [{
-          "component": "AddOptions",
-          "label": "Add Config",
-          "bind": "headers"
-        },{
-          "component": "DeleteButton",
-          "bind": "headers"
-        }],
+        "title": "API Configuration",
         "children": [
           {
             "component": "LabeledInput",
@@ -178,7 +237,7 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
             "children": [{
               "component": "KeyValueList",
               "bind": "params",
-              "Key": { "component": "input", "placeholder": "Key" },
+                "Key": { "component": "input", "placeholder": "Key" },
               "Value": { "component": "input", "placeholder": "Value" }
             }]
           },
@@ -189,7 +248,7 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
             "children": [{
               "component": "KeyValueList",
               "bind": "headers",
-              "itemSchema": {
+                "itemSchema": {
                 "Key": { "component": "input", "placeholder": "Key" },
                 "Value": { "component": "input", "placeholder": "Value" }
               }
@@ -215,17 +274,19 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
               "switch": [{
                   "key": "none",
                   "component": "empty",
-                  "bind": "body"
+                  "bind": "body",
+                  "parent": "api_call"
                 },{ 
                   "key": "raw",
                   "component": "CodeTextarea",
                   "language": "json",
-                  "bind": "body"
+                  "bind": "body",
+                  "parent": "api_call"
                 },{ 
                   "key": "xxx-url-encoded",
                   "component": "KeyValueList",
                   "bind": "body",
-                  "itemSchema": {
+                        "itemSchema": {
                     "Key": { "component": "input" },
                     "Value": { "component": "input" }
                   }
@@ -233,7 +294,7 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
                   "key": "form-data",
                   "component": "KeyValueList",
                   "bind": "body",
-                  "itemSchema": {
+                        "itemSchema": {
                     "Key": { "component": "input" },
                     "Value": { "component": "input" }
                   }
