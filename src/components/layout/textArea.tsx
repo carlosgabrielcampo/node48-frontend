@@ -16,9 +16,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 };
 
 export const CodeTextarea = ({ className, value, bind, state, setDraft }) => {
-  console.log({className, value, bind, state, setDraft})
   const [raw, setRaw] = useState(() => JSON.stringify(value || {}, null, 2));
-
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
     setRaw(text);

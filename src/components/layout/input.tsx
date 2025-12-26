@@ -18,8 +18,8 @@ interface LabeledInputInterface {
 
 export const LabeledInput = ({label, value, onChange, placeholder, className, children, ...props}: LabeledInputInterface) => {
     return(
-        <div>
-            <Label className="text-xs">{label}</Label>
+        <div key={label}>
+            <Label  className="text-xs">{label}</Label>
             <Input
                 value={value}
                 onChange={onChange}
@@ -36,11 +36,13 @@ const objectFromArray = (array) => {
     return Object.fromEntries(array.map((e) => [e.key, e.value]))
 }
 
-export const KeyValueInput = ({bind, value, commit}) => {
+export const KeyValueInput = ({bind, value, commit, open}) => {
     const [inputValue, setValue] = useState([])
     const [newDraft, setNewDraft] = useState({key: "", value: ""})
     
-    useEffect(() => setValue(Object.entries(value ?? {}).map(([key, value]) => ({ id: uuid(), key, value }))), [value])
+    const keyvalues = value ? [...Object.entries(value ?? {}).map(([key, value]) => ({ id: uuid(), key, value }))]: []
+    useEffect(() => setValue(keyvalues), [keyvalues.length])
+
     const keyRef = useRef<HTMLInputElement | null>(null);
     const valueRef = useRef<HTMLInputElement | null>(null);
 

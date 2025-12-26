@@ -116,7 +116,6 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
           },{
             "component": "DeleteButton",
             "type": "delete",
-            "bind": "condition"
           }],
           children: [{
             bind: "condition",
@@ -125,8 +124,9 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
               label: "Rule",
               component: "LabeledCard",
               bind: "condition",
-              header: [{ 
-                component: "DeleteButton"
+              header: [{
+                component: "DeleteButton",
+                "type": "delete",
               }],
               children: [
                 {
