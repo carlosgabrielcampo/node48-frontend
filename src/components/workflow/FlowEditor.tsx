@@ -161,6 +161,7 @@ export const FlowEditor = ({
       timerRef.current = null;
     }, minimapDelay);
   };
+  
   const showMinimap = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
     setIsScreenMoving(true);

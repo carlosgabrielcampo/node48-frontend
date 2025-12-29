@@ -16,6 +16,17 @@ interface LabeledInputInterface {
     [key: string]: any;
 }
 
+interface LabeledArrayInputInterface {
+    label: string; 
+    arrayValue: any;
+    onChange?: (value: any) => void
+    placeholder?: string;
+    className?: string;
+    children?: ReactNode;
+    type?: string;
+    [key: string]: any;
+}
+
 export const LabeledInput = ({label, value, onChange, placeholder, className, children, ...props}: LabeledInputInterface) => {
     return(
         <div key={label} className="flex flex-col gap-2">
@@ -32,37 +43,34 @@ export const LabeledInput = ({label, value, onChange, placeholder, className, ch
     )
 }
 
-export const LabeledArrayInput = ({label, arrayValue, onChange, placeholder, className, children, ...props}: LabeledInputInterface) => {
+export const LabeledArrayInput = ({label, arrayValue, onChange, placeholder, className, children, ...props}: LabeledArrayInputInterface) => {
     return(
         <div key={label} className="gap-2 flex flex-col">
             <Label className="text-xs h-full">{label}</Label>
-            { 
-                arrayValue?.length 
-                    ? arrayValue.map((item, index) => {
-                        const itemChange = (value, index) => {
-                            arrayValue[index] = value
-                            onChange(arrayValue)
-                        }
-                        const itemDelete = (value, index) => {
-                            value.splice(index, 1)
-                            onChange(value)
-                        }
-                        return (
-                        <div className="flex w-full gap-2">
-                            <Input
-                                value={`${item}`}
-                                onChange={({target: {value}}) => itemChange(value, index)}
-                                placeholder={placeholder}
-                                className={"flex-1"}
-                                {...props}
-                            />
-                            <Button onClick={() => itemDelete(arrayValue, index)} size="sm" variant="outline">
-                                <Trash2 className="h-4 w-4"/>
-                            </Button>
-                        </div>
-                        )
-                    })
-                    : <></>
+            {
+                arrayValue?.length ? arrayValue.map((item, index) => {
+                    const itemChange = (value, index) => {
+                        arrayValue[index] = value
+                        onChange(arrayValue)
+                    }
+                    const itemDelete = (value, index) => {
+                        value.splice(index, 1)
+                        onChange(value)
+                    }
+                    return (
+                    <div className="flex w-full gap-2">
+                        <Input
+                            value={`${item}`}
+                            onChange={({target: {value}}) => itemChange(value, index)}
+                            placeholder={placeholder}
+                            className={"flex-1"}
+                            {...props}
+                        />
+                        <Button onClick={() => itemDelete(arrayValue, index)} size="sm" variant="outline"><Trash2 className="h-4 w-4"/></Button>
+                    </div>
+                    )
+                })
+                : <></>
             }
             {children}
         </div>

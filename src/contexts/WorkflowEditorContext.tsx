@@ -33,37 +33,23 @@ const AUTOSAVE_KEY = "lovable_autosave_enabled";
 export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) => {
   const [isDirty, setIsDirty] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
-  const [autosaveEnabled, setAutosaveEnabledState] = useState(() => {
-    try {
-      return localStorage.getItem(AUTOSAVE_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
   const [showUnsavedModal, setShowUnsavedModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const [hasConflict, setHasConflict] = useState(false);
   const [conflictData, setConflictData] = useState<{ local: any; remote: any } | null>(null);
+  const [autosaveEnabled, setAutosaveEnabledState] = useState(() => {
+    try { return localStorage.getItem(AUTOSAVE_KEY) === "true" }
+    catch { return false }
+  });
 
-  const setDirty = useCallback((dirty: boolean) => {
-    setIsDirty(dirty);
-  }, []);
-
-  const markDirty = useCallback(() => {
-    setIsDirty(true);
-  }, []);
-
-  const clearDirty = useCallback(() => {
-    setIsDirty(false);
-  }, []);
+  const setDirty = useCallback((dirty: boolean) => setIsDirty(dirty), []);
+  const markDirty = useCallback(() => setIsDirty(true), []);
+  const clearDirty = useCallback(() => setIsDirty(false), []);
 
   const setAutosaveEnabled = useCallback((enabled: boolean) => {
     setAutosaveEnabledState(enabled);
-    try {
-      localStorage.setItem(AUTOSAVE_KEY, String(enabled));
-    } catch (e) {
-      console.error("Failed to save autosave preference");
-    }
+    try { localStorage.setItem(AUTOSAVE_KEY, String(enabled)) } 
+    catch (e) { console.error("Failed to save autosave preference"); }
     toast.success(enabled ? "Autosave enabled" : "Autosave disabled");
   }, []);
 
@@ -89,17 +75,17 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
         markDirty,
         clearDirty,
         lastSavedAt,
-        setLastSavedAt,
-        autosaveEnabled,
-        setAutosaveEnabled,
-        showUnsavedModal,
-        setShowUnsavedModal,
-        pendingNavigation,
-        setPendingNavigation,
         hasConflict,
-        setHasConflict,
         conflictData,
+        setHasConflict,
+        setLastSavedAt,
         setConflictData,
+        autosaveEnabled,
+        showUnsavedModal,
+        pendingNavigation,
+        setAutosaveEnabled,
+        setShowUnsavedModal,
+        setPendingNavigation,
       }}
     >
       {children}

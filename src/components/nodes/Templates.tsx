@@ -409,18 +409,9 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
     description: "Iterate over data with format or create operations",
     icon: Repeat,
     panelInfo: {
-      sourceVar: "",
-      outputVar: "",
-      type: "raw",
-      fields: [
-        {
-          field: "",
-          type: "",
-          convertionType: ""
-        }
-      ],
-      limit: undefined,
-      offset: undefined
+      "type": "raw",
+      "sourceVar": "",
+      "outputVar": "",
     },
     panelFormat: {
       title: "Loop Configuration",
@@ -466,13 +457,10 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
                 { itemProperties: { value: "raw" }, display: "Raw" }
               ]
             },
-
-            // ---- Switch by type ----
             {
               component: "SwitchableChildren",
               bind: "type",
               switch: [
-                // ===== FORMAT =====
                 {
                   key: "format",
                   component: "LabeledCard",
@@ -493,6 +481,7 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
                         {
                           component: "LabeledCard",
                           label: "Field",
+                          bind: "fields",
                           header: [
                             {
                               component: "DeleteButton",
@@ -527,8 +516,6 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
                     }
                   ]
                 },
-
-                // ===== CREATE =====
                 {
                   key: "create",
                   component: "LabeledCard",
@@ -548,8 +535,6 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
                     }
                   ]
                 },
-
-                // ===== RAW =====
                 {
                   key: "raw",
                   component: "empty"
