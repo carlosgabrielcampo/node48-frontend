@@ -20,26 +20,26 @@ import { WorkflowJSON } from "@/types/workflows";
 import { NodeConfigPanel } from "../panels/NodePanel";
 import { createEdge } from "../edges/EdgeDataStructure";
 import { Button } from "@/components/ui/button";
-import { Maximize, ZoomIn, ZoomOut } from "lucide-react";
+import { Maximize, ZoomIn, ZoomOut, ChevronsRightLeft } from "lucide-react";
 
 const nodeTypes = { custom: UnifiedNode };
 
 export const FlowEditor = ({
-  onNodeAdded, 
-  workflow, 
+  edges,
   nodes, 
-  setNodes, 
-  onNodesChange, 
-  edges, 
   setEdges, 
+  workflow, 
+  setNodes, 
+  onNodeAdded, 
+  selectedNode,
+  onNodesChange, 
   onEdgesChange,
   setSelectedNode,
-  selectedNode,
-  setConfigPanelOpen,
   configPanelOpen,
   handleNodeClick,
   handleDeleteNode,
-  setPendingChanges
+  setPendingChanges,
+  setConfigPanelOpen,
 }: FlowEditorProps) => {
 
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
@@ -69,8 +69,16 @@ export const FlowEditor = ({
         sourceHandle: connection.sourceHandle,
         target: connection.target,
       })
-      setEdges((eds) => addEdge(newEdge, eds));
-      toast.success("Connection created");
+      console.log(connection)
+      setEdges((eds) => {
+        const edgeFound = eds.filter((e) => e.id === newEdge.id )
+        if(edgeFound.length > 1 || (edgeFound.length === 1 && edgeFound[0].target)){
+          toast.error("Double connection");
+          return eds
+        }
+        toast.success("Connection created");
+        return addEdge(newEdge, eds)
+      });
     },
     [setEdges]
   );
@@ -165,6 +173,7 @@ export const FlowEditor = ({
       <Button size="icon" onClick={() => zoomIn()} variant="outline"><ZoomIn/></Button>
       <Button size="icon" onClick={() => zoomOut()} variant="outline"><ZoomOut/></Button>
       <Button size="icon" onClick={() => fitView()} variant="outline"><Maximize/></Button>
+      <Button size="icon" onClick={() => {}} variant="outline"><ChevronsRightLeft/></Button>
     </div>
   );
 }
@@ -174,21 +183,21 @@ export const FlowEditor = ({
       {/* Canvas */}
       <div className="flex-1" onKeyDown={handleKeyDown} tabIndex={0} >
         <ReactFlow
+          fitView
           nodes={nodes}
           edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onSelectionChange={onSelectionChange}
-          nodeTypes={nodeTypes}
-          connectionMode={ConnectionMode.Strict}
-          fitView
-          attributionPosition="bottom-left"
-          onMoveStart={showMinimap}
-          onClick={hideMinimap}
-          onMoveEnd={hideMinimap}
           minZoom={0.1}
           maxZoom={1.5}
+          onClick={hideMinimap}
+          onConnect={onConnect}
+          nodeTypes={nodeTypes}
+          onMoveEnd={hideMinimap}
+          onMoveStart={showMinimap}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          attributionPosition="bottom-left"
+          onSelectionChange={onSelectionChange}
+          connectionMode={ConnectionMode.Strict}
         >
           <Background className="bg-canvas" gap={20} />
           <FlowControls />
@@ -198,9 +207,10 @@ export const FlowEditor = ({
 
       <NodeConfigPanel
         node={selectedNode}
+        setEdges={setEdges}
         open={configPanelOpen}
-        onOpenChange={setConfigPanelOpen}
         onUpdate={handleUpdateNode}
+        onOpenChange={setConfigPanelOpen}
       />
     </div>
   );

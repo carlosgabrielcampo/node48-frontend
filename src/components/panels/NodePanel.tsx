@@ -15,13 +15,14 @@ type RendererProps = {
   open: boolean;
   draft: Record<string, any>;
   panelInfo?: Record<string, any>;
+  connections: Record<string, any>;
   defaultPanel: Record<string, any>;
   panelFormat?: Record<string, any>;
+  setEdges: (v: Record<string, any>) => void;
   setDraft: (v: Record<string, any>) => void;
-  connections: Record<string, any>;
 };
 
-export const NodeConfigPanel = ({ node, open, onOpenChange, onUpdate }: NodeConfigPanelProps) => {
+export const NodeConfigPanel = ({ node, open, onOpenChange, onUpdate, setEdges }: NodeConfigPanelProps) => {
   const [draft, setDraft] = useState<any>([]);
   const type = node?.type
   const nodeType = nodeTemplates?.[type]
@@ -45,17 +46,30 @@ export const NodeConfigPanel = ({ node, open, onOpenChange, onUpdate }: NodeConf
   </div>
 
   return (
-    <DialogLayout open={open} handleClose={() => { onUpdate(node.id, draft, connections); onOpenChange(false) }} dialogTitle={dialogTitle}  classes={{contentClass: "max-w-[600px] h-[95%]"}}> 
-        <ScrollArea className="h-[calc(100%)]">
-          <div className="space-y-4">       
-            <ConfigPanel connections={connections} draft={draft} setDraft={setDraft} defaultPanel={nodeType.panelInfo || {}} panelFormat={nodeType.panelFormat} open={open} />
-          </div>
-        </ScrollArea>
+    <DialogLayout 
+      open={open} 
+      dialogTitle={dialogTitle}  
+      classes={{contentClass: "max-w-[600px] h-[95%]"}}
+      handleClose={() => { onUpdate(node.id, draft, connections); onOpenChange(false) }} 
+    > 
+      <ScrollArea className="h-[calc(100%)]">
+        <div className="space-y-4">       
+          <ConfigPanel
+            open={open}
+            draft={draft}
+            setDraft={setDraft}
+            setEdges={setEdges}
+            connections={connections}
+            panelFormat={nodeType.panelFormat}
+            defaultPanel={nodeType.panelInfo || {}}
+          />
+        </div>
+      </ScrollArea>
     </DialogLayout>
   );
 };
 
-const removeAtPath = (root: any, path: (string | number)[], connections: any) => {
+const removeAtPath = (root: any, path: (string | number)[], connections: any, setEdges) => {
   const cloned = structuredClone(root);
   console.log({connections, path})
 
@@ -63,15 +77,13 @@ const removeAtPath = (root: any, path: (string | number)[], connections: any) =>
   for (let i = 0; i < path.length - 1; i++) parent = parent[path[i]];
   const last = path[path.length - 1];
   if(path.length === 1){
-    const connectionLength = Object.keys(connections)
-    console.log(connectionLength.length)
-    if(connectionLength.length > 1){
-      const id = Object.keys(connections)?.[path[0]]
+    const connection = Object.keys(connections)
+    const id = connection?.[path[0]]
+    if(connection.length > 1){
+      setEdges((prev) => prev.filter((e) => e.id !== id))
       delete connections?.[id]
     }
-  }
-  console.log(connections)
-
+  }  
   if(Array.isArray(parent)){
     if(parent.length <= 1){
       toast.error("Options cannot be empty")
@@ -92,15 +104,13 @@ const removeAtPath = (root: any, path: (string | number)[], connections: any) =>
   return cloned;
 };
 
-const ConfigPanel = ({draft, setDraft, defaultPanel, panelFormat, open, connections }: RendererProps) => {
+const ConfigPanel = ({draft, setDraft, defaultPanel, panelFormat, open, connections, setEdges }: RendererProps) => {
   const { children, title, header } = panelFormat
-  const removeState = (position: (string | number)[]) => setDraft(prev => removeAtPath(prev, position, connections))
-  const renderProps = { draft, setDraft, defaultPanel, open, removeState, connections }
+  const removeState = (position: (string | number)[]) => setDraft(prev => removeAtPath(prev, position, connections, setEdges))
 
   return <LabeledCard 
     label={title} 
-    header={ ChildrenRender({ schema: header, ...renderProps}) } >
-      {/* // draft, setDraft, defaultPanel, schema: header, open, removeState, connections}) }> */}
+    header={ ChildrenRender({draft, setDraft, defaultPanel, schema: header, open, removeState, connections}) }>
     {
       children && Array.isArray(draft) ? draft?.map((value: Partial<Record<string, string>>, index: number) => {
             value.render_id = uuidv4()

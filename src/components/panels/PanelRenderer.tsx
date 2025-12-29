@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import { UUID } from "crypto";
 import { LabeledCheckbox } from "@/components/layout/checkbox";
 import React from "react";
+
 type SchemaProps = {
   type: string;
   bind: string;
@@ -22,7 +23,6 @@ type SchemaProps = {
   placeholder: string;
   dropdownExtra: any;
 }
-
 type RendererProps = {
   open: boolean;
   position?: any[];
@@ -34,7 +34,6 @@ type RendererProps = {
   commit?: (bind: string, v: Record<string, any>) => void;
   connections?: any;
 };
-
 type ChildrenProps = {
   open: boolean;
   position?: any[];
@@ -46,9 +45,6 @@ type ChildrenProps = {
   commit?: (bind: string, v: Record<string, any>) => void;
   connections?: any;
 };
-
-
-export const ChildrenRender = ({schema, ...props}: ChildrenProps) => schema?.length ? schema.map((child: any, i: number) => RenderSchema({schema: child, ...props})) : <></>
 
 export function RenderSchema({ schema, draft, setDraft, position, commit, connections, ...props  }: RendererProps) {
   if (!schema) return null;
@@ -78,6 +74,8 @@ export function RenderSchema({ schema, draft, setDraft, position, commit, connec
     default: return ComponentRender({schema, draft, setDraft, position, commit, connections, ...props})
   }
 }
+
+export const ChildrenRender = ({schema, ...props}: ChildrenProps) => schema?.length ? schema.map((child: any, i: number) => RenderSchema({schema: child, ...props})) : <></>
 
 const ComponentRender = ({schema, draft, setDraft, commit, position, defaultPanel, open, removeState, connections }) => {
   const {bind, label, placeholder, component, options, menuLabel, dropdownExtra, switch: switcher, type, children, header } = schema

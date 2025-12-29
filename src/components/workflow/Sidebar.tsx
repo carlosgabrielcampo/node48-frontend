@@ -13,6 +13,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/favicon.ico";
+
+
 const navItems = [
   { title: "Overview", url: "/overview", icon: LayoutDashboard },
   // { title: "Personal", url: "/personal", icon: User },
@@ -33,24 +36,17 @@ export const WorkflowSidebar = () => {
             ? 
               <div className={`w-full flex justify-between items-center `}>
                 <Button
-                  variant="ghost"
                   size="icon"
-                  onClick={toggleSidebar}
-                  className={`
-                    transition-all duration-700 ease-in-out
-                    top-4 h-8 w-8 left-3 rounded-lg bg-sidebar-background shadow-sm hover:bg-primary/20 z-99
-                  `}
+                  variant="ghost"
+                  onClick={() => navigate('/overview')}
                   aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
+                  className={`transition-all duration-700 ease-in-out top-4 h-8 w-8 left-3 rounded-lg bg-sidebar-background shadow-sm hover:bg-primary/20 z-99`}
                 >
-                  <img
-                    src="/favicon.ico"
-                    className="h-8 w-8 p-1"
-                    />
+                  <img src={logo} className="h-8 w-8 p-1" />
                 </Button>
                 <Button
                   onClick={toggleSidebar}
-                  className={`transition-all duration-700 ease-in-out transition-transform 
-                    bg-sidebar-background  hover:bg-primary/20 ${!open ? "opacity-0 scale-105" : "opacity-100 scale-100"}`}
+                  className={`transition-all duration-700 ease-in-out transition-transform bg-sidebar-background  hover:bg-primary/20 ${!open ? "opacity-0 scale-105" : "opacity-100 scale-100"}`}
                 >
                   <PanelLeft className="absolute w-10"/>
                 </Button>
@@ -58,21 +54,15 @@ export const WorkflowSidebar = () => {
             : 
             <div>
               <Button
-                variant="ghost"
                 size="icon"
+                variant="ghost"
                 onClick={toggleSidebar}
-                className={`
-                  transition-all duration-300 ease-in-out
-                  top-4 h-8 w-8 left-3 rounded-lg bg-sidebar-background  hover:bg-primary/20 z-99 transition-transform duration-200
-                `}
-                 aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
-                >
-                <img
-                  src="/favicon.ico"
-                  className="h-8 w-8 p-1"
-                  />
+                aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
+                className={`transition-all duration-300 ease-in-out top-4 h-8 w-8 left-3 rounded-lg bg-sidebar-background  hover:bg-primary/20 z-99 transition-transform duration-200`}
+              >
+                <img src={logo} className="h-8 w-8 p-1" />
               </Button>
-              </div>
+            </div>
           }
         </div>
       </SidebarHeader>
