@@ -50,10 +50,8 @@ export const FlowEditor = ({
   const minimapDelay = 400
 
   useEffect(() => {
-    if (onNodeAdded) {
-      globalThis.__addWorkflowNode = (node) => {
-        setPendingNode(node); 
-      };
+    if (onNodeAdded) { 
+      globalThis.__addWorkflowNode = (node) => setPendingNode(node)
     }
     return () => { delete (globalThis).__addWorkflowNode; };
   }, [onNodeAdded]);
@@ -70,7 +68,6 @@ export const FlowEditor = ({
         source: connection.source,
         sourceHandle: connection.sourceHandle,
         target: connection.target,
-        label: 'aa'
       })
       setEdges((eds) => addEdge(newEdge, eds));
       toast.success("Connection created");
@@ -79,10 +76,7 @@ export const FlowEditor = ({
   );
 
   const onSelectionChange = useCallback(({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
-    const selectedIds = [
-      ...nodes.map((n) => n.id),
-      ...edges.map((e) => e.id),
-    ];
+    const selectedIds = [ ...nodes.map((n) => n.id), ...edges.map((e) => e.id) ];
     setSelectedElements(selectedIds);
   }, []);
 
@@ -95,23 +89,13 @@ export const FlowEditor = ({
     [setNodes, handleDeleteNode, handleNodeClick ]
   );
 
-  const handleUpdateNode = useCallback((nodeId: string, parameters: any[]) => {
+  const handleUpdateNode = useCallback((nodeId: string, parameters: any[], connections: any[]) => {
     setNodes((nds) =>
-      nds.map((node: Node) =>{
-         if(node.id === nodeId) {
-            if(JSON.stringify(node.data.parameters) != JSON.stringify(parameters)){
-              setPendingChanges(true)
-            }
-            return ({
-            ...node, 
-              data: { 
-                ...node.data, 
-                parameters,
-              }
-            })
-          } else {
-            return node
-          }
+      nds.map((node: Node) => {
+        if(node.id === nodeId) {
+          if(JSON.stringify(node.data.parameters) != JSON.stringify(parameters)) setPendingChanges(true)
+          return ({ ...node, data: { ...node.data, parameters, connections } })
+        } else { return node }
       })
     );
     
@@ -135,15 +119,11 @@ export const FlowEditor = ({
         // Delete selected nodes
         const selectedNodes = selectedElements.filter((id) => nodes.some((n) => n.id === id) );
         const selectedEdges = selectedElements.filter((id) => edges.some((e) => e.id === id) );
+        selectedElements.filter((id) => nodes.map((e) =>{ if(e.data.connections[id]) e.data.connections[id] = "" }))
 
         if (selectedNodes.length > 0) {
           setNodes((nds) => nds.filter((node) => !selectedNodes.includes(node.id)));
-          setEdges((eds) =>
-            eds.filter(
-              (edge) =>
-                !selectedNodes.includes(edge.source) && !selectedNodes.includes(edge.target)
-            )
-          );
+          setEdges((eds) => eds.filter((edge) => !selectedNodes.includes(edge.source) && !selectedNodes.includes(edge.target)));
           toast.success(`Deleted ${selectedNodes.length} node(s)`);
         }
 
@@ -158,11 +138,7 @@ export const FlowEditor = ({
 
   useEffect(() => {
     if(workflow){
-      const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(
-        (workflow as WorkflowJSON),
-        handleDeleteNode,
-        handleNodeClick
-      );
+      const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON((workflow as WorkflowJSON), handleDeleteNode, handleNodeClick);
       setNodes(parsedNodes);
       setEdges(parsedEdges);
     } else {
@@ -186,15 +162,9 @@ export const FlowEditor = ({
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   return (
     <div className="absolute bottom-4 left-4 flex gap-2 z-50">
-      <Button size="icon" onClick={() => zoomIn()} variant="outline">
-        <ZoomIn />
-      </Button>
-      <Button size="icon" onClick={() => zoomOut()} variant="outline">
-        <ZoomOut />
-      </Button>
-      <Button size="icon" onClick={() => fitView()} variant="outline">
-        <Maximize />
-      </Button>
+      <Button size="icon" onClick={() => zoomIn()} variant="outline"><ZoomIn/></Button>
+      <Button size="icon" onClick={() => zoomOut()} variant="outline"><ZoomOut/></Button>
+      <Button size="icon" onClick={() => fitView()} variant="outline"><Maximize/></Button>
     </div>
   );
 }

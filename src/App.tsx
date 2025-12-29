@@ -55,9 +55,7 @@ const App = () => (
                   {/* Protected routes */}
                   <Route element={<SidebarLayout />}>
                     <Route element={<ProtectedRoutes />} >
-                      <Route path="/templates" element={<Index />} />
-                      <Route path="/personal" element={<Index />} />
-                      <Route path="/projects" element={<Index />} />
+                      <Route path="/overview" element={<Index />} />
                       <Route path="/settings" element={<Settings />} />
                       <Route path="/workflows/:id" element={<WorkflowDetail />} />
                       <Route path="/workflows" element={<WorkflowsPage />} />

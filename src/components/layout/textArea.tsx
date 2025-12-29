@@ -2,6 +2,7 @@
 import { Textarea, TextareaProps } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
+import { Label } from "../ui/label";
 
 const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
   if(e.key === "Tab") {
@@ -16,7 +17,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 };
 
 export const CodeTextarea = ({ className, value, bind, state, setDraft }) => {
-  const [raw, setRaw] = useState(() => JSON.stringify(value || {}, null, 2));
+  const [raw, setRaw] = useState(() => JSON.stringify(value, null, 2));
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
     setRaw(text);
@@ -44,4 +45,29 @@ export const CodeTextarea = ({ className, value, bind, state, setDraft }) => {
   );
 }
 
+export const LabeledTextArea = ({ label, className, value, bind, state, setDraft }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const text = e.target.value;
+    setDraft({ ...state, [bind]: text })
+  };
+
+  return (
+    <div key={label}>
+      <Label className="text-xs">{label}</Label>
+      <Textarea
+        onKeyDown={handleKeyDown}
+        className={cn(
+          "min-h-[300px]",
+          "font-mono whitespace-pre resize-y tab-size-[2] leading-5",
+          "focus-visible:ring-2 focus-visible:ring-blue-500", 
+          className
+        )}
+        spellCheck={false}
+        value={value}
+        onChange={handleChange}
+      />
+    </div>
+  );
+}
+LabeledTextArea.displayName = "LabeledTextArea"
 CodeTextarea.displayName = "CodeTextarea";

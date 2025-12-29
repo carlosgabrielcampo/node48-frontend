@@ -1,5 +1,5 @@
 import { ForwardRefExoticComponent } from "react";
-import { LucideProps, Power, Zap, Cog, Network, RefreshCcw,  } from "lucide-react";
+import { LucideProps, Zap, Cog, Network, FileSpreadsheet, Repeat, Timer, Mail, Code, RectangleEllipsis, DatabaseZap, Bot } from "lucide-react";
 
 interface NodeTypeOption {
     type: string,
@@ -11,77 +11,176 @@ interface NodeTypeOption {
 }
 
 export const nodeTemplates: Record<string, NodeTypeOption>= {
-  "html_input": {
-    name: "HTML Input",
-    description: "Make an HTML input",
-    type: "html_input",
-    icon: Power,
-    panelInfo: [{}],
-    panelFormat: {}
-  },
-  "http_request": {
-    type: "http_request",
-    name: "HTTP Request",
-    description: "Make an HTTP API call",
-    icon: Power,
-    panelInfo: [{}],
-    panelFormat: {}
-  },
-  "receive_email": {
-    type: "receive_email",
-    name: "Receive Email",
-    description: "Receive an email",
-    icon: Power,
-    panelInfo: [{}],
-    panelFormat: {}
-  },
-  "database_query": {
-    type: "database_query",
-    name: "Database Query",
-    description: "Execute a database query",
-    icon: Power,
-    panelInfo: [{}],
-    panelFormat: {}
-  },
-  "webhook_call": {
-    type: "webhook_call",
-    name: "Webhook Trigger",
-    description: "Trigger on webhook event",
-    icon: Power,
-    panelInfo: [{}],
-    panelFormat: {}
+  "schedule_trigger": {
+    "type": "schedule_trigger",
+    "name": "Schedule Trigger",
+    "description": "Trigger workflow on a schedule.",
+    "icon": Timer,
+    "panelInfo": {
+      "cronExpressions": ""
+    },
+    "panelFormat": {
+      "title": "Schedule Trigger",
+      "header": [{
+        "component": "AddButton",
+        "label": "New Rule",
+        "type": "new_default",
+        "bind": "condition"
+      }],
+      "children": [{
+          component: "LabeledCard",
+          label: "Cron Expression",
+          header: [{
+            component: "DeleteButton",
+            "type": "delete",
+          }],
+          children: [
+            {
+              component: "LabeledInput",
+              bind: "cronExpressions",
+              valueType: "string",
+              placeholder: "0 9 * * *"
+            }
+          ]
+        }]
+    }
   },
   "send_email": {
-    type: "send_email",
-    name: "Send Email",
-    description: "Send an email notification",
-    icon: Zap,
-    panelInfo: [{}],
-    panelFormat: {}
+    "type": "send_email",
+    "name": "Send Email",
+    "description": "Send email via SMTP.",
+    "icon": Mail,
+    "panelInfo": {
+      "to": "",
+      "subject": "",
+      "body": ""
+    },
+    "panelFormat": {
+      "title": "Send Email",
+      "children": [
+        {
+          "component": "LabeledInput",
+          "label": "To",
+          "bind": "to"
+        },
+        {
+          "component": "LabeledInput",
+          "label": "Subject",
+          "bind": "subject"
+        },
+        {
+          "component": "LabeledTextArea",
+          "label": "Body",
+          "bind": "body"
+        }
+      ]
+    }
   },
-  "filter_array": {
-    type: "filter_array",
-    name: "Filter Data",
-    description: "Filter array of items",
-    icon: Cog,
-    panelInfo: [{}],
-    panelFormat: {}
+  "code_node": {
+    "type": "code_node",
+    "name": "Code",
+    "description": "Run custom JavaScript.",
+    "icon": Code,
+    "panelInfo": {
+      "language": "javascript",
+      "code": ""
+    },
+    "panelFormat": {
+      "title": "Code Script",
+      "children": [
+        {
+          "component": "LabeledDropdown",
+          "label": "Language",
+          "bind": "language",
+          "options": [
+            { "itemProperties": { "value": "javascript" }, "display": "JavaScript" },
+            { "itemProperties": { "value": "python" }, "display": "Python" }
+          ]
+        },
+        {
+          "component": "CodeTextarea",
+          "label": "Script",
+          "bind": "code"
+        }
+      ]
+    }
   },
-  "transform_data": {
-    type: "transform_data",
-    name: "Transform Data",
-    description: "Transform data structure",
-    icon: Cog,
-    panelInfo: [{}],
-    panelFormat: {}
+  "set_values": {
+    "type": "set_values",
+    "name": "Set Values",
+    "description": "Set data fields.",
+    "icon": RectangleEllipsis,
+    "panelInfo": {
+      "values": {}
+    },
+    "panelFormat": {
+      "title": "Set Data Values",
+      "children": [
+        {
+          "component": "KeyValueList",
+          "bind": "values"
+        }
+      ]
+    }
   },
-  "aggregate_value": {
-    type: "aggregate_value",
-    name: "Aggregate",
-    description: "Aggregate multiple values",
-    icon: Cog,
-    panelInfo: [{}],
-    panelFormat: {}
+  "database_write": {
+    "type": "database_write",
+    "name": "Database Write",
+    "description": "Write data to a database.",
+    "icon": DatabaseZap,
+    "panelInfo": {
+      "connectionString": "",
+      "table": "",
+      "data": {}
+    },
+    "panelFormat": {
+      "title": "Database Write",
+      "children": [
+        {
+          "component": "LabeledInput",
+          "label": "Connection String",
+          "bind": "connectionString"
+        },
+        {
+          "component": "LabeledInput",
+          "label": "Table Name",
+          "bind": "table"
+        },
+        {
+          "component": "KeyValueList",
+          "bind": "data"
+        }
+      ]
+    }
+  },
+  "ai_action": {
+    "type": "ai_action",
+    "name": "AI Action",
+    "description": "Send a prompt to an AI model.",
+    "icon": Bot,
+    "panelInfo": {
+      "model": "gpt-4",
+      "prompt": ""
+    },
+    "panelFormat": {
+      "title": "AI Action",
+      "children": [
+        {
+          "component": "LabeledDropdown",
+          "label": "Model",
+          "bind": "model",
+          "options": [
+            { "itemProperties": { "value": "gpt-4" }, "display": "GPT-4" },
+            { "itemProperties": { "value": "gpt-3.5" }, "display": "GPT-3.5" }
+          ]
+        },
+        {
+          "component": "CodeTextarea",
+          "label": "Prompt",
+          "bind": "prompt"
+        }
+      ]
+    }
   },
   "conditional_operation": {
     type: "conditional_operation",
@@ -100,7 +199,7 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
     panelFormat: {
       "title": "Set Conditions",
       "header": [{
-        "component": "AddOptions",
+        "component": "AddButton",
         "label": "New Condition",
         "type": "new_default",
       }],
@@ -109,7 +208,7 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
           component: "LabeledCard",
           label: "Condition",
           "header": [{
-            "component": "AddOptions",
+            "component": "AddButton",
             "label": "New Rule",
             "type": "new_array",
             "bind": "condition"
@@ -177,8 +276,7 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
         "responseFormat": "json",
         "nextStepId": "",
         "outputVar": ""
-      }
-    ,
+    },
     panelFormat: {
         "title": "API Configuration",
         "children": [
@@ -309,16 +407,263 @@ export const nodeTemplates: Record<string, NodeTypeOption>= {
     type: "loop_operation",
     name: "Loop Operation",
     description: "Iterate over data with format or create operations",
-    icon: RefreshCcw,
-    panelInfo: [{}],
-    panelFormat: {}
+    icon: Repeat,
+    panelInfo: {
+      sourceVar: "",
+      outputVar: "",
+      type: "raw",
+      fields: [
+        {
+          field: "",
+          type: "",
+          convertionType: ""
+        }
+      ],
+      limit: undefined,
+      offset: undefined
+    },
+    panelFormat: {
+      title: "Loop Configuration",
+      header: [
+        {
+          component: "AddButton",
+          label: "Add Config",
+          type: "new_default"
+        }
+      ],
+      children: [
+        {
+          component: "LabeledCard",
+          label: "Config",
+          header: [
+            {
+              component: "DeleteButton",
+              type: "delete"
+            }
+          ],
+          children: [
+            {
+              component: "LabeledInput",
+              label: "Source Variable",
+              bind: "sourceVar",
+              placeholder: "{{Autorizados}}",
+              valueType: "string"
+            },
+            {
+              component: "LabeledInput",
+              label: "Output Variable",
+              bind: "outputVar",
+              placeholder: "csvAutorizados",
+              valueType: "string"
+            },
+            {
+              component: "LabeledDropdown",
+              label: "Type",
+              bind: "type",
+              options: [
+                { itemProperties: { value: "format" }, display: "Format" },
+                { itemProperties: { value: "create" }, display: "Create" },
+                { itemProperties: { value: "raw" }, display: "Raw" }
+              ]
+            },
+
+            // ---- Switch by type ----
+            {
+              component: "SwitchableChildren",
+              bind: "type",
+              switch: [
+                // ===== FORMAT =====
+                {
+                  key: "format",
+                  component: "LabeledCard",
+                  label: "Fields",
+                  header: [
+                    {
+                      component: "AddButton",
+                      label: "Add Field",
+                      type: "new_array",
+                      bind: "fields"
+                    }
+                  ],
+                  children: [
+                    {
+                      bind: "fields",
+                      format: "array",
+                      children: [
+                        {
+                          component: "LabeledCard",
+                          label: "Field",
+                          header: [
+                            {
+                              component: "DeleteButton",
+                              type: "delete"
+                            }
+                          ],
+                          children: [
+                            {
+                              component: "LabeledInput",
+                              label: "Field",
+                              bind: "field",
+                              placeholder: "{{Autorizados.DT_NASC}}",
+                              valueType: "string"
+                            },
+                            {
+                              component: "LabeledInput",
+                              label: "Type",
+                              bind: "type",
+                              placeholder: "convert",
+                              valueType: "string"
+                            },
+                            {
+                              component: "LabeledInput",
+                              label: "Conversion Type",
+                              bind: "convertionType",
+                              placeholder: "brDateFormatToDate",
+                              valueType: "string"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+
+                // ===== CREATE =====
+                {
+                  key: "create",
+                  component: "LabeledCard",
+                  label: "Create Options",
+                  children: [
+                    {
+                      component: "LabeledInput",
+                      label: "Limit",
+                      bind: "limit",
+                      valueType: "number"
+                    },
+                    {
+                      component: "LabeledInput",
+                      label: "Offset",
+                      bind: "offset",
+                      valueType: "number"
+                    }
+                  ]
+                },
+
+                // ===== RAW =====
+                {
+                  key: "raw",
+                  component: "empty"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
   },
   "read_csv":{
     type: "read_csv",
     name: "Read CSV",
     description: "Read and parse CSV files",
-    icon: Zap,
-    panelInfo: [{}],
-    panelFormat: {}
+    icon: FileSpreadsheet,
+    panelInfo: {
+      filePath: "",
+      encoding: "utf-8",
+      chunkSize: 200,
+      errorPolicy: "skip",
+      outputVar: "",
+      nullValues: [],
+      parser: {
+        escape: "'",
+        separator: ";",
+        strict: false
+      }
+    },
+    panelFormat: {
+      title: "CSV Configuration",
+      children: [
+        {
+          component: "LabeledInput",
+          label: "File Path",
+          bind: "filePath",
+          placeholder: "_test/mock/database/Autorizados.csv",
+          valueType: "string"
+        },
+        {
+          component: "LabeledInput",
+          label: "Encoding",
+          bind: "encoding",
+          placeholder: "utf-8",
+          valueType: "string"
+        },
+        {
+          component: "LabeledInput",
+          label: "Chunk Size",
+          bind: "chunkSize",
+          valueType: "number"
+        },
+        {
+          component: "LabeledInput",
+          label: "Error Policy",
+          bind: "errorPolicy",
+          placeholder: "skip",
+          valueType: "string"
+        },
+        {
+          component: "LabeledInput",
+          label: "Output Variable",
+          bind: "outputVar",
+          placeholder: "Autorizados",
+          valueType: "string"
+        },
+        {
+          component: "LabeledCard",
+          label: "Null Values",
+          header: [
+            {
+              component: "AddButton",
+              label: "Add",
+              type: "new_array",
+              bind: "nullValues"
+            }
+          ],
+          children: [
+            {
+              component: "LabeledArrayInput",
+              bind: "nullValues",
+              valueType: "string"
+            }
+          ]
+        },
+        {
+          component: "LabeledCard",
+          label: "Parser Settings",
+          format: "object",
+          bind: "parser",
+          children: [
+            {
+              component: "LabeledInput",
+              label: "Escape Character",
+              bind: "escape",
+              placeholder: "'",
+              valueType: "string"
+            },
+            {
+              component: "LabeledInput",
+              label: "Separator",
+              bind: "separator",
+              placeholder: ";",
+              valueType: "string"
+            },
+            {
+              component: "LabeledCheckbox",
+              label: "Strict Mode",
+              bind: "strict",
+              valueType: "boolean"
+            }
+          ]
+        }
+      ]
+    }
   }
 };

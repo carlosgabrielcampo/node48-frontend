@@ -1,5 +1,5 @@
 import { LayoutDashboard, User, FileText, ChevronLeft, ChevronRight, Workflow, Settings, PanelLeft } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 const navItems = [
-  { title: "Overview", url: "/", icon: LayoutDashboard },
+  { title: "Overview", url: "/overview", icon: LayoutDashboard },
   // { title: "Personal", url: "/personal", icon: User },
   { title: "Workflows", url: "/workflows", icon: Workflow },
   // { title: "Templates", url: "/templates", icon: FileText },
@@ -23,7 +23,8 @@ const navItems = [
 
 export const WorkflowSidebar = () => {
   const { open, toggleSidebar } = useSidebar();
-// style={{objectFit: "contain", width: "100px", border: "rounded"}}
+  const navigate = useNavigate();
+  // style={{objectFit: "contain", width: "100px", border: "rounded"}}
   return (
     <Sidebar collapsible="icon" className="transition-all duration-200 ease-in-out border-r border-sidebar-border">
       <SidebarHeader>

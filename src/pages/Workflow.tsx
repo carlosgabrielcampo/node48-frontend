@@ -15,12 +15,12 @@ interface Window {
 const Workflow = ({workflow}) => {
   const [isActive, setIsActive] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [workflowId, setWorkflowId] = useState<string | undefined>();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
   const [pendingChanges, setPendingChanges] = useState(false)
   const [configPanelOpen, setConfigPanelOpen] = useState(false);
+
   const handleNodeClick = useCallback((node) => {
     const workflowNode: WorkflowNode = {
       id: node.id,
@@ -31,16 +31,17 @@ const Workflow = ({workflow}) => {
       list: node?.list,
       workflowId: node?.workflowId,
       createdAtUTC: node?.createdAtUTC,
+      connections: node?.connections,
     };
     setSelectedNode(workflowNode);
     setConfigPanelOpen(true);
   }, [setConfigPanelOpen, setSelectedNode]);
+  
   const handleNodeAdded = useCallback((node) => {
-    if ((window as Window).__addWorkflowNode) {
-      (window as Window).__addWorkflowNode(node);
-    }
+    if ((window as Window).__addWorkflowNode) (window as Window).__addWorkflowNode(node);
     setIsDrawerOpen(false);
   }, []);
+
   const handleDeleteNode = useCallback(
     (nodeId: string) => {
       setNodes((nds) => nds.filter((node) => node.id !== nodeId));
@@ -64,7 +65,6 @@ const Workflow = ({workflow}) => {
           setNodes={setNodes}
           setEdges={setEdges}
           setIsActive={setIsActive}
-          setWorkflowId={setWorkflowId}
           setSelectedNode={setSelectedNode}
           setIsDrawerOpen={setIsDrawerOpen}
           handleNodeClick={handleNodeClick}

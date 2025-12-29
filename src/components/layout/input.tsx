@@ -18,8 +18,8 @@ interface LabeledInputInterface {
 
 export const LabeledInput = ({label, value, onChange, placeholder, className, children, ...props}: LabeledInputInterface) => {
     return(
-        <div key={label}>
-            <Label  className="text-xs">{label}</Label>
+        <div key={label} className="flex flex-col gap-2">
+            <Label className="text-xs">{label}</Label>
             <Input
                 value={value}
                 onChange={onChange}
@@ -32,9 +32,44 @@ export const LabeledInput = ({label, value, onChange, placeholder, className, ch
     )
 }
 
-const objectFromArray = (array) => {
-    return Object.fromEntries(array.map((e) => [e.key, e.value]))
+export const LabeledArrayInput = ({label, arrayValue, onChange, placeholder, className, children, ...props}: LabeledInputInterface) => {
+    return(
+        <div key={label} className="gap-2 flex flex-col">
+            <Label className="text-xs h-full">{label}</Label>
+            { 
+                arrayValue?.length 
+                    ? arrayValue.map((item, index) => {
+                        const itemChange = (value, index) => {
+                            arrayValue[index] = value
+                            onChange(arrayValue)
+                        }
+                        const itemDelete = (value, index) => {
+                            value.splice(index, 1)
+                            onChange(value)
+                        }
+                        return (
+                        <div className="flex w-full gap-2">
+                            <Input
+                                value={`${item}`}
+                                onChange={({target: {value}}) => itemChange(value, index)}
+                                placeholder={placeholder}
+                                className={"flex-1"}
+                                {...props}
+                            />
+                            <Button onClick={() => itemDelete(arrayValue, index)} size="sm" variant="outline">
+                                <Trash2 className="h-4 w-4"/>
+                            </Button>
+                        </div>
+                        )
+                    })
+                    : <></>
+            }
+            {children}
+        </div>
+    )
 }
+
+const objectFromArray = (array) => { return Object.fromEntries(array.map((e) => [e.key, e.value])) }
 
 export const KeyValueInput = ({bind, value, commit, open}) => {
     const [inputValue, setValue] = useState([])

@@ -53,7 +53,7 @@ const saveToStorage = async <T>(key: string, value: T): Promise<void> => {
       },
       body: JSON.stringify(value)
     });
-    if(response.status === 201) console.log("Env saved")
+    if(response.status === 201) console.info("Env saved")
     else console.error("Failed to save");
   } catch (e) {
     console.error("Failed to save");

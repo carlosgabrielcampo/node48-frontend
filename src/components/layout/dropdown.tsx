@@ -66,7 +66,7 @@ const ExtraContent = ({ dropdownExtra }) => {
 }
 
 export const LabeledDropdown = ({...props}: DropdownInterface) => 
-<div className={"h-full w-full"} key={props.label}>
+<div className={"h-full w-full flex flex-col gap-2"} key={props.label}>
     {props.label && <Label className="text-xs">{props.label}</Label>}
     <DropdownMenu>
         <DropdownMenuTrigger asChild >

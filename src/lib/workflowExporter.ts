@@ -17,9 +17,9 @@ export const exportToWorkflowJSON = (
   // Convert nodes to steps
   nodes.forEach((node) => {
     const { data } = node;
-    
+
     // Build connections map from edges
-    const connections: Record<string, string> = {};
+    const connections: Record<string, string> = node.data.connections;
     edges.forEach((edge) => {
       if (edge.source === node.id && edge.sourceHandle) {
         connections[edge.sourceHandle] = edge.target;
