@@ -19,19 +19,20 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { KeyValueInput } from "@/components/layout/input";
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
-  const { projectEnvs, createProjectEnv, updateProjectEnv, deleteProjectEnv, setProjectDefault, exportEnvs, importEnvs } = useEnv();
+  const { createProjectEnv, updateProjectEnv, deleteProjectEnv, setProjectDefault, exportEnvs, importEnvs, globalEnvs } = useEnv();
   const { autosaveEnabled, setAutosaveEnabled } = useWorkflowEditor();
   
   const [newEnvName, setNewEnvName] = useState("");
   const [newEnvDialogOpen, setNewEnvDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleCreateEnv = async () => {
+  const handleCreateEnv = async (id) => {
     if (!newEnvName.trim()) return;
-    await createProjectEnv({ name: newEnvName.trim(), values: {} });
+    await createProjectEnv(id, { name: newEnvName.trim(), values: {} });
     setNewEnvName("");
     setNewEnvDialogOpen(false);
   };
@@ -115,14 +116,14 @@ export default function Settings() {
                       </div>
                       <DialogFooter>
                         <Button variant="outline" onClick={() => setNewEnvDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={handleCreateEnv} disabled={!newEnvName.trim()}>Create</Button>
+                        <Button onClick={() => handleCreateEnv()} disabled={!newEnvName.trim()}>Create</Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {projectEnvs?.map((env) => (
+                {globalEnvs?.profiles && Object.values(globalEnvs?.profiles)?.map((env) => (
                   <Card key={env.id} className="p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
@@ -134,7 +135,7 @@ export default function Settings() {
                         <Button variant="destructive" size="sm" onClick={() => deleteProjectEnv(env.id)}><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </div>
-                    <EnvKeyEditor values={env.values} onChange={(values) => updateProjectEnv(env.id, { values })} />
+                    <KeyValueInput bind={""} value={env.values} commit={(values) => updateProjectEnv(env.id, { values })} type={"masked"} />
                   </Card>
                 ))}
               </CardContent>

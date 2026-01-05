@@ -20,29 +20,26 @@ interface EnvSelectorProps {
 export const EnvSelector = ({ workflowId }: EnvSelectorProps) => {
   const navigate = useNavigate();
   const { 
-    projectEnvs, 
+    globalEnvs, 
+    getActiveEnv,
+    workflowEnvs,
+    setWorkflowEnvs,
     activeProjectEnvId, 
     setActiveProjectEnv,
-    workflowEnvMeta,
     setWorkflowActiveEnv,
-    getActiveEnv,
   } = useEnv();
   
+  setWorkflowEnvs(workflowId)
   const { isDirty } = useWorkflowEditor();
 
   const activeEnv = getActiveEnv();
-  const hasWorkflowOverride = workflowId && workflowEnvMeta?.activeEnvId;
-  const defaultEnv = projectEnvs.find((e) => e.isDefault);
+  const hasWorkflowOverride = workflowId && workflowEnvs?.activeEnvId;
+  const defaultEnv = globalEnvs.find((e) => e.isDefault);
+  
   const deviatesFromDefault = activeProjectEnvId && activeProjectEnvId !== defaultEnv?.id;
 
-  const handleProjectEnvSelect = (envId: string) => {
-    setActiveProjectEnv(envId);
-  };
-
   const handleWorkflowEnvSelect = (envId: string | null) => {
-    if (workflowId) {
-      setWorkflowActiveEnv(workflowId, envId);
-    }
+    if (workflowId) { setWorkflowActiveEnv(workflowId, envId); }
   };
 
   return (
@@ -53,9 +50,9 @@ export const EnvSelector = ({ workflowId }: EnvSelectorProps) => {
           <span className="max-w-[100px] truncate">
             {activeEnv?.name || "No Env"}
           </span>
-          {/* {(hasWorkflowOverride || deviatesFromDefault) && (
+          {(hasWorkflowOverride || deviatesFromDefault) && (
             <CircleAlert className="h-3 w-3 text-red-500" />
-          )} */}
+          )}
           {isDirty && <Badge variant="destructive" className="h-2 w-2 p-0 rounded-full" />}
           <ChevronDown className="h-4 w-4" />
         </Button>
@@ -65,10 +62,10 @@ export const EnvSelector = ({ workflowId }: EnvSelectorProps) => {
           <Globe className="h-4 w-4" />
           Project Environments
         </DropdownMenuLabel>
-        {projectEnvs.map((env) => (
+        {globalEnvs.map((env) => (
           <DropdownMenuItem
             key={env.id}
-            onClick={() => handleProjectEnvSelect(env.id)}
+            onClick={() => setActiveProjectEnv(env.id)}
             className="flex items-center justify-between"
           >
             <span className="flex items-center gap-2">
@@ -81,7 +78,7 @@ export const EnvSelector = ({ workflowId }: EnvSelectorProps) => {
           </DropdownMenuItem>
         ))}
 
-        {workflowId && workflowEnvMeta && workflowEnvMeta.envProfiles.length > 0 && (
+        {workflowId && workflowEnvs && workflowEnvs.envProfiles.length > 0 && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuLabel className="flex items-center gap-2">
@@ -93,16 +90,16 @@ export const EnvSelector = ({ workflowId }: EnvSelectorProps) => {
               className="flex items-center justify-between"
             >
               <span className="text-muted-foreground">Use Project Env</span>
-              {!workflowEnvMeta.activeEnvId && <Check className="h-4 w-4" />}
+              {!workflowEnvs.activeEnvId && <Check className="h-4 w-4" />}
             </DropdownMenuItem>
-            {workflowEnvMeta.envProfiles.map((env) => (
+            {workflowEnvs.envProfiles.map((env) => (
               <DropdownMenuItem
                 key={env.id}
                 onClick={() => handleWorkflowEnvSelect(env.id)}
                 className="flex items-center justify-between"
               >
                 <span>{env.name}</span>
-                {workflowEnvMeta.activeEnvId === env.id && <Check className="h-4 w-4" />}
+                {workflowEnvs.activeEnvId === env.id && <Check className="h-4 w-4" />}
               </DropdownMenuItem>
             ))}
           </>

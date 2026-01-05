@@ -56,7 +56,6 @@ export function RenderSchema({ schema, draft, setDraft, position, commit, connec
     case "array": {
       return draftValue?.length 
         ? draftValue?.map((draftI, index) => {
-          console.log({draft})
           const updateDraft = (patch) => {
             draft[bind] = draftValue.map((p, i) => i === index ? { ...p, ...patch } : p); 
             setDraft(draft)
@@ -80,7 +79,7 @@ export function RenderSchema({ schema, draft, setDraft, position, commit, connec
 export const ChildrenRender = ({schema, ...props}: ChildrenProps) => schema?.length ? schema.map((child: any, i: number) => RenderSchema({schema: child, ...props})) : <></>
 
 const ComponentRender = ({schema, draft, setDraft, commit, position, defaultPanel, open, removeState, connections }) => {
-  const {bind, label, placeholder, component, options, menuLabel, dropdownExtra, switch: switcher, type, children, header } = schema
+  const { bind, label, placeholder, component, options, menuLabel, dropdownExtra, switch: switcher, type, children, header } = schema
   const renderProps = { schema, draft, setDraft, commit, position, defaultPanel, open, removeState, connections }
   const childRender = ChildrenRender({...renderProps, schema: children })
   const headRender = ChildrenRender({...renderProps, schema: header })
@@ -89,12 +88,10 @@ const ComponentRender = ({schema, draft, setDraft, commit, position, defaultPane
   switch (component) {
     case "AddButton": return <Button size="sm" variant="outline" onClick={() => AddOnClick({type, defaultPanel, draft, connections, setDraft, bind})}><Plus className="h-4 w-4" />{label}</Button>
     case "LabeledCard": return <LabeledCard label={label} header={headRender}>{childRender}</LabeledCard>
-    case "KeyValueList": return <KeyValueInput bind={bind} value={draftValue} commit={commit} open={open} />
+    case "KeyValueList": return <KeyValueInput bind={bind} value={draftValue} commit={commit} />
     case "CodeTextarea": return <CodeTextarea state={draft} bind={bind} setDraft={setDraft} value={draftValue} className={""}/>
     case "DeleteButton": return <Button size="sm" variant="ghost" onClick={() => removeState(position)}><Trash2 className="h-4 w-4" /></Button>
-    case "LabeledInput": {
-      return <LabeledInput label={label} placeholder={placeholder} value={draftValue} onChange={({target: {value}}) => setDraft({ ...draft, [bind]: value })} commit={commit}>{childRender}</LabeledInput>
-    }
+    case "LabeledInput": return <LabeledInput label={label} placeholder={placeholder} value={draftValue} onChange={({target: {value}}) => setDraft({ ...draft, [bind]: value })} commit={commit}>{childRender}</LabeledInput>
     case "LabeledCheckbox": return <LabeledCheckbox id={bind} checked={draftValue} onCheckedChange={(checked) => setDraft({ ...draft, [bind]: checked })} label={"Strict Mode"} />
     case "LabeledTextArea": return <LabeledTextArea label={label} state={draft} value={draftValue} bind={bind} setDraft={setDraft} className={""}/>
     case "LabeledDropdown": return <LabeledDropdown label={label} options={options} menuLabel={menuLabel} header={draftValue} dropdownExtra={dropdownExtra} onSelect={({value}) => setDraft({ ...draft, [bind]: value })}>{childRender}</LabeledDropdown>

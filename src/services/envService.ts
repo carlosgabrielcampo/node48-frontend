@@ -1,90 +1,85 @@
-import { EnvProfile, UUID, WorkflowEnvMetadata } from "@/types/env";
+import { EnvProfile, UUID, workflowEnvsdata } from "@/types/env";
 import { v4 as uuidv4 } from "uuid";
 
-const STORAGE_KEY_PROJECT_ENVS = "lovable_project_envs";
-const STORAGE_KEY_WORKFLOW_ENVS = "lovable_workflow_envs";
-const STORAGE_KEY_ACTIVE_ENV = "lovable_active_env";
+const STORAGE_KEY_GLOBAL_ENVS = "global";
 
-// Mock data for development
-const defaultProjectEnvs: EnvProfile[] = [
-  {
-    id: "default-local",
-    name: "Local",
-    values: { API_URL: "http://localhost:3000", DEBUG: "true" },
-    scope: "project",
-    isDefault: true,
-    createdAtUTC: new Date().toISOString(),
-  },
-  {
-    id: "default-staging",
-    name: "Staging",
-    values: { API_URL: "https://staging.api.example.com", DEBUG: "false" },
-    scope: "project",
-    createdAtUTC: new Date().toISOString(),
-  },
-  {
-    id: "default-production",
-    name: "Production",
-    values: { API_URL: "https://api.example.com", DEBUG: "false" },
-    scope: "project",
-    createdAtUTC: new Date().toISOString(),
-  },
-];
+const normalizeProfiles = (profiles: Record<string, EnvProfile>): EnvProfile[] => Object.values(profiles);
 
 // Local storage helpers
 const getFromStorage = async <T>(key: string, defaultValue: T): Promise<T> => {
   try {
-    const response = await fetch(`http://localhost:4014/v1/envs/${key}`);
-    const envs = await response.json();
-    return envs ||[];
+    const response = await (await fetch(`http://localhost:4014/v1/envs/profiles/${key}`)).json();
+    if (!response) return defaultValue;
+    return response;
+  
   } catch (error) {
-    console.error(error)
     return defaultValue;
   }
 };
+const toProfileMap = (envs: EnvProfile[]) => Object.fromEntries(envs.map(e => [e.id, e]));
 
-const saveToStorage = async <T>(key: string, value: T): Promise<void> => {
+const updateStorage = async <T>({id, profiles, active}): Promise<void> => {
   try {
-    const response = await fetch(`http://localhost:4014/v1/envs/${key}`, { 
-      method: "POST", 
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(value)
-    });
-    if(response.status === 201) console.info("Env saved")
-    else console.error("Failed to save");
+    const requestBody = {}
+    if(profiles) requestBody["profiles"] = toProfileMap(profiles) 
+    if(active) requestBody["active"] = [active]
+    console.log({requestBody})
+
+    const response = await (await fetch(`http://localhost:4014/v1/envs/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
+    })).json();
+
+    if(response.status === 200){ console.info("Env saved") }
+    else{ console.error("Failed to save"); }
+    return response
+    
   } catch (e) {
+    console.log(e)
     console.error("Failed to save");
   }
 };
+const saveToStorage = async <T>({id, profiles, active }): Promise<void> => {
+  try {
+
+    const requestBody = {}
+    if(profiles) requestBody["profiles"] = toProfileMap(profiles) 
+    if(active) requestBody["active"] = [active]
+
+    const response = await (await fetch(`http://localhost:4014/v1/envs/profiles/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
+    })).json();
+
+    if(response.status === 201){ console.info("Env saved") }
+    else{ console.error("Failed to save"); }
+
+  } catch (e) {
+    console.log(e)
+    console.error("Failed to save");
+  }
+}
 
 export const envService = {
   // Project-level env profiles
-  getProjectEnvs: async (): Promise<EnvProfile[]> => {
-    await new Promise((r) => setTimeout(r, 100));
-    const envs = await getFromStorage<EnvProfile[]>(STORAGE_KEY_PROJECT_ENVS, []);
-    if (envs.length === 0) {
-      saveToStorage(STORAGE_KEY_PROJECT_ENVS, defaultProjectEnvs);
-      return defaultProjectEnvs;
-    }
-    return envs;
+  getProjectEnvs: async (env): Promise<EnvProfile[]> => {
+    const profiles = await getFromStorage(env, {})
+    return normalizeProfiles(profiles);
   },
-
-  createProjectEnv: async (data: Omit<EnvProfile, "id" | "scope" | "createdAtUTC">): Promise<EnvProfile> => {
+  createProjectEnv: async (id, data: Omit<EnvProfile, "id" | "scope" | "createdAtUTC">): Promise<EnvProfile> => {
     await new Promise((r) => setTimeout(r, 100));
-    const envs = await envService.getProjectEnvs();
+    const envs = await envService.getProjectEnvs(id);
     const newEnv: EnvProfile = {
       ...data,
       id: uuidv4(),
       scope: "project",
       createdAtUTC: new Date().toISOString(),
     };
-    saveToStorage(STORAGE_KEY_PROJECT_ENVS, [...envs, newEnv]);
+    updateStorage(STORAGE_KEY_GLOBAL_ENVS, [...envs, newEnv]);
     return newEnv;
   },
-
   updateProjectEnv: async (id: UUID, updates: Partial<EnvProfile>): Promise<EnvProfile | null> => {
     await new Promise((r) => setTimeout(r, 100));
     const envs = await envService.getProjectEnvs();
@@ -92,53 +87,59 @@ export const envService = {
     if (index === -1) return null;
     
     envs[index] = { ...envs[index], ...updates, updatedAtUTC: new Date().toISOString() };
-    saveToStorage(STORAGE_KEY_PROJECT_ENVS, envs);
+    updateStorage(id, envs);
     return envs[index];
   },
-
   deleteProjectEnv: async (id: UUID): Promise<boolean> => {
     await new Promise((r) => setTimeout(r, 100));
     const envs = await envService.getProjectEnvs();
     const filtered = envs.filter((e) => e.id !== id);
-    saveToStorage(STORAGE_KEY_PROJECT_ENVS, filtered);
+    updateStorage(id, filtered);
     return filtered.length < envs.length;
   },
-
   setProjectDefault: async (id: UUID): Promise<void> => {
     const envs = await envService.getProjectEnvs();
     const updated = envs.map((e) => ({ ...e, isDefault: e.id === id }));
-    saveToStorage(STORAGE_KEY_PROJECT_ENVS, updated);
+    updateStorage(id, updated);
   },
-
-  // Workflow-level env profiles
-  getWorkflowEnvs: async (workflowId: UUID): Promise<WorkflowEnvMetadata> => {
-    await new Promise((r) => setTimeout(r, 100));
-    const allWorkflowEnvs = await getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
-    return allWorkflowEnvs[workflowId] || { workflowId, envProfiles: [], activeEnvId: null };
-  },
-
-  createWorkflowEnv: async (workflowId: UUID, data: Omit<EnvProfile, "id" | "scope" | "workflowId" | "createdAtUTC">): Promise<EnvProfile> => {
-    await new Promise((r) => setTimeout(r, 100));
-    const allWorkflowEnvs = await getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
-    const workflowMeta = allWorkflowEnvs[workflowId] || { workflowId, envProfiles: [], activeEnvId: null };
-    
-    const newEnv: EnvProfile = {
-      ...data,
-      id: uuidv4(),
-      scope: "workflow",
+  getWorkflowEnvs: async (workflowId: UUID): Promise<workflowEnvsdata> => {
+    const all = await getFromStorage<Record<UUID, workflowEnvsdata>>(
       workflowId,
-      createdAtUTC: new Date().toISOString(),
-    };
-    
-    workflowMeta.envProfiles.push(newEnv);
-    allWorkflowEnvs[workflowId] = workflowMeta;
-    saveToStorage(STORAGE_KEY_WORKFLOW_ENVS, allWorkflowEnvs);
-    return newEnv;
-  },
+      {}
+    );
 
+    return all[workflowId] ?? {
+      workflowId,
+      envProfiles: [],
+      activeEnvId: null,
+    };
+  },
+  createWorkflowEnv: async (workflowId: UUID, data): Promise<EnvProfile> => {
+    // const all = await getFromStorage<Record<UUID, workflowEnvsdata>>(workflowId, []);
+    // const workflowMeta = all[workflowId] ?? {
+    //   workflowId,
+    //   envProfiles: [],
+    //   activeEnvId: null,
+    // };
+
+    // const newEnv: EnvProfile = {
+    //   ...data,
+    //   id: uuidv4(),
+    //   scope: "workflow",
+    //   workflowId,
+    //   createdAtUTC: new Date().toISOString(),
+    // };
+
+    // workflowMeta.envProfiles = [...workflowMeta.envProfiles, newEnv];
+
+    // all[workflowId] = workflowMeta;
+    
+    // await updateStorage(workflowId, all);
+    // return newEnv;
+  },
   updateWorkflowEnv: async (workflowId: UUID, envId: UUID, updates: Partial<EnvProfile>): Promise<EnvProfile | null> => {
     await new Promise((r) => setTimeout(r, 100));
-    const allWorkflowEnvs = await getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
+    const allWorkflowEnvs = await getFromStorage<Record<UUID, workflowEnvsdata>>(workflowId, {});
     const workflowMeta = allWorkflowEnvs[workflowId];
     if (!workflowMeta) return null;
     
@@ -146,53 +147,137 @@ export const envService = {
     if (index === -1) return null;
     
     workflowMeta.envProfiles[index] = { ...workflowMeta.envProfiles[index], ...updates, updatedAtUTC: new Date().toISOString() };
-    saveToStorage(STORAGE_KEY_WORKFLOW_ENVS, allWorkflowEnvs);
+    
+    updateStorage(workflowId, allWorkflowEnvs);
     return workflowMeta.envProfiles[index];
   },
-
   deleteWorkflowEnv: async (workflowId: UUID, envId: UUID): Promise<boolean> => {
-    const allWorkflowEnvs = await getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
+    const allWorkflowEnvs = await getFromStorage<Record<UUID, workflowEnvsdata>>(workflowId, {});
     const workflowMeta = allWorkflowEnvs[workflowId];
     if (!workflowMeta) return false;
     
     const prevLength = workflowMeta.envProfiles.length;
     workflowMeta.envProfiles = workflowMeta.envProfiles.filter((e) => e.id !== envId);
-    saveToStorage(STORAGE_KEY_WORKFLOW_ENVS, allWorkflowEnvs);
+    
+    updateStorage(workflowId, allWorkflowEnvs);
     return workflowMeta.envProfiles.length < prevLength;
   },
+  setWorkflowActiveEnv: async (id: UUID, envId: UUID | null): Promise<void> => {
+    const workflow = await getFromStorage<Record<UUID, workflowEnvsdata>>( id, {});
+    const global = await getFromStorage<Record<UUID, workflowEnvsdata>>( STORAGE_KEY_GLOBAL_ENVS, {});
 
-  setWorkflowActiveEnv: async (workflowId: UUID, envId: UUID | null): Promise<void> => {
-    const allWorkflowEnvs = await getFromStorage<Record<UUID, WorkflowEnvMetadata>>(STORAGE_KEY_WORKFLOW_ENVS, {});
-    const workflowMeta = allWorkflowEnvs[workflowId] || { workflowId, envProfiles: [], activeEnvId: null };
-    workflowMeta.activeEnvId = envId;
-    allWorkflowEnvs[workflowId] = workflowMeta;
-    saveToStorage(STORAGE_KEY_WORKFLOW_ENVS, allWorkflowEnvs);
+    const workflowMeta = global.find((e) => e.id === envId)
+    const cleanedGlobal = workflow.filter((workflow) => workflow.scope !== "global")
+    workflowMeta.active = true
+    cleanedGlobal.push(workflowMeta)
+    await updateStorage(id, cleanedGlobal);
   },
-
   // Global active environment (project-wide)
   getGlobalActiveEnv: async (): Promise<UUID | null> => {
-    return await getFromStorage<UUID | null>(STORAGE_KEY_ACTIVE_ENV, null);
+    return await getFromStorage<UUID | null>("", null);
   },
-
   setGlobalActiveEnv: async (envId: UUID | null): Promise<void> => {
-    saveToStorage(STORAGE_KEY_ACTIVE_ENV, envId);
+    updateStorage(STORAGE_KEY_GLOBAL_ENVS, envId);
   },
-
   // Import/Export
   exportProjectEnvs: async (): Promise<string> => {
     const envs = await envService.getProjectEnvs();
+
     return JSON.stringify(envs, null, 2);
   },
-
   importProjectEnvs: async (json: string): Promise<EnvProfile[]> => {
     try {
-      const envs = JSON.parse(json) as EnvProfile[];
-      const withNewIds = envs.map((e) => ({ ...e, id: uuidv4(), createdAtUTC: new Date().toISOString() }));
-      const existingEnvs = await envService.getProjectEnvs();
-      saveToStorage(STORAGE_KEY_PROJECT_ENVS, [...existingEnvs, ...withNewIds]);
-      return withNewIds;
+      // const envs = JSON.parse(json) as EnvProfile[];
+      // const withNewIds = envs.map((e) => ({ ...e, id: uuidv4(), createdAtUTC: new Date().toISOString() }));
+      // const existingEnvs = await envService.getProjectEnvs();
+      // updateStorage({id: STORAGE_KEY_GLOBAL_ENVS, ...existingEnvs, ...withNewIds});
+      // return withNewIds;
+      return []
     } catch (e) {
       throw new Error("Invalid JSON format");
     }
   },
 };
+
+
+export const envGlobalService = {
+  get: async({id, defaultValue}: {id: string}): Promise<any> => {
+    return await getFromStorage(id, defaultValue)
+  },
+  getProfiles: async({id}) => {
+    return (await envGlobalService.get({id, defaultValue: {}}))["profiles"] 
+  },
+  getActive: async({id}) => {
+    return (await envGlobalService.get({id, defaultValue: []}))["active"]
+  },
+  create: async({id, profiles}): Promise<void> => {
+    return await saveToStorage({id, profiles: Object.values(profiles)})
+  },
+  updateProfiles: async({id, profileName, updates}): Promise<void> => {
+    const existingEnv = await envGlobalService.getProfiles({id})
+    existingEnv[profileName].values = updates.values
+    console.log({existingEnv: Object.values(existingEnv)})
+    return await updateStorage({id, profiles: Object.values(existingEnv)})
+  },
+  delete: async(): Promise<string> => {
+  
+  },
+  setDefault: async(): Promise<string> => {
+  
+  },
+  setActiveEnv: async({id, envId}): Promise<void> => {
+    const profiles = await envGlobalService.getProfiles({id})
+    const saved = envId 
+      ? await updateStorage({id, active: profiles[envId]})
+      : await updateStorage({id, active: {}})
+    return saved
+  },
+  setWorkflowActiveGlobalEnv: async({id, envId}): Promise<void> => {
+    const get = await envGlobalService.get({id: "global"})
+    const saved = envId 
+      ? await updateStorage({id, active: get.profiles[envId]})
+      : await updateStorage({id, active: {}})
+    return saved
+  },
+  export: async(): Promise<string> => {
+  
+  },
+  import: async(json: string): Promise<EnvProfile[]> => {
+    try {
+      const envs = JSON.parse(json) as EnvProfile[];
+      const withNewIds = Object.values(envs).map((e, i) => envs[i] = { ...e, id: uuidv4(), createdAtUTC: new Date().toISOString() });
+      const existingEnvs = await envGlobalService.get({id: STORAGE_KEY_GLOBAL_ENVS});
+      updateStorage({id: STORAGE_KEY_GLOBAL_ENVS, ...existingEnvs, ...withNewIds });
+      return withNewIds;
+    } catch (e) {
+      throw new Error("Invalid JSON format");
+    }
+  },
+}
+
+const envWorkflowService = {
+  get: async(): Promise<string> => {
+
+  },
+  create: async(): Promise<string> => {
+  
+  },
+  update: async(): Promise<string> => {
+  
+  },
+  delete: async(): Promise<string> => {
+  
+  },
+  setActiveEnv: async(): Promise<string> => {
+  
+  },
+  getActiveEnv: async(): Promise<string> => {
+  
+  },
+  export: async(): Promise<string> => {
+  
+  },
+  import: async(): Promise<string> => {
+  
+  },
+}

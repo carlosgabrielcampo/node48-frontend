@@ -109,7 +109,7 @@ export const DialogLayout = ({dialogTitle, dialogDescription, dialogFooter, chil
     //               </Select>
     //             </div>
 
-    //             {selectedEnvId !== workflowEnvMeta?.activeEnvId && (
+    //             {selectedEnvId !== workflowEnvs?.activeEnvId && (
     //               <Button onClick={handleSetActive} className="w-full">
     //                 Set as Active for Workflow
     //               </Button>
@@ -230,10 +230,6 @@ export const DialogLayout = ({dialogTitle, dialogDescription, dialogFooter, chil
     //                       </Button>
     //                     </div>
     //                     <ScrollArea className="flex-1">
-    //                       <EnvKeyEditor
-    //                         values={localValues}
-    //                         onChange={handleValuesChange}
-    //                       />
     //                     </ScrollArea>
     //                   </div>
     //                 ) : (

@@ -71,8 +71,6 @@ export const NodeConfigPanel = ({ node, open, onOpenChange, onUpdate, setEdges }
 
 const removeAtPath = (root: any, path: (string | number)[], connections: any, setEdges) => {
   const cloned = structuredClone(root);
-  console.log({connections, path})
-
   let parent = cloned;
   for (let i = 0; i < path.length - 1; i++) parent = parent[path[i]];
   const last = path[path.length - 1];

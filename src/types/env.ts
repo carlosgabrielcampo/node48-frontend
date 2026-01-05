@@ -23,7 +23,7 @@ export interface EnvDiff {
   source: "project" | "workflow";
 }
 
-export interface WorkflowEnvMetadata {
+export interface workflowEnvsdata {
   workflowId: UUID;
   activeEnvId?: UUID | null;
   envProfiles: EnvProfile[];

@@ -156,7 +156,7 @@ export const WorkflowToolBar = ({
 
   return (
     <div className="w-full flex items-center justify-between h-16 gap-2 p-4 border-b bg-background overflow-hidden">
-      <div>
+      <div className="flex items-center gap-2">
         <Button variant="default" onClick={onAddNode} size="sm" className="gap-2">
           <Plus className="h-4 w-4" />
         </Button>
@@ -170,7 +170,9 @@ export const WorkflowToolBar = ({
           <input type="file" accept=".json" onChange={handleImport} className="hidden" />
         </label>
       </div>
-      <div> <h1 className="text-lg font-bold overflow-hidden">{workflow.name}</h1> </div>
+      <div className="flex w-full items-center justify-center"> 
+        <h1 className="flex justify-center overflow-hidden items-center w-full text-lg font-bold overflow-hidden">{workflow.name}</h1> 
+      </div>
       <div className="flex items-center">
         <div className="flex h-8 items-center gap-2 px-3 py-1 border-x mx-2 border-border">
         <Switch id="workflow-active" checked={isActive} onCheckedChange={handleToggleActive} disabled={isToggling} aria-label="Toggle workflow active state" />

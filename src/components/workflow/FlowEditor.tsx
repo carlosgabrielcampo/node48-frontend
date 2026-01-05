@@ -50,9 +50,7 @@ export const FlowEditor = ({
   const minimapDelay = 400
 
   useEffect(() => {
-    if (onNodeAdded) { 
-      globalThis.__addWorkflowNode = (node) => setPendingNode(node)
-    }
+    if (onNodeAdded) { globalThis.__addWorkflowNode = (node) => setPendingNode(node) }
     return () => { delete (globalThis).__addWorkflowNode; };
   }, [onNodeAdded]);
 
@@ -69,7 +67,6 @@ export const FlowEditor = ({
         sourceHandle: connection.sourceHandle,
         target: connection.target,
       })
-      console.log(connection)
       setEdges((eds) => {
         const edgeFound = eds.filter((e) => e.id === newEdge.id )
         if(edgeFound.length > 1 || (edgeFound.length === 1 && edgeFound[0].target)){
@@ -168,16 +165,16 @@ export const FlowEditor = ({
   };  
 
   function FlowControls() {
-  const { zoomIn, zoomOut, fitView } = useReactFlow();
-  return (
-    <div className="absolute bottom-4 left-4 flex gap-2 z-50">
-      <Button size="icon" onClick={() => zoomIn()} variant="outline"><ZoomIn/></Button>
-      <Button size="icon" onClick={() => zoomOut()} variant="outline"><ZoomOut/></Button>
-      <Button size="icon" onClick={() => fitView()} variant="outline"><Maximize/></Button>
-      <Button size="icon" onClick={() => {}} variant="outline"><ChevronsRightLeft/></Button>
-    </div>
-  );
-}
+    const { zoomIn, zoomOut, fitView } = useReactFlow();
+    return (
+      <div className="absolute bottom-4 left-4 flex gap-2 z-50">
+        <Button size="icon" onClick={() => zoomIn()} variant="outline"><ZoomIn/></Button>
+        <Button size="icon" onClick={() => zoomOut()} variant="outline"><ZoomOut/></Button>
+        <Button size="icon" onClick={() => fitView()} variant="outline"><Maximize/></Button>
+        <Button size="icon" onClick={() => {}} variant="outline"><ChevronsRightLeft/></Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col" ref={reactFlowWrapper}>
