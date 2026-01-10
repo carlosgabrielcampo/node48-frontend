@@ -5,7 +5,6 @@ const STORAGE_KEY_GLOBAL_ENVS = "global";
 
 const normalizeProfiles = (profiles: Record<string, EnvProfile>): EnvProfile[] => Object.values(profiles);
 
-// Local storage helpers
 const getFromStorage = async <T>(key: string, defaultValue: T): Promise<T> => {
   try {
     const response = await (await fetch(`http://localhost:4014/v1/envs/profiles/${key}`)).json();
@@ -256,32 +255,5 @@ export const envService = {
     } catch (e) {
       throw new Error("Invalid JSON format");
     }
-  },
-}
-
-const envWorkflowService = {
-  get: async(): Promise<string> => {
-
-  },
-  create: async(): Promise<string> => {
-  
-  },
-  update: async(): Promise<string> => {
-  
-  },
-  delete: async(): Promise<string> => {
-  
-  },
-  setActiveEnv: async(): Promise<string> => {
-  
-  },
-  getActiveEnv: async(): Promise<string> => {
-  
-  },
-  export: async(): Promise<string> => {
-  
-  },
-  import: async(): Promise<string> => {
-  
   },
 }
