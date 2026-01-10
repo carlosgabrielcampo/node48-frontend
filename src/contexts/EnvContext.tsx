@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { EnvProfile, EnvValues, EnvDiff, UUID, workflowEnvsdata } from "@/types/env";
-import { envGlobalService, envService } from "@/services/envService";
+import { envService } from "@/services/envService";
 import { toast } from "sonner";
 
 interface EnvContextType {
@@ -49,7 +49,8 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   const refreshProjectEnvs = useCallback(async () => {
     setLoadingProjectEnvs(true);
     try {
-      setGlobalEnvs(await envGlobalService.get({id: "global"}) ?? {});
+      const global = await envService.get({id: "global"}) ?? {}
+      setGlobalEnvs(global);
     } catch (e) {
       toast.error("Failed to load environments");
     } finally {
@@ -59,7 +60,7 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     refreshProjectEnvs();
-    envGlobalService.getActive({id: "global"}).then((env) => setActiveGlobalEnvId(env[0]?.id))
+    envService.getActive({id: "global"}).then((env) => setActiveGlobalEnvId(env[0]?.id))
   }, []);
 
 
@@ -119,21 +120,22 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   // Workflow envs
   const loadWorkflowEnvs = useCallback(async (workflowId: UUID) => {
     // console.log({workflowId})
-    const meta = await envGlobalService.get({id: workflowId})
+    const meta = await envService.get({id: workflowId})
     setWorkflowEnvs({...meta});
+    return meta
     // console.log({workflowEnvs})
   }, []);
 
   const createWorkflowEnv = useCallback(async (workflowId: UUID, data: Omit<EnvProfile, "id" | "workflowId" | "createdAtUTC">) => {
     console.log({createWorkflowEnv: data})
-    const newEnv = await envGlobalService.create({id: workflowId, profiles: [data]});
+    const newEnv = await envService.create({id: workflowId, profiles: [data]});
     // setWorkflowEnvs((prev) => prev ? { ...prev, envProfiles: [...prev.envProfiles, newEnv] } : null);    
     // toast.success("Workflow environment created");
     return newEnv;
   }, []);
 
   const updateWorkflowEnv = useCallback(async (workflowId: UUID, envId: UUID, updates: Partial<EnvProfile>) => {
-    const updated = await envGlobalService.updateProfiles({id: workflowId, profileName: envId, updates});
+    const updated = await envService.updateProfiles({id: workflowId, profileName: envId, updates});
     if (updated) {
       setWorkflowEnvs(updated);
       toast.success("Environment updated");
@@ -151,30 +153,25 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
 
   const removeWorkflowActiveEnv = useCallback(async (id: UUID, envId: UUID | null) => {
     console.log({id, envId, globalEnvs, workflowEnvs})
-    // await envGlobalService.setWorkflowActiveGlobalEnv({id, envId});
+    // await envService.setWorkflowActiveGlobalEnv({id, envId});
     // setWorkflowEnvs((prev) => prev ? { ...prev, activeEnvId: envId } : null);
     // setActiveGlobalEnvId(envId)
     // toast.success("Workflow environment switched");
   }, [workflowEnvs]);
 
   const setGlobalActiveEnv = useCallback(async (id: UUID, envId: UUID | null) => {
-    await envGlobalService.setWorkflowActiveGlobalEnv({id, envId});
+    await envService.setWorkflowActiveGlobalEnv({id, envId});
     console.log({setGlobalActiveEnv: id, envId, workflowEnvs, globalEnvs})
-    setWorkflowEnvs((prev) => prev ? { ...prev, active: [...prev.active.filter((e) => e.scope !== 'global'), globalEnvs.profiles[envId]] } : null);
+    // setWorkflowEnvs((prev) => prev ? { ...prev, active: [...prev?.active?.filter((e) => e.scope !== 'global'), globalEnvs?.profiles[envId]] } : null);
     setActiveGlobalEnvId(envId)
-    // toast.success("Workflow environment switched");
+    toast.success("Workflow environment switched");
   }, [globalEnvs, workflowEnvs]);
 
-  const setWorkflowActiveEnv = useCallback(async (id: UUID, envId: UUID | null) => {
-    // await envGlobalService.setWorkflowActiveGlobalEnv({id, envId});
-    // console.log({setWorkflowActiveEnv: id, envId, workflowEnvs})
-    // console.log()
-    // setWorkflowEnvs((prev) => {
-    //   console.log({prev})
-    //   return prev ? { ...prev, activeEnvId: envId } : null
-    // });
-    // setActiveGlobalEnvId(envId)
-    // toast.success("Workflow environment switched");
+  const setWorkflowActiveEnv = useCallback(async (id: UUID, envId: any) => {
+    console.log({id, envId})
+    await envService.setWorkflowActiveGlobalEnv({id, envId});
+    setActiveProjectEnvId(envId)
+    toast.success("Workflow environment switched");
   }, []);
 
   // Resolved values
@@ -213,45 +210,13 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
     return resolved;
   }, [globalEnvs.profiles, activeProjectEnvId, workflowEnvs]);
 
-  const getEnvDiff = useCallback((workflowId?: UUID): EnvDiff[] => {
-    const defaultEnv = Object.values(globalEnvs.profiles).find((e) => e.isDefault);
-    const activeEnv = activeProjectEnvId ? Object.values(globalEnvs.profiles).find((e) => e.id === activeProjectEnvId) : defaultEnv;
-    const projectValues = activeEnv?.values || {};
-    
-    let workflowOverrides: EnvValues = {};
-    if (workflowId && workflowEnvs?.workflowId === workflowId && workflowEnvs.activeEnvId) {
-      console.log({workflowEnvs})
-      const workflowEnv = Object.values(workflowEnvs?.profiles).find((e) => e.id === workflowEnvs.activeEnvId);
-      workflowOverrides = workflowEnv?.values || {};
-    }
-    
-    const allKeys = new Set([...Object.keys(projectValues), ...Object.keys(workflowOverrides)]);
-    const diff: EnvDiff[] = [];
-    
-    allKeys.forEach((key) => {
-      const projectValue = projectValues[key];
-      const workflowOverride = workflowOverrides[key];
-      const hasOverride = key in workflowOverrides;
-      
-      diff.push({
-        key,
-        projectValue,
-        workflowOverride: hasOverride ? workflowOverride : undefined,
-        resolvedValue: hasOverride ? workflowOverride : projectValue,
-        source: hasOverride ? "workflow" : "project",
-      });
-    });
-    
-    return diff.sort((a, b) => a.key.localeCompare(b.key));
-  }, [globalEnvs, activeProjectEnvId, workflowEnvs]);
-
   // Import/Export
   const exportEnvs = useCallback(async () => {
     return envService.exportProjectEnvs();
   }, []);
 
   const importEnvs = useCallback(async (json: string) => {
-    await envGlobalService.import.importProjectEnvs(json);
+    await envService.import.importProjectEnvs(json);
     await refreshProjectEnvs();
     toast.success("Environments imported");
   }, [refreshProjectEnvs]);
@@ -259,7 +224,6 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   return (
     <EnvContext.Provider
       value={{
-        getEnvDiff,
         exportEnvs,
         importEnvs,
         globalEnvs,

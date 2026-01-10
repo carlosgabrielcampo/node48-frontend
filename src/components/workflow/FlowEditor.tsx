@@ -20,7 +20,7 @@ import { WorkflowJSON } from "@/types/workflows";
 import { NodeConfigPanel } from "../panels/NodePanel";
 import { createEdge } from "../edges/EdgeDataStructure";
 import { Button } from "@/components/ui/button";
-import { Maximize, ZoomIn, ZoomOut, ChevronsRightLeft } from "lucide-react";
+import { Maximize, ZoomIn, ZoomOut, Shrink, Expand } from "lucide-react";
 
 const nodeTypes = { custom: UnifiedNode };
 
@@ -43,6 +43,7 @@ export const FlowEditor = ({
 }: FlowEditorProps) => {
 
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
+  const [collapsed, setCollapsed] = useState(null)
   const [pendingNode, setPendingNode] = useState<any>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [isScreenMoving, setIsScreenMoving] = useState(false);
@@ -171,7 +172,7 @@ export const FlowEditor = ({
         <Button size="icon" onClick={() => zoomIn()} variant="outline"><ZoomIn/></Button>
         <Button size="icon" onClick={() => zoomOut()} variant="outline"><ZoomOut/></Button>
         <Button size="icon" onClick={() => fitView()} variant="outline"><Maximize/></Button>
-        <Button size="icon" onClick={() => {}} variant="outline"><ChevronsRightLeft/></Button>
+        <Button size="icon" onClick={() => setCollapsed(!collapsed)} variant="outline">{collapsed ? <Expand/> : <Shrink/>}</Button>
       </div>
     );
   }

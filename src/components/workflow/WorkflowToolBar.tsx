@@ -12,7 +12,6 @@ import { createNode } from "../nodes/NodeDataStructure";
 import { exportToWorkflowJSON } from "@/lib/workflowExporter";
 import { workflowService } from "@/services/workflowService";
 import { WorkflowEnvModal } from "@/components/env/WorkflowEnvModal";
-import { EnvSelector } from "@/components/env/EnvSelector";
 export const WorkflowToolBar = ({
   setIsActive,
   isActive,

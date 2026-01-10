@@ -25,7 +25,7 @@ interface DropdownInterface {
 const Item = ({itemProperties, onSelect, itemDisplay}) => {
     return (
         <DropdownMenuItem onSelect={() => onSelect(itemProperties)} className={"w-30"}>
-            {String(itemDisplay).toUpperCase()}
+            { itemDisplay }
         </DropdownMenuItem>
     )
 }
@@ -72,7 +72,7 @@ export const LabeledDropdown = ({...props}: DropdownInterface) =>
         <DropdownMenuTrigger asChild >
             <Button variant="outline" size="sm" className="justify-between gap-2 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
                 <div className="flex w-full justify-between">
-                    <p className="overflow-hidden">{ String(props.header).toUpperCase() }</p>
+                    <p className="overflow-hidden">{ String(props.header).toUpperCase() || <Label>{props.placeholder}</Label> }</p>
                     <ChevronDown className="ml-2 h-4 w-4"/>
                 </div>
             </Button>
