@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { EnvProfile, EnvValues, EnvDiff, UUID, workflowEnvsdata } from "@/types/env";
-import { envService } from "@/services/env/envService";
+import { envService } from "@/services/env/EnvService";
 import { toast } from "sonner";
 
 interface EnvContextType {
@@ -49,7 +49,7 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   const refreshProjectEnvs = useCallback(async () => {
     setLoadingProjectEnvs(true);
     try {
-      const global = await envService.get({id: "global"}) ?? {}
+      const global = await envService.get({id: "global"}) ?? { profiles: {}, active: []}
       setGlobalEnvs(global);
     } catch (e) {
       toast.error("Failed to load environments");
@@ -60,7 +60,7 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     refreshProjectEnvs();
-    envService.getActive({id: "global"}).then((env) => setActiveGlobalEnvId(env[0]?.id))
+    envService.getActive({id: "global"}).then((env) => setActiveGlobalEnvId(env?.[0]?.id))
   }, []);
 
 
@@ -71,8 +71,9 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const createProjectEnv = useCallback(async (id, data: Omit<EnvProfile, "id" | "scope" | "createdAtUTC">) => {
-    const newEnv = await envService.createProjectEnv(id, data);
-    setGlobalEnvs((prev) => [...prev, newEnv]);
+    console.log({id, data})
+    const newEnv = await envService.create({id, profiles: data});
+    setGlobalEnvs((prev) => ({...prev, newEnv}));
     toast.success("Environment created");
     return newEnv;
   }, []);
@@ -86,7 +87,7 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const deleteProjectEnv = useCallback(async (id: UUID) => {
-    await envService.deleteProjectEnv(id);
+    await envService.delete(id);
     setGlobalEnvs((prev) => {
       const next = prev.filter((e) => e.id !== id);
 

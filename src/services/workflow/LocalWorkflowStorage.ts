@@ -1,17 +1,23 @@
 import { v4 as uuidv4 } from 'uuid'
 const STORAGE_KEY = "workflows";
-import { WorkflowInterface, WorkflowStorageInterface } from './types';
+const AUTH_TOKEN_KEY = "node48_auth_token";
 
-
+import { WorkflowInterface, WorkflowStorageInterface } from './WorkflowStorageTypes';
 
 const readAll = (): WorkflowInterface[] => {
-  const raw = localStorage.getItem(STORAGE_KEY);
+  const auth_token = localStorage.getItem(AUTH_TOKEN_KEY)
+  console.log(`${auth_token}:${STORAGE_KEY}`)
+
+  const raw = localStorage.getItem(`${auth_token}:${STORAGE_KEY}`);
   return raw ? JSON.parse(raw) : [];
 };
 
 const writeAll = (workflows: WorkflowInterface[]) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(workflows));
+  const auth_token = localStorage.getItem(AUTH_TOKEN_KEY)
+  console.log(`${auth_token}:${STORAGE_KEY}`)
+  localStorage.setItem(`${auth_token}:${STORAGE_KEY}`, JSON.stringify(workflows));
 };
+
 
 export class LocalWorkflowStorage implements WorkflowStorageInterface {
   async getAll(): Promise<WorkflowInterface[]> {

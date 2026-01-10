@@ -1,16 +1,16 @@
+import { toast } from "sonner";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Save, Play, Download, Plus, Upload, Settings2, CircleAlert } from "lucide-react";
-import { toast } from "sonner";
-import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
 import { MarkerType, Edge, Node } from "reactflow";
 import { WorkflowData } from "@/types/configPanels";
 import { WorkflowToolBarProps } from "@/types/workflows";
 import { createNode } from "../nodes/NodeDataStructure";
 import { exportToWorkflowJSON } from "@/lib/workflowExporter";
-import { workflowService } from "@/services/workflow/workflowStorage";
+import { workflowService } from "@/services/workflow/workflowService";
 import { WorkflowEnvModal } from "@/components/env/WorkflowEnvModal";
+import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
+import { Save, Play, Download, Plus, Upload, Settings2, CircleAlert } from "lucide-react";
 export const WorkflowToolBar = ({
   setIsActive,
   isActive,
@@ -47,7 +47,7 @@ export const WorkflowToolBar = ({
   const onSave = async () => {
     const workflowJSON = getWorkflowJSON();    
     const savedWorkflow = await workflowService.save(workflowJSON)
-    if(savedWorkflow.status !== 200) throw Error("failed to save")
+    if(savedWorkflow?.status !== 200) throw Error("failed to save")
   }
   const handleSave = async () => {
     setIsSaving(true);

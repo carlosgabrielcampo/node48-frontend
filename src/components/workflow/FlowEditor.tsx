@@ -172,7 +172,7 @@ export const FlowEditor = ({
         <Button size="icon" onClick={() => zoomIn()} variant="outline"><ZoomIn/></Button>
         <Button size="icon" onClick={() => zoomOut()} variant="outline"><ZoomOut/></Button>
         <Button size="icon" onClick={() => fitView()} variant="outline"><Maximize/></Button>
-        <Button size="icon" onClick={() => setCollapsed(!collapsed)} variant="outline">{collapsed ? <Expand/> : <Shrink/>}</Button>
+        {/* <Button size="icon" onClick={() => setCollapsed(!collapsed)} variant="outline">{collapsed ? <Expand/> : <Shrink/>}</Button> */}
       </div>
     );
   }

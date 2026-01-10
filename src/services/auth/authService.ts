@@ -1,21 +1,28 @@
 import { User, AuthResponse, LoginCredentials, RegisterCredentials } from "@/types/auth";
+import { v4 as uuid } from "uuid";
 
 const AUTH_TOKEN_KEY = "node48_auth_token";
 const AUTH_USER_KEY = "node48_auth_user";
 
-// Mock users for development
-const mockUsers: Map<string, { user: User; password: string }> = new Map();
+const setMockUser = (key) => {
+  const mockUserKey = "test@example.com"
+  const mockUserValue = {
+    id: uuid(),
+    user: {
+      email: "test@example.com",
+      name: "Test User",
+      createdAt: new Date().toISOString(),
+    },
+    password: "password123",
+  }
+  localStorage.setItem(key, JSON.stringify({[mockUserKey]: mockUserValue}))
+  return JSON.parse(localStorage.getItem(key))
+}
+const getUsers = (key) => localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : setMockUser(AUTH_USER_KEY)
 
-// Initialize with a test user
-mockUsers.set("test@example.com", {
-  user: {
-    id: "user-1",
-    email: "test@example.com",
-    name: "Test User",
-    createdAt: new Date().toISOString(),
-  },
-  password: "password123",
-});
+const mockUsers = getUsers(AUTH_USER_KEY)
+
+console.log({mockUsers})
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -23,26 +30,29 @@ export const authService = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     await delay(800);
 
-    const stored = mockUsers.get(credentials.email);
+    const stored = mockUsers[credentials.email];
+    const accessToken = stored.id
+    
     if (!stored || stored.password !== credentials.password) {
       throw new Error("Invalid email or password");
     }
 
     const response: AuthResponse = {
       user: stored.user,
-      accessToken: `mock-token-${Date.now()}`,
+      accessToken,
     };
 
-    localStorage.setItem(AUTH_TOKEN_KEY, response.accessToken);
-    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.user));
+    localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
 
     return response;
   },
 
   register: async (credentials: RegisterCredentials): Promise<AuthResponse> => {
+    const register_id = uuid()
+
     await delay(800);
 
-    if (mockUsers.has(credentials.email)) {
+    if (mockUsers[credentials.email]) {
       throw new Error("Email already registered");
     }
 
@@ -55,31 +65,32 @@ export const authService = {
     }
 
     const newUser: User = {
-      id: `user-${Date.now()}`,
       email: credentials.email,
       name: credentials.name,
       createdAt: new Date().toISOString(),
     };
 
-    mockUsers.set(credentials.email, {
+    mockUsers[credentials.email] = {
+      id: register_id,
       user: newUser,
       password: credentials.password,
-    });
-
-    const response: AuthResponse = {
-      user: newUser,
-      accessToken: `mock-token-${Date.now()}`,
     };
 
-    localStorage.setItem(AUTH_TOKEN_KEY, response.accessToken);
-    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.user));
+    const response: AuthResponse = {
+      id: register_id,
+      user: newUser,
+      accessToken: register_id,
+    };
+
+  
+    localStorage.setItem(AUTH_TOKEN_KEY, register_id);
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(mockUsers));
 
     return response;
   },
 
   logout: (): void => {
     localStorage.removeItem(AUTH_TOKEN_KEY);
-    localStorage.removeItem(AUTH_USER_KEY);
   },
 
   getStoredUser: (): User | null => {
@@ -101,34 +112,24 @@ export const authService = {
   },
 
   // Google OAuth - redirect to backend endpoint
-  initiateGoogleLogin: (): void => {
-    // In production, this would redirect to your backend OAuth endpoint
-    // For mock, we'll simulate the flow
-    window.location.href = "/api/auth/google";
+  initiateGoogleLogin: async(): Promise<void> => {
+    const googleUser = await authService.handleOAuthCallback()
+    return authService.login(googleUser)
   },
 
   // Handle OAuth callback
-  handleOAuthCallback: async (token: string): Promise<AuthResponse> => {
+  handleOAuthCallback: async (): Promise<RegisterCredentials> => {
     await delay(300);
 
     // Mock OAuth user
-    const oauthUser: User = {
-      id: `google-user-${Date.now()}`,
+    const oauthUser: RegisterCredentials = {
       email: "google@example.com",
       name: "Google User",
-      avatar: "https://lh3.googleusercontent.com/a/default-user",
-      createdAt: new Date().toISOString(),
+      confirmPassword: "password",
+      password: "password"
     };
 
-    const response: AuthResponse = {
-      user: oauthUser,
-      accessToken: token,
-    };
-
-    localStorage.setItem(AUTH_TOKEN_KEY, response.accessToken);
-    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.user));
-
-    return response;
+    return oauthUser;
   },
 
   // Refresh session

@@ -1,6 +1,7 @@
+import { useAuth } from "@/contexts/AuthContext";
 import { LocalWorkflowStorage } from "./LocalWorkflowStorage";
-import { RemoteWorkflowStorage } from "./RemoteWorkflowService";
-import { WorkflowStorageInterface } from "./types";
+import { RemoteWorkflowStorage } from "./RemoteWorkflowStorage";
+import { WorkflowStorageInterface } from "./WorkflowStorageTypes";
 const isProd = import.meta.env.PROD;
 
 

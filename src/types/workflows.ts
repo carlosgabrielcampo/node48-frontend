@@ -1,4 +1,4 @@
-import { Workflow } from "@/services/workflow/RemoteWorkflowService";
+import { Workflow } from "@/services/workflow/RemoteWorkflowStorage";
 import { Dispatch, SetStateAction } from "react";
 export interface FlowEditorProps {
   onNodeAdded?: ({mainType, type, name}) => void;

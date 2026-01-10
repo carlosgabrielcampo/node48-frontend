@@ -8,7 +8,7 @@ import { CreateWorkflowDialog } from "@/components/workflow/CreateWorkflowDialog
 // import { workflowService } from "@/services/workflow/RemoteWorkflowService";
 
 import { useToast } from "@/hooks/useToast";
-import { workflowService } from "@/services/workflow/workflowStorage";
+import { workflowService } from "@/services/workflow/workflowService";
 
 const WorkflowsPage = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -49,64 +49,68 @@ const WorkflowsPage = () => {
   };
 
   return (
-    <div className="min-h-screen  bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight">Workflows</h1>
-            <p className="text-muted-foreground mt-2">
-              Manage and create your automation workflows
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="icon" onClick={handleRefresh}>
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-            <Button onClick={() => setCreateDialogOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Workflow
-            </Button>
-          </div>
-        </div>
-
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-40 rounded-lg bg-muted animate-pulse" />
-            ))}
-          </div>
-        ) : workflows.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-              <Plus className="h-8 w-8 text-muted-foreground" />
+    <div className="min-h-screen  w-full  bg-background">
+      <main className="flex-1 overflow-y-auto">
+        <div className="container max-w-1xl py-8 px-6">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-4xl font-bold tracking-tight">Workflows</h1>
+                <p className="text-muted-foreground mt-2">
+                  Manage and create your automation workflows
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" size="icon" onClick={handleRefresh}>
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+                <Button onClick={() => setCreateDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Workflow
+                </Button>
+              </div>
             </div>
-            <h3 className="text-lg font-semibold mb-2">No workflows yet</h3>
-            <p className="text-muted-foreground mb-6">
-              Get started by creating your first workflow
-            </p>
-            <Button onClick={() => setCreateDialogOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Your First Workflow
-            </Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {workflows.map((workflow) => (
-              <WorkflowCard
-                key={workflow.id}
-                workflow={workflow}
-                onClick={() => navigate(`/workflows/${workflow.id}`)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
 
-      <CreateWorkflowDialog
-        open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
-        onSuccess={handleCreateWorkflow}
-      />
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-40 rounded-lg bg-muted animate-pulse" />
+                ))}
+              </div>
+            ) : workflows.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                  <Plus className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">No workflows yet</h3>
+                <p className="text-muted-foreground mb-6">
+                  Get started by creating your first workflow
+                </p>
+                <Button onClick={() => setCreateDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Your First Workflow
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {workflows.map((workflow) => (
+                  <WorkflowCard
+                    key={workflow.id}
+                    workflow={workflow}
+                    onClick={() => navigate(`/workflows/${workflow.id}`)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <CreateWorkflowDialog
+            open={createDialogOpen}
+            onOpenChange={setCreateDialogOpen}
+            onSuccess={handleCreateWorkflow}
+          />
+        </div>
+      </main>
     </div>
   );
 };

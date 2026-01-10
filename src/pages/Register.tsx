@@ -216,17 +216,17 @@ export default function Register() {
           </form>
 
           {/* Divider */}
-          <div className="relative my-6">
+          {/* <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-700"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-slate-900 px-2 text-slate-500">Or continue with</span>
             </div>
-          </div>
+          </div> */}
 
           {/* Google Login */}
-          <Button
+          {/* <Button
             type="button"
             variant="outline"
             className="w-full border-slate-700 bg-slate-800/50 hover:bg-slate-800 text-white"
@@ -252,7 +252,7 @@ export default function Register() {
               />
             </svg>
             Continue with Google
-          </Button>
+          </Button> */}
 
           {/* Login Link */}
           <p className="mt-6 text-center text-sm text-slate-400">

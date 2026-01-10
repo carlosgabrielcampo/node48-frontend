@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Moon, Sun, Monitor, Plus, Download, Upload, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { EnvKeyEditor } from "@/components/env/EnvKeyEditor";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useState, useRef } from "react";
@@ -116,7 +115,7 @@ export default function Settings() {
                       </div>
                       <DialogFooter>
                         <Button variant="outline" onClick={() => setNewEnvDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={() => handleCreateEnv()} disabled={!newEnvName.trim()}>Create</Button>
+                        <Button onClick={() => handleCreateEnv('global')} disabled={!newEnvName.trim()}>Create</Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>

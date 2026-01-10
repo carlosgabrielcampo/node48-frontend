@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { WorkflowInterface, WorkflowStorageInterface } from './types';
+import { WorkflowInterface, WorkflowStorageInterface } from './WorkflowStorageTypes';
 
 export class RemoteWorkflowStorage implements WorkflowStorageInterface {
   async getAll(): Promise<WorkflowInterface[]> {
