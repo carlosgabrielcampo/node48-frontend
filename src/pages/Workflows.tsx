@@ -5,8 +5,10 @@ import { Plus, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WorkflowCard } from "@/components/workflow/WorkflowCard";
 import { CreateWorkflowDialog } from "@/components/workflow/CreateWorkflowDialog";
-import { workflowService } from "@/services/workflowService";
+// import { workflowService } from "@/services/workflow/RemoteWorkflowService";
+
 import { useToast } from "@/hooks/useToast";
+import { workflowService } from "@/services/workflow/workflowStorage";
 
 const WorkflowsPage = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -16,11 +18,11 @@ const WorkflowsPage = () => {
 
   const { data: workflows = [], isLoading, refetch } = useQuery({
     queryKey: ["workflows"],
-    queryFn: workflowService.getWorkflows,
+    queryFn: workflowService.getAll
   });
 
   const createMutation = useMutation({
-    mutationFn: workflowService.createWorkflow,
+    mutationFn: workflowService.create,
     onSuccess: (newWorkflow) => {
       queryClient.invalidateQueries({ queryKey: ["workflows"] });
       navigate(`/workflows/${newWorkflow.id}`);

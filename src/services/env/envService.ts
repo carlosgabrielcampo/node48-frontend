@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const STORAGE_KEY_GLOBAL_ENVS = "global";
 
-const normalizeProfiles = (profiles: Record<string, EnvProfile>): EnvProfile[] => Object.values(profiles);
+const toProfileMap = (envs: EnvProfile[]) => Object.fromEntries(envs.map(e => [e.id, e]));
 
 const getFromStorage = async <T>(key: string, defaultValue: T): Promise<T> => {
   try {
@@ -15,8 +15,6 @@ const getFromStorage = async <T>(key: string, defaultValue: T): Promise<T> => {
     return defaultValue;
   }
 };
-const toProfileMap = (envs: EnvProfile[]) => Object.fromEntries(envs.map(e => [e.id, e]));
-
 const updateStorage = async <T>({id, profiles, active}): Promise<void> => {
   try {
     const requestBody = {}
@@ -196,7 +194,7 @@ const saveToStorage = async <T>({id, profiles, active }): Promise<void> => {
 //     }
 //   },
 // };
-
+// const normalizeProfiles = (profiles: Record<string, EnvProfile>): EnvProfile[] => Object.values(profiles);
 
 export const envService = {
   get: async({id, defaultValue}: {id: string}): Promise<any> => {
@@ -235,8 +233,7 @@ export const envService = {
     const get = await envService.get({id: "global"})
     const workflowEnv = await envService.get({id})
     const activeEnv = workflowEnv?.active?.filter((e) => e?.scope !== "global")
-    
-    
+  
     const saved = envId 
       ? await updateStorage({id, active: [...activeEnv, get.profiles[envId]]})
       : await updateStorage({id, active: [...activeEnv]})

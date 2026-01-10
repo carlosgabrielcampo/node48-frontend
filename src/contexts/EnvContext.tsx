@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { EnvProfile, EnvValues, EnvDiff, UUID, workflowEnvsdata } from "@/types/env";
-import { envService } from "@/services/envService";
+import { envService } from "@/services/env/envService";
 import { toast } from "sonner";
 
 interface EnvContextType {

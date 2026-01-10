@@ -10,9 +10,10 @@ export const exportToWorkflowJSON = (
   workflowId: string,
   workflowName: string,
   workflowDescription?: string,
-  createdAtUTC?: string
+  createdAtUTC?: string,
+  workflowSteps?: any
 ): WorkflowJSON => {
-  const steps: Record<string, WorkflowStep> = {};
+  const steps: Record<string, WorkflowStep> = workflowSteps || {};
   
   // Convert nodes to steps
   nodes.forEach((node) => {
