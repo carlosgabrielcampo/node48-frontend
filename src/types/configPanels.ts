@@ -67,6 +67,7 @@ export interface WorkflowNode {
 
   type: string,
   data: Record<string, any>
+  connections?: Record<string, string>;
   
   // Config can be different types based on node type
   parameters?: ApiConfig[] | CsvConfig[] | LoopConfigEntry[] | ConditionBlock[];
@@ -108,7 +109,8 @@ export interface NodeConfigPanelProps {
   node: WorkflowNode | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpdate: (nodeId: string, updates: any[]) => void;
+  onUpdate: (nodeId: string, updates: any[], connections?: any) => void;
+  setEdges?: (v: any) => void;
 }
 
 export interface CsvConfigPanelProps {

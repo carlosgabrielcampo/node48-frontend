@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import Workflow from "./Workflow";
-import { workflowService } from "@/services/workflow/workflowService";
+import { workflowService } from "@/services/workflow/WorkflowService";
 
 const WorkflowDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +14,7 @@ const WorkflowDetail = () => {
     queryFn: () => workflowService.getById(id!),
     enabled: !!id,
   });
+
   useEffect(() => {
     if (error || (!isLoading && !workflow)) {
       navigate("/workflows");

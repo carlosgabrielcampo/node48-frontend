@@ -1,7 +1,17 @@
-import { Workflow } from "@/services/workflow/RemoteWorkflowStorage";
 import { Dispatch, SetStateAction } from "react";
+import { WorkflowNode } from "./configPanels";
+
+export interface Workflow {
+  id: string;
+  name: string;
+  description?: string;
+  createdAtUTC?: string;
+  updatedAtUTC?: string;
+  isActive?: boolean;
+}
+
 export interface FlowEditorProps {
-  onNodeAdded?: ({mainType, type, name}) => void;
+  onNodeAdded?: ({mainType, type, name}: {mainType: string; type: string; name: string}) => void;
   workflow: WorkflowJSON | null;
   nodes: any;
   setNodes: any;
@@ -16,7 +26,6 @@ export interface FlowEditorProps {
   handleNodeClick: any;
   handleDeleteNode: any;
   setPendingChanges: Dispatch<SetStateAction<boolean>>,
-
 }
 
 export interface CreateWorkflowDialogProps {
