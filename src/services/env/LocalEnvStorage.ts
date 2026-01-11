@@ -1,4 +1,5 @@
 import { EnvProfile, EnvStorageInterface } from "./EnvStorageTypes";
+
 const STORAGE_PREFIX = "env-manager";
 
 const buildKey = (id: string) => `${STORAGE_PREFIX}:${id}`;
@@ -6,10 +7,10 @@ const buildKey = (id: string) => `${STORAGE_PREFIX}:${id}`;
 const toProfileMap = (envs: EnvProfile[]) => Object.fromEntries(envs.map(e => [e.id, e]));
 
 export class LocalEnvStorage implements EnvStorageInterface {
-    async get<T>(key: string, defaultValue: T): Promise<T> {
+    async get(key?: string, defaultValue?: any): Promise<any> {
         try {
-            const raw = localStorage.getItem(buildKey(key));            
-            return raw ? (JSON.parse(raw) as T) : defaultValue;
+            const raw = localStorage.getItem(buildKey(key || ""));            
+            return raw ? JSON.parse(raw) : defaultValue;
         } catch (err) {
             console.error(err)
             return defaultValue;
@@ -17,7 +18,7 @@ export class LocalEnvStorage implements EnvStorageInterface {
     }
 
     async save({ id, profiles, active }: any): Promise<void> {
-        const current = await this.get<any>(id, { profiles: {}, active: [] });
+        const current = await this.get(id, { profiles: {}, active: [] });
 
         const next = {
             profiles: profiles
@@ -27,7 +28,6 @@ export class LocalEnvStorage implements EnvStorageInterface {
         };
 
         localStorage.setItem(buildKey(id), JSON.stringify(next));
-        return next
     }
 
     async update(options: any): Promise<void> {

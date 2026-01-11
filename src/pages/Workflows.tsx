@@ -5,10 +5,9 @@ import { Plus, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WorkflowCard } from "@/components/workflow/WorkflowCard";
 import { CreateWorkflowDialog } from "@/components/workflow/CreateWorkflowDialog";
-// import { workflowService } from "@/services/workflow/RemoteWorkflowService";
-
 import { useToast } from "@/hooks/useToast";
-import { workflowService } from "@/services/workflow/workflowService";
+import { workflowService } from "@/services/workflow/WorkflowService";
+import { Workflow } from "@/types/workflows";
 
 const WorkflowsPage = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -16,14 +15,14 @@ const WorkflowsPage = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: workflows = [], isLoading, refetch } = useQuery({
+  const { data: workflows = [], isLoading, refetch } = useQuery<Workflow[]>({
     queryKey: ["workflows"],
     queryFn: workflowService.getAll
   });
 
   const createMutation = useMutation({
     mutationFn: workflowService.create,
-    onSuccess: (newWorkflow) => {
+    onSuccess: (newWorkflow: Workflow) => {
       queryClient.invalidateQueries({ queryKey: ["workflows"] });
       navigate(`/workflows/${newWorkflow.id}`);
     },
@@ -49,7 +48,7 @@ const WorkflowsPage = () => {
   };
 
   return (
-    <div className="min-h-screen  w-full  bg-background">
+    <div className="min-h-screen w-full bg-background">
       <main className="flex-1 overflow-y-auto">
         <div className="container max-w-1xl py-8 px-6">
           <div className="container mx-auto px-4 py-8">

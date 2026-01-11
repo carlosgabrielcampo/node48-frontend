@@ -3,8 +3,9 @@ import { FlowEditor } from "@/components/workflow/FlowEditor";
 import { WorkflowToolBar } from "@/components/workflow/WorkflowToolBar";
 import { NodeTypeDrawer } from "@/components/nodes/NodeTypeDrawer";
 import { useEdgesState, useNodesState } from "reactflow";
-import { WorkflowNode } from "@/types/panels";
+import { WorkflowNode } from "@/types/configPanels";
 import { toast } from "sonner";
+
 interface Window {
   __addWorkflowNode?: (args: {
     type: string;
@@ -12,7 +13,7 @@ interface Window {
   }) => void;
 }
 
-const Workflow = ({workflow}) => {
+const Workflow = ({workflow}: {workflow: any}) => {
   const [isActive, setIsActive] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -21,7 +22,7 @@ const Workflow = ({workflow}) => {
   const [pendingChanges, setPendingChanges] = useState(false)
   const [configPanelOpen, setConfigPanelOpen] = useState(false);
 
-  const handleNodeClick = useCallback((node) => {
+  const handleNodeClick = useCallback((node: any) => {
     const workflowNode: WorkflowNode = {
       id: node.id,
       name: node?.name,
@@ -37,8 +38,8 @@ const Workflow = ({workflow}) => {
     setConfigPanelOpen(true);
   }, [setConfigPanelOpen, setSelectedNode]);
   
-  const handleNodeAdded = useCallback((node) => {
-    if ((window as Window).__addWorkflowNode) (window as Window).__addWorkflowNode(node);
+  const handleNodeAdded = useCallback((node: any) => {
+    if ((window as any).__addWorkflowNode) (window as any).__addWorkflowNode(node);
     setIsDrawerOpen(false);
   }, []);
 

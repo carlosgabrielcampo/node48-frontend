@@ -16,10 +16,7 @@ export interface EnvProfile {
 }
 
 export interface EnvStorageInterface {
-  get<T>(key?: string, defaultValue?: {
-    active: Record<string, string>[],
-    profiles: Record<string, string>
-  }): Promise<T>;
+  get(key?: string, defaultValue?: any): Promise<any>;
   save(options: {
     id: string;
     profiles?: EnvProfile[];

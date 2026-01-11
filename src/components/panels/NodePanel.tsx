@@ -1,5 +1,5 @@
-import { NodeConfigPanelProps } from "@/types/panels";
-import { useEffect, useRef, useState } from "react";
+import { NodeConfigPanelProps } from "@/types/configPanels";
+import { useEffect, useState } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import { copyToClipboard } from "@/lib/utils";
 import { nodeTemplates } from "../nodes/Templates";
@@ -8,7 +8,6 @@ import { Cog } from "lucide-react";
 import { ChildrenRender } from "./PanelRenderer";
 import { LabeledCard } from "../layout/card";
 import { v4 as uuidv4 } from "uuid";
-import { UUID } from "crypto";
 import { toast } from "sonner";
 
 type RendererProps = {
@@ -25,8 +24,8 @@ type RendererProps = {
 export const NodeConfigPanel = ({ node, open, onOpenChange, onUpdate, setEdges }: NodeConfigPanelProps) => {
   const [draft, setDraft] = useState<any>([]);
   const type = node?.type
-  const nodeType = nodeTemplates?.[type]
-  const connections = node?.connections
+  const nodeType = nodeTemplates?.[type as keyof typeof nodeTemplates]
+  const connections = node?.connections || {}
 
   useEffect(() => {
     if(node?.parameters?.length) setDraft(node?.parameters)
@@ -58,10 +57,10 @@ export const NodeConfigPanel = ({ node, open, onOpenChange, onUpdate, setEdges }
             open={open}
             draft={draft}
             setDraft={setDraft}
-            setEdges={setEdges}
+            setEdges={setEdges || (() => {})}
             connections={connections}
-            panelFormat={nodeType.panelFormat}
-            defaultPanel={nodeType.panelInfo || {}}
+            panelFormat={nodeType?.panelFormat}
+            defaultPanel={nodeType?.panelInfo || {}}
           />
         </div>
       </ScrollArea>
@@ -69,16 +68,16 @@ export const NodeConfigPanel = ({ node, open, onOpenChange, onUpdate, setEdges }
   );
 };
 
-const removeAtPath = (root: any, path: (string | number)[], connections: any, setEdges) => {
+const removeAtPath = (root: any, path: (string | number)[], connections: any, setEdges: any) => {
   const cloned = structuredClone(root);
   let parent = cloned;
   for (let i = 0; i < path.length - 1; i++) parent = parent[path[i]];
   const last = path[path.length - 1];
   if(path.length === 1){
     const connection = Object.keys(connections)
-    const id = connection?.[path[0]]
+    const id = connection?.[path[0] as number]
     if(connection.length > 1){
-      setEdges((prev) => prev.filter((e) => e.id !== id))
+      setEdges((prev: any[]) => prev.filter((e) => e.id !== id))
       delete connections?.[id]
     }
   }  
@@ -103,8 +102,8 @@ const removeAtPath = (root: any, path: (string | number)[], connections: any, se
 };
 
 const ConfigPanel = ({draft, setDraft, defaultPanel, panelFormat, open, connections, setEdges }: RendererProps) => {
-  const { children, title, header } = panelFormat
-  const removeState = (position: (string | number)[]) => setDraft(prev => removeAtPath(prev, position, connections, setEdges))
+  const { children, title, header } = panelFormat || {}
+  const removeState = (position: (string | number)[]) => setDraft((prev: any) => removeAtPath(prev, position, connections, setEdges))
 
   return <LabeledCard 
     label={title} 
@@ -112,8 +111,8 @@ const ConfigPanel = ({draft, setDraft, defaultPanel, panelFormat, open, connecti
     {
       children && Array.isArray(draft) ? draft?.map((value: Partial<Record<string, string>>, index: number) => {
             value.render_id = uuidv4()
-            const setState = (patch: Partial<Record<string, string>>) => setDraft(draft.map((p, i) => i === index ? { ...p, ...patch } : p ))
-            const commit = (bind: string, value: Partial<Record<string, string>>) => setDraft(draft.map((p, i) => i === index ? { ...p, [bind]: value } : p))
+            const setState = (patch: Partial<Record<string, string>>) => setDraft(draft.map((p: any, i: number) => i === index ? { ...p, ...patch } : p ))
+            const commit = (bind: string, value: Partial<Record<string, string>>) => setDraft(draft.map((p: any, i: number) => i === index ? { ...p, [bind]: value } : p))
             return ChildrenRender({ open, connections, removeState, defaultPanel, draft: value, position: [index], setDraft: setState, commit, schema: children })
         })
         : <div className="text-sm text-muted-foreground">No configuration available.</div>

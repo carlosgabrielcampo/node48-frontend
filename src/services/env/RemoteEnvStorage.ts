@@ -1,11 +1,11 @@
-import { EnvStorage, EnvProfile } from "./EnvStorageTypes";
+import { EnvStorageInterface, EnvProfile } from "./EnvStorageTypes";
 
 const toProfileMap = (envs: EnvProfile[]) => Object.fromEntries(envs.map(e => [e.id, e]));
 
-export class RemoteEnvStorage implements EnvStorage {
-    get = async <T>(key: string, defaultValue: T): Promise<T> => {
+export class RemoteEnvStorage implements EnvStorageInterface {
+    get = async (key?: string, defaultValue?: any): Promise<any> => {
       try {
-        const response = await (await fetch(`http://localhost:4014/v1/envs/profiles/${key}`)).json();
+        const response = await (await fetch(`http://localhost:4014/v1/envs/profiles/${key || ""}`)).json();
         if (!response) return defaultValue;
         return response;
       
@@ -13,9 +13,10 @@ export class RemoteEnvStorage implements EnvStorage {
         return defaultValue;
       }
     };
-    update = async <T>({id, profiles, active}): Promise<void> => {
+
+    update = async ({id, profiles, active}: any): Promise<void> => {
       try {
-        const requestBody = {}
+        const requestBody: any = {}
         if(profiles) requestBody["profiles"] = toProfileMap(profiles) 
         if(active) requestBody["active"] = active
     
@@ -27,16 +28,16 @@ export class RemoteEnvStorage implements EnvStorage {
     
         if(response.status === 200){ console.info("Env saved") }
         else{ console.error("Failed to save"); }
-        return response
     
       } catch (e) {
         console.log(e)
         console.error("Failed to save");
       }
     };
-    save = async <T>({id, profiles, active }): Promise<void> => {
+
+    save = async ({id, profiles, active }: any): Promise<void> => {
       try {
-        const requestBody = {}
+        const requestBody: any = {}
         if(profiles) requestBody["profiles"] = toProfileMap(profiles) 
         if(active) requestBody["active"] = [active]
     

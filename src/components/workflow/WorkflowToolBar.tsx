@@ -7,10 +7,11 @@ import { WorkflowData } from "@/types/configPanels";
 import { WorkflowToolBarProps } from "@/types/workflows";
 import { createNode } from "../nodes/NodeDataStructure";
 import { exportToWorkflowJSON } from "@/lib/workflowExporter";
-import { workflowService } from "@/services/workflow/workflowService";
+import { workflowService } from "@/services/workflow/WorkflowService";
 import { WorkflowEnvModal } from "@/components/env/WorkflowEnvModal";
 import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
-import { Save, Play, Download, Plus, Upload, Settings2, CircleAlert } from "lucide-react";
+import { Save, Play, Download, Plus, Upload, Settings2 } from "lucide-react";
+
 export const WorkflowToolBar = ({
   setIsActive,
   isActive,
@@ -30,6 +31,7 @@ export const WorkflowToolBar = ({
   const [isRunning, setIsRunning] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
   const [envModalOpen, setEnvModalOpen] = useState(false);
+
   const getWorkflowJSON = () => exportToWorkflowJSON(
     nodes,
     edges,
@@ -49,6 +51,7 @@ export const WorkflowToolBar = ({
     const savedWorkflow = await workflowService.save(workflowJSON)
     if(savedWorkflow?.status !== 200) throw Error("failed to save")
   }
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -62,15 +65,18 @@ export const WorkflowToolBar = ({
       setIsSaving(false);
     }
   }
+
   const onRun = async () => {
     toast.success("Running...");
     await new Promise((resolve) => setTimeout(resolve, 10000));
     toast.success("Running...");
   };
+
   const onToggleActive = async (active: boolean) => {
     await new Promise((resolve) => setTimeout(resolve, 300));
     setIsActive(active);
   };
+
   const handleRun = async () => {
     setIsRunning(true);
     try {
@@ -83,6 +89,7 @@ export const WorkflowToolBar = ({
       setIsRunning(false);
     }
   };
+
   const handleToggleActive = async (checked: boolean) => {
     setIsToggling(true);
     try {
@@ -95,6 +102,7 @@ export const WorkflowToolBar = ({
       setIsToggling(false);
     }
   };
+
   const handleExport = useCallback(() => {    
     const workflowJSON = getWorkflowJSON();
     const blob = new Blob([JSON.stringify(workflowJSON, null, 2)], {
@@ -125,7 +133,7 @@ export const WorkflowToolBar = ({
           } else {
             const workflowData: WorkflowData = jsonData;
             const importedNodes: Node[] = workflowData.nodes.map((node) => ( 
-              createNode({id: node.id, position: node.data.position || {x: 0, y: 0}, connections: node.data.connections, type: node.data.type, onDelete: handleDeleteNode, onClick: handleNodeClick})
+              createNode({id: node.id, position: node.data.position || {x: 0, y: 0}, connections: node.connections, type: node.type, onDelete: handleDeleteNode, onClick: handleNodeClick})
             ));
             const importedEdges: Edge[] = workflowData.connections.map((conn) => ({
               id: conn.id,

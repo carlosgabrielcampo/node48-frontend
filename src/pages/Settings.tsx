@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { KeyValueInput } from "@/components/layout/input";
+import { EnvProfile } from "@/types/env";
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
@@ -29,9 +30,9 @@ export default function Settings() {
   const [newEnvDialogOpen, setNewEnvDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleCreateEnv = async (id) => {
+  const handleCreateEnv = async (id: string) => {
     if (!newEnvName.trim()) return;
-    await createProjectEnv(id, { name: newEnvName.trim(), values: {} });
+    await createProjectEnv(id, { name: newEnvName.trim(), values: {} } as any);
     setNewEnvName("");
     setNewEnvDialogOpen(false);
   };
@@ -58,6 +59,10 @@ export default function Settings() {
       toast.error("Invalid JSON file");
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleValuesUpdate = async (envId: string, _bind: string, values: Record<string, string>) => {
+    await updateProjectEnv(envId, { values });
   };
 
   return (
@@ -122,7 +127,7 @@ export default function Settings() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {globalEnvs?.profiles && Object.values(globalEnvs?.profiles)?.map((env) => (
+                {globalEnvs?.profiles && Object.values(globalEnvs?.profiles)?.map((env: EnvProfile) => (
                   <Card key={env.id} className="p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
@@ -134,7 +139,7 @@ export default function Settings() {
                         <Button variant="destructive" size="sm" onClick={() => deleteProjectEnv(env.id)}><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </div>
-                    <KeyValueInput bind={""} value={env.values} commit={(values) => updateProjectEnv(env.id, { values })} type={"masked"} />
+                    <KeyValueInput bind="" value={env.values} commit={(bind, values) => handleValuesUpdate(env.id, bind, values)} type="masked" />
                   </Card>
                 ))}
               </CardContent>

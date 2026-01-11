@@ -4,11 +4,12 @@ import { v4 as uuid } from "uuid";
 const AUTH_TOKEN_KEY = "node48_auth_token";
 const AUTH_USER_KEY = "node48_auth_user";
 
-const setMockUser = (key) => {
+const setMockUser = (key: string) => {
   const mockUserKey = "test@example.com"
   const mockUserValue = {
     id: uuid(),
     user: {
+      id: uuid(),
       email: "test@example.com",
       name: "Test User",
       createdAt: new Date().toISOString(),
@@ -16,12 +17,11 @@ const setMockUser = (key) => {
     password: "password123",
   }
   localStorage.setItem(key, JSON.stringify({[mockUserKey]: mockUserValue}))
-  return JSON.parse(localStorage.getItem(key))
+  return JSON.parse(localStorage.getItem(key) || "{}")
 }
-const getUsers = (key) => localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : setMockUser(AUTH_USER_KEY)
+const getUsers = (key: string) => localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key) || "{}") : setMockUser(AUTH_USER_KEY)
 
 const mockUsers = getUsers(AUTH_USER_KEY)
-
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -36,6 +36,7 @@ export const authService = {
     }
 
     const response: AuthResponse = {
+      id: stored.id,
       user: stored.user,
       accessToken: stored.id,
     };
@@ -63,6 +64,7 @@ export const authService = {
     }
 
     const newUser: User = {
+      id: register_id,
       email: credentials.email,
       name: credentials.name,
       createdAt: new Date().toISOString(),
@@ -110,9 +112,9 @@ export const authService = {
   },
 
   // Google OAuth - redirect to backend endpoint
-  initiateGoogleLogin: async(): Promise<void> => {
+  initiateGoogleLogin: async(): Promise<AuthResponse> => {
     const googleUser = await authService.handleOAuthCallback()
-    return authService.login(googleUser)
+    return authService.register(googleUser)
   },
 
   // Handle OAuth callback
