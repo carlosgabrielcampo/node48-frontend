@@ -1,12 +1,11 @@
-# Node 48
-
-## Project info
-
-**URL**: [https://node48-frontend.vercel.app/](https://node48-frontend.vercel.app/)
-
 # NODE48 Frontend
 
 NODE48 Frontend is a modern React + TypeScript UI for building, editing, and orchestrating node-based workflows. It provides a drag-and-drop flow editor, reusable node templates, environment management, import/export tooling, and pluggable storage adapters.
+
+## Project URL
+
+**URL**: [https://node48-frontend.vercel.app/](https://node48-frontend.vercel.app/)
+
 
 ## Key features
 
