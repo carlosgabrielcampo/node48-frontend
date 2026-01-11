@@ -30,7 +30,6 @@ export class RemoteEnvStorage implements EnvStorageInterface {
         else{ console.error("Failed to save"); }
     
       } catch (e) {
-        console.log(e)
         console.error("Failed to save");
       }
     };
@@ -51,7 +50,6 @@ export class RemoteEnvStorage implements EnvStorageInterface {
         else{ console.error("Failed to save"); }
     
       } catch (e) {
-        console.log(e)
         console.error("Failed to save");
       }
     }

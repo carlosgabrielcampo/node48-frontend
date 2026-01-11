@@ -152,12 +152,12 @@ export default function Login() {
                   Remember me
                 </label>
               </div>
-              <Link
+              {/* <Link
                 to="/forgot-password"
                 className="text-sm text-primary hover:text-primary/80 transition-colors"
               >
                 Forgot password?
-              </Link>
+              </Link> */}
             </div>
 
             {/* Submit */}

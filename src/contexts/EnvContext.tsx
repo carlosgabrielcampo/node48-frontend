@@ -130,7 +130,6 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   }, [loadWorkflowEnvs]);
 
   const removeWorkflowActiveEnv = useCallback((id: UUID, envId: UUID | null) => {
-    console.log({id, envId, globalEnvs, workflowEnvs});
   }, [workflowEnvs, globalEnvs]);
 
   const setGlobalActiveEnv = useCallback(async (id: UUID, envId: UUID | null) => {
