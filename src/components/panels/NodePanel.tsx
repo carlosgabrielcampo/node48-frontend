@@ -31,7 +31,7 @@ export const NodeConfigPanel = ({ node, open, onOpenChange, onUpdate, setEdges }
     if(node?.parameters?.length) setDraft(node?.parameters)
     else if(nodeType?.panelInfo) {setDraft([structuredClone(nodeType?.panelInfo)])} 
     else setDraft([])
-  }, [node?.parameters, open, nodeType?.panelInfo, connections])
+  }, [node?.parameters, open, nodeType?.panelInfo])
   
   if (!node) return null;
 

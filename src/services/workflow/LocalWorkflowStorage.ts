@@ -43,13 +43,14 @@ export class LocalWorkflowStorage implements WorkflowStorageInterface {
     return workflow;
   }
 
-  async save(workflow: WorkflowInterface): Promise<void> {
+  async save(workflow: WorkflowInterface): Promise<WorkflowInterface[]> {
     const all = readAll().map(w =>
       w.id === workflow.id
         ? { ...workflow, updatedAtUTC: new Date().toISOString() }
         : w
     );
     writeAll(all);
+    return all
   }
 
   async delete(id: string): Promise<void> {
