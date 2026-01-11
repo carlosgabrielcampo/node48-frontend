@@ -4,70 +4,47 @@
 
 **URL**: https://lovable.dev/projects/427a01ba-7c3a-400a-b641-d3565a1ab733
 
-## How can I edit this code?
+# NODE48 Frontend
 
-There are several ways of editing your application.
+NODE48 Frontend is a modern React + TypeScript UI for building, editing, and orchestrating node-based workflows. It provides a drag-and-drop flow editor, reusable node templates, environment management, import/export tooling, and pluggable storage adapters.
 
-**Use Lovable**
+## Key features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/427a01ba-7c3a-400a-b641-d3565a1ab733) and start prompting.
+- Visual flow editor with node templates and edge management
+- Component-driven UI using Tailwind and shadcn-ui primitives
+- Environment modal and runtime configuration support
+- Workflow import/export and storage adapters (local & remote)
+- Auth-ready services and modular architecture for easy integration
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
+## Tech stack
 
 - Vite
-- TypeScript
 - React
-- shadcn-ui
+- TypeScript
 - Tailwind CSS
+- shadcn-ui
 
-## How can I deploy this project?
+## Quickstart
 
-Simply open [Lovable](https://lovable.dev/projects/427a01ba-7c3a-400a-b641-d3565a1ab733) and click on Share -> Publish.
+```bash
+npm install
+npm run dev
 
-## Can I connect a custom domain to my Lovable project?
+# Build and preview production bundle
+npm run build
+npm run preview
+```
 
-Yes, you can!
+## Storage & database note
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+This repository does not include a direct connection to a production database. Workflows are currently persisted via local adapters and optional remote storage abstractions located in the `services/workflow` folder. Database-backed persistence (e.g., PostgreSQL, MongoDB, or managed cloud storage) is a planned future feature and will be added as a configurable storage adapter so the UI can be connected to your preferred backend.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+If you'd like, I can scaffold a simple API and database adapter (Express + SQLite/Postgres) to demonstrate end-to-end persistence. Ask me to add it and I'll create the minimal server and adapter.
+
+## Where to look in the codebase
+
+- UI components: `src/components` and `src/components/ui`
+- Workflow editor and nodes: `src/components/workflow` and `src/components/nodes`
+- Services and storage adapters: `src/services/workflow` and `src/services/env`
+- Context providers: `src/contexts`
+

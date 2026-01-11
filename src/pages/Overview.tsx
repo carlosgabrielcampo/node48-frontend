@@ -1,6 +1,6 @@
 // Update this page (the content is just a fallback if you fail to update the page)
 
-const Index = () => {
+const Overview = () => {
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-background">
       <div className="text-center">
@@ -11,4 +11,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Overview;

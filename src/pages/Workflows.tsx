@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Dispatch, SetStateAction } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Plus, RefreshCw } from "lucide-react";
@@ -10,9 +10,13 @@ import { workflowService } from "@/services/workflow/WorkflowService";
 import { Workflow } from "@/types/workflows";
 
 const WorkflowsPage = () => {
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [createDialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [workflowDialog, setWorkflowDialog ] = useState({name: "", description: ""})
+  const [mode, setMode] = useState("create")
+
   const { toast } = useToast();
 
   const { data: workflows = [], isLoading, refetch } = useQuery<Workflow[]>({
@@ -47,6 +51,49 @@ const WorkflowsPage = () => {
     });
   };
 
+  const onCreate = async (data: FormData, reset: () => void ) => {
+    try {
+      setIsSubmitting(true);
+      await handleCreateWorkflow({ name: data.name, description: data.description });
+      toast({
+        title: "Workflow created",
+        description: "Your workflow has been created successfully.",
+      });
+      reset();
+      setDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create workflow. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onUpdate = async (data: {name: string, description: string}, reset: () => void ) => {
+    console.log(data)
+    try {
+      setIsSubmitting(true);
+    //   await handleCreateWorkflow({ name: data.name, description: data.description });
+      toast({
+        title: "Workflow created",
+        description: "Your workflow has been created successfully.",
+      });
+      reset();
+      setDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create workflow. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen w-full bg-background">
       <main className="flex-1 overflow-y-auto">
@@ -63,7 +110,7 @@ const WorkflowsPage = () => {
                 <Button variant="outline" size="icon" onClick={handleRefresh}>
                   <RefreshCw className="h-4 w-4" />
                 </Button>
-                <Button onClick={() => setCreateDialogOpen(true)}>
+                <Button onClick={() => {setDialogOpen(true); setWorkflowDialog({name: "", description: ""}); setMode('create')}}>
                   <Plus className="h-4 w-4 mr-2" />
                   New Workflow
                 </Button>
@@ -85,7 +132,7 @@ const WorkflowsPage = () => {
                 <p className="text-muted-foreground mb-6">
                   Get started by creating your first workflow
                 </p>
-                <Button onClick={() => setCreateDialogOpen(true)}>
+                <Button onClick={() => { setDialogOpen(true); setWorkflowDialog({name: "", description: ""}); setMode('create') }}>
                   <Plus className="h-4 w-4 mr-2" />
                   Create Your First Workflow
                 </Button>
@@ -97,16 +144,21 @@ const WorkflowsPage = () => {
                     key={workflow.id}
                     workflow={workflow}
                     onClick={() => navigate(`/workflows/${workflow.id}`)}
+                    setMode={setMode}
+                    setWorkflowDialog={() => setWorkflowDialog(workflow)}
+                    setDialogOpen={() => setDialogOpen(true)}
                   />
                 ))}
               </div>
             )}
           </div>
-
           <CreateWorkflowDialog
             open={createDialogOpen}
-            onOpenChange={setCreateDialogOpen}
-            onSuccess={handleCreateWorkflow}
+            onOpenChange={setDialogOpen}
+            mode={mode}
+            onSubmit={mode === 'create' ? onCreate : onUpdate}
+            isSubmitting={isSubmitting}
+            card={workflowDialog}            
           />
         </div>
       </main>

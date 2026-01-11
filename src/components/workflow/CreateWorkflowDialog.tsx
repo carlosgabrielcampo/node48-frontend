@@ -24,54 +24,37 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-export const CreateWorkflowDialog = ({ open, onOpenChange, onSuccess }: CreateWorkflowDialogProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-  
+export const CreateWorkflowDialog = ({ open, onOpenChange, onSubmit, isSubmitting, card, mode }: CreateWorkflowDialogProps) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      setIsSubmitting(true);
-      await onSuccess({ name: data.name, description: data.description });
-      toast({
-        title: "Workflow created",
-        description: "Your workflow has been created successfully.",
-      });
-      reset();
-      onOpenChange(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create workflow. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const setCardValues = ({name, description}) => {
+    setValue("name", name)
+    setValue("description", description)
+  }
+  setCardValues({name: card?.name, description: card?.description})
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New Workflow</DialogTitle>
+          <DialogTitle>{mode === "create" ? "Create New Workflow" : "Update Workflow"}</DialogTitle>
           <DialogDescription>
-            Create a new workflow to start building your automation.
+            {mode === "create" ? "Create a new workflow to start building your automation." : "Update workflow information"}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={() => handleSubmit(onSubmit)}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name *</Label>
-              <Input id="name" placeholder="Enter workflow name" {...register("name")} />
+              <Input id="name" placeholder="Enter workflow name" {...register("name")}/>
               { errors.name && ( <p className="text-sm text-destructive">{errors.name.message}</p> ) }
             </div>
             <div className="space-y-2">
@@ -82,7 +65,11 @@ export const CreateWorkflowDialog = ({ open, onOpenChange, onSuccess }: CreateWo
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={isSubmitting}>{ isSubmitting ? "Creating..." : "Create Workflow" }</Button>
+            <Button type="submit" disabled={isSubmitting}>{
+                mode === "create" 
+                  ? isSubmitting ? "Creating..." : "Create Workflow" 
+                  : isSubmitting ? "Updating..." : "Update Workflow"
+            }</Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -29,7 +29,7 @@ export const WorkflowSidebar = () => {
   const { open, toggleSidebar } = useSidebar();
   const navigate = useNavigate();
   const { logout } = useAuth()
-  // style={{objectFit: "contain", width: "100px", border: "rounded"}}
+
   return (
     <Sidebar collapsible="icon" className="transition-all duration-200 ease-in-out border-r border-sidebar-border">
       <SidebarHeader>
@@ -70,8 +70,8 @@ export const WorkflowSidebar = () => {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup className=" h-full">
-          <SidebarGroupContent className=" h-full">
+        <SidebarGroup className=" h-full ">
+          <SidebarGroupContent className=" h-full ">
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
@@ -93,17 +93,20 @@ export const WorkflowSidebar = () => {
               ))}
               </SidebarMenu>
           </SidebarGroupContent>
-          <SidebarGroupContent>
+          <div className="border-b w-full border-sidebar-border"></div>
+          <SidebarGroupContent className="py-2">
             <SidebarMenu>
               <SidebarMenuItem key={"logout"}>
+                <SidebarMenuButton asChild>
                   <NavLink 
-                    className="flex justify-center w-full"
                     to={"/"}
+                    onClick={logout}
+                    className={"bg-destructive/50 text-sidebar-accent-foreground w-full"}
                   >
-                    <Button variant="destructive" className="rounded-lg w-10" size="icon" >
                       <LogOut />
-                    </Button>
+                      <span>Logout</span>
                   </NavLink>
+                </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </ SidebarGroupContent>
