@@ -1,8 +1,8 @@
-# Welcome to your Lovable project
+Node 48
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/427a01ba-7c3a-400a-b641-d3565a1ab733
+**URL**: [https://node48-frontend.vercel.app/](https://node48-frontend.vercel.app/)
 
 # NODE48 Frontend
 
