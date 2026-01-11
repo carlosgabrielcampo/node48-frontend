@@ -7,9 +7,9 @@ import { EnvStorageInterface } from "./EnvStorageTypes";
 const STORAGE_KEY_GLOBAL_ENVS = "global";
 const isProd = import.meta.env.PROD;
 
-export const envStorageService: EnvStorageInterface = isProd
-  ? new RemoteEnvStorage()
-  : new LocalEnvStorage();
+export const envStorageService: EnvStorageInterface = new LocalEnvStorage()
+  // ? new RemoteEnvStorage()
+  // : new LocalEnvStorage();
 
 export const envService = {
   get: async () => {

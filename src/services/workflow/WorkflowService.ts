@@ -4,7 +4,7 @@ import { RemoteWorkflowStorage } from "./RemoteWorkflowStorage";
 import { WorkflowStorageInterface } from "./WorkflowStorageTypes";
 const isProd = import.meta.env.PROD;
 
-
-export const workflowService: WorkflowStorageInterface = isProd
-  ? new RemoteWorkflowStorage()
-  : new LocalWorkflowStorage();
+console.log(import.meta.env)
+export const workflowService: WorkflowStorageInterface = new LocalWorkflowStorage()
+  // ? new RemoteWorkflowStorage()
+  // : new LocalWorkflowStorage();
