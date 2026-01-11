@@ -3,13 +3,13 @@ import { WorkflowInterface, WorkflowStorageInterface } from './WorkflowStorageTy
 
 export class RemoteWorkflowStorage implements WorkflowStorageInterface {
   async getAll(): Promise<WorkflowInterface[]> {
-    const res = await fetch("http://localhost:4014/v1/workflows");
+    const res = await fetch(`${process.env.origin}/v1/workflows`);
     return await res.json();
   }
 
   async getById(id: string): Promise<WorkflowInterface | null> {
     try {
-      const res = await fetch(`http://localhost:4014/v1/workflows/${id}`);
+      const res = await fetch(`${process.env.origin}/v1/workflows/${id}`);
       return await res.json();
     } catch {
       return null;
@@ -30,7 +30,7 @@ export class RemoteWorkflowStorage implements WorkflowStorageInterface {
 
   async save(workflow: WorkflowInterface): Promise<void> {
     const res = await fetch(
-      `http://localhost:4014/v1/workflows/${workflow.id}`,
+      `${process.env.origin}/v1/workflows/${workflow.id}`,
       {
         method: "PATCH",
         headers: {
@@ -46,7 +46,7 @@ export class RemoteWorkflowStorage implements WorkflowStorageInterface {
   }
 
   async delete(id: string): Promise<void> {
-    await fetch(`http://localhost:4014/v1/workflows/${id}`, {
+    await fetch(`${process.env.origin}/v1/workflows/${id}`, {
       method: "DELETE",
     });
   }

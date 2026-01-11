@@ -5,7 +5,7 @@ const toProfileMap = (envs: EnvProfile[]) => Object.fromEntries(envs.map(e => [e
 export class RemoteEnvStorage implements EnvStorageInterface {
     get = async (key?: string, defaultValue?: any): Promise<any> => {
       try {
-        const response = await (await fetch(`http://localhost:4014/v1/envs/profiles/${key || ""}`)).json();
+        const response = await (await fetch(`${process.env.origin}/v1/envs/profiles/${key || ""}`)).json();
         if (!response) return defaultValue;
         return response;
       
@@ -20,7 +20,7 @@ export class RemoteEnvStorage implements EnvStorageInterface {
         if(profiles) requestBody["profiles"] = toProfileMap(profiles) 
         if(active) requestBody["active"] = active
     
-        const response = await (await fetch(`http://localhost:4014/v1/envs/${id}`, {
+        const response = await (await fetch(`${process.env.origin}/v1/envs/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestBody),
@@ -40,7 +40,7 @@ export class RemoteEnvStorage implements EnvStorageInterface {
         if(profiles) requestBody["profiles"] = toProfileMap(profiles) 
         if(active) requestBody["active"] = [active]
     
-        const response = await (await fetch(`http://localhost:4014/v1/envs/profiles/${id}`, {
+        const response = await (await fetch(`${process.env.origin}/v1/envs/profiles/${id}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestBody),
