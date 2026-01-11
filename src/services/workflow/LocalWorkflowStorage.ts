@@ -6,15 +6,16 @@ import { WorkflowInterface, WorkflowStorageInterface } from './WorkflowStorageTy
 
 const readAll = (): WorkflowInterface[] => {
   const auth_token = localStorage.getItem(AUTH_TOKEN_KEY)
-  console.log(`${auth_token}:${STORAGE_KEY}`)
-
   const raw = localStorage.getItem(`${auth_token}:${STORAGE_KEY}`);
   return raw ? JSON.parse(raw) : [];
 };
 
 const writeAll = (workflows: WorkflowInterface[]) => {
   const auth_token = localStorage.getItem(AUTH_TOKEN_KEY)
-  console.log(`${auth_token}:${STORAGE_KEY}`)
+
+  console.log({writeAll: workflows})
+  console.log(`${auth_token}:${STORAGE_KEY}`,  JSON.stringify(workflows))
+  
   localStorage.setItem(`${auth_token}:${STORAGE_KEY}`, JSON.stringify(workflows));
 };
 
@@ -52,7 +53,6 @@ export class LocalWorkflowStorage implements WorkflowStorageInterface {
         ? { ...workflow, updatedAtUTC: new Date().toISOString() }
         : w
     );
-
     writeAll(all);
   }
 

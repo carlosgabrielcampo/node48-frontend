@@ -22,7 +22,6 @@ const getUsers = (key) => localStorage.getItem(key) ? JSON.parse(localStorage.ge
 
 const mockUsers = getUsers(AUTH_USER_KEY)
 
-console.log({mockUsers})
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -31,7 +30,6 @@ export const authService = {
     await delay(800);
 
     const stored = mockUsers[credentials.email];
-    const accessToken = stored.id
     
     if (!stored || stored.password !== credentials.password) {
       throw new Error("Invalid email or password");
@@ -39,10 +37,10 @@ export const authService = {
 
     const response: AuthResponse = {
       user: stored.user,
-      accessToken,
+      accessToken: stored.id,
     };
 
-    localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
+    localStorage.setItem(AUTH_TOKEN_KEY, stored.id);
 
     return response;
   },

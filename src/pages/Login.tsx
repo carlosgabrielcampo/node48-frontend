@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
+const AUTH_TOKEN_KEY = "node48_auth_token";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -27,6 +28,8 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
 
   const from = location.state?.from?.pathname || "/workflows";
+
+  useEffect(() => {localStorage.removeItem(AUTH_TOKEN_KEY)}, [])
 
   const {
     register,
