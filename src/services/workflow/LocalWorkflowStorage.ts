@@ -12,10 +12,6 @@ const readAll = (): WorkflowInterface[] => {
 
 const writeAll = (workflows: WorkflowInterface[]) => {
   const auth_token = localStorage.getItem(AUTH_TOKEN_KEY)
-
-  console.log({writeAll: workflows})
-  console.log(`${auth_token}:${STORAGE_KEY}`,  JSON.stringify(workflows))
-  
   localStorage.setItem(`${auth_token}:${STORAGE_KEY}`, JSON.stringify(workflows));
 };
 
