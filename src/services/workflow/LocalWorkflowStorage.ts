@@ -52,10 +52,9 @@ export class LocalWorkflowStorage implements WorkflowStorageInterface {
     const foundWorkflowData = allWorkflows.find(w => w.id === data.id) ?? null
     if(!foundWorkflowData) return null
     const all = allWorkflows.map((w) =>{
-      console.log(w.id === foundWorkflowData.id)
       return  w.id === foundWorkflowData.id ? { ...foundWorkflowData, ...data, updatedAtUTC: new Date().toISOString()} : w 
     })
-    writeAll(all);
+    return writeAll(all);
   }
 
   async save(workflow: WorkflowInterface): Promise<WorkflowInterface[]> {
@@ -68,7 +67,6 @@ export class LocalWorkflowStorage implements WorkflowStorageInterface {
   }
 
   async delete(id: string): Promise<WorkflowInterface[]> {
-    console.log({id})
     return writeAll(readAll().filter(w => w.id !== id));
   }
 }

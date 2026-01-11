@@ -53,7 +53,6 @@ export const CreateWorkflowDialog = ({ open, onOpenChange, isSubmitting, card, m
       reset();
       onOpenChange(false);
     } catch (error) {
-      console.log(error)
       toast({
         title: "Error",
         description: "Failed to create workflow. Please try again.",
@@ -75,7 +74,6 @@ export const CreateWorkflowDialog = ({ open, onOpenChange, isSubmitting, card, m
       reset();
       onOpenChange(false);
     } catch (error) {
-      console.log(error)
       toast({
         title: "Error",
         description: "Failed to update workflow. Please try again.",
