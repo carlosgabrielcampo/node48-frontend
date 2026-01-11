@@ -10,7 +10,8 @@ export interface WorkflowInterface {
 export interface WorkflowStorageInterface {
   getAll(): Promise<WorkflowInterface[]>;
   getById(id: string): Promise<WorkflowInterface | null>;
-  create(data: { name: string; description?: string }): Promise<WorkflowInterface>;
+  create(data: Partial<WorkflowInterface>): Promise<WorkflowInterface>;
   save(workflow: WorkflowInterface): Promise<WorkflowInterface[]>;
+  update(workflow: Partial<WorkflowInterface>): Promise<WorkflowInterface[]>;
   delete(id: string): Promise<void>;
 }

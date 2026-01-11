@@ -30,9 +30,10 @@ export interface FlowEditorProps {
 
 export interface CreateWorkflowDialogProps {
   open: boolean;
+  mode: "create" | "update";
   isSubmitting: boolean;
   card?: {name: string, description: string}
-  onSubmit: () => void
+  onSubmit: (onSubmit: () => void ) => void
   onOpenChange: (open: boolean) => void;
   onSuccess: (workflow: { name: string; description?: string }) => void;
 }

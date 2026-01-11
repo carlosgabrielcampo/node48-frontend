@@ -14,17 +14,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/useToast";
 import { CreateWorkflowDialogProps } from "@/types/workflows";
+import { useToast } from "@/hooks/useToast";
 
 const formSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  name: z.string().max(100, "Name must be less than 100 characters"),
   description: z.string().max(500, "Description must be less than 500 characters").optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-export const CreateWorkflowDialog = ({ open, onOpenChange, onSubmit, isSubmitting, card, mode }: CreateWorkflowDialogProps) => {
+export const CreateWorkflowDialog = ({ open, onOpenChange, isSubmitting, card, mode, setIsSubmitting, onSuccess }: CreateWorkflowDialogProps) => {
+  const { toast } = useToast();
   const {
     register,
     handleSubmit,
@@ -41,6 +42,51 @@ export const CreateWorkflowDialog = ({ open, onOpenChange, onSubmit, isSubmittin
   }
   setCardValues({name: card?.name, description: card?.description})
 
+  const onCreate = async (data: FormData) => {
+    try {
+      setIsSubmitting(true);
+      await onSuccess({ name: data.name, description: data.description });
+      toast({
+        title: "Workflow created",
+        description: "Your workflow has been created successfully.",
+      });
+      reset();
+      onOpenChange(false);
+    } catch (error) {
+      console.log(error)
+      toast({
+        title: "Error",
+        description: "Failed to create workflow. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onUpdate = async (data: FormData) => {
+    try {
+      setIsSubmitting(true);
+      await onSuccess({ name: data.name, description: data.description });
+      toast({
+        title: "Workflow created",
+        description: "Your workflow has been updated successfully.",
+      });
+      reset();
+      onOpenChange(false);
+    } catch (error) {
+      console.log(error)
+      toast({
+        title: "Error",
+        description: "Failed to update workflow. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onSubmit = mode === 'create' ? onCreate : onUpdate
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -50,7 +96,7 @@ export const CreateWorkflowDialog = ({ open, onOpenChange, onSubmit, isSubmittin
             {mode === "create" ? "Create a new workflow to start building your automation." : "Update workflow information"}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={() => handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name *</Label>

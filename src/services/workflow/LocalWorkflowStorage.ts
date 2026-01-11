@@ -13,6 +13,7 @@ const readAll = (): WorkflowInterface[] => {
 const writeAll = (workflows: WorkflowInterface[]) => {
   const auth_token = localStorage.getItem(AUTH_TOKEN_KEY)
   localStorage.setItem(`${auth_token}:${STORAGE_KEY}`, JSON.stringify(workflows));
+  return workflows
 };
 
 
@@ -25,16 +26,18 @@ export class LocalWorkflowStorage implements WorkflowStorageInterface {
     return readAll().find(w => w.id === id) ?? null;
   }
 
-  async create(data: { name: string; description?: string }): Promise<WorkflowInterface> {
+  async create(data): Promise<WorkflowInterface> {
     const now = new Date().toISOString();
 
     const workflow: WorkflowInterface = {
-      id: uuidv4(),
-      name: data.name,
-      description: data.description,
+      
+      name: '',
+      description: '',
+      steps: [],
+      ...data,
       createdAtUTC: now,
       updatedAtUTC: now,
-      steps: [],
+      id: uuidv4(),
     };
 
     const all = readAll();
@@ -43,17 +46,29 @@ export class LocalWorkflowStorage implements WorkflowStorageInterface {
     return workflow;
   }
 
+  async update(data: Partial<WorkflowInterface>): Promise<WorkflowInterface> {
+    if(!data.id) return null
+    const allWorkflows = readAll()
+    const foundWorkflowData = allWorkflows.find(w => w.id === data.id) ?? null
+    if(!foundWorkflowData) return null
+    const all = allWorkflows.map((w) =>{
+      console.log(w.id === foundWorkflowData.id)
+      return  w.id === foundWorkflowData.id ? { ...foundWorkflowData, ...data, updatedAtUTC: new Date().toISOString()} : w 
+    })
+    writeAll(all);
+  }
+
   async save(workflow: WorkflowInterface): Promise<WorkflowInterface[]> {
     const all = readAll().map(w =>
       w.id === workflow.id
         ? { ...workflow, updatedAtUTC: new Date().toISOString() }
         : w
     );
-    writeAll(all);
-    return all
+   return writeAll(all);
   }
 
-  async delete(id: string): Promise<void> {
-    writeAll(readAll().filter(w => w.id !== id));
+  async delete(id: string): Promise<WorkflowInterface[]> {
+    console.log({id})
+    return writeAll(readAll().filter(w => w.id !== id));
   }
 }

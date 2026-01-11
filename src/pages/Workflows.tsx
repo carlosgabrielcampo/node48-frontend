@@ -16,12 +16,25 @@ const WorkflowsPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [workflowDialog, setWorkflowDialog ] = useState({name: "", description: ""})
   const [mode, setMode] = useState("create")
-
   const { toast } = useToast();
 
   const { data: workflows = [], isLoading, refetch } = useQuery<Workflow[]>({
     queryKey: ["workflows"],
     queryFn: workflowService.getAll
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: workflowService.update,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workflows"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update workflow. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   const createMutation = useMutation({
@@ -39,10 +52,20 @@ const WorkflowsPage = () => {
     },
   });
 
-  const handleCreateWorkflow = async (data: { name: string; description?: string }) => {
-    await createMutation.mutateAsync(data);
-  };
-
+  const deleteMutation = useMutation({
+    mutationFn: workflowService.delete,
+    onSuccess: (newWorkflow: Workflow) => {
+      queryClient.invalidateQueries({ queryKey: ["workflows"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete workflow. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+  
   const handleRefresh = () => {
     refetch();
     toast({
@@ -51,47 +74,8 @@ const WorkflowsPage = () => {
     });
   };
 
-  const onCreate = async (data: FormData, reset: () => void ) => {
-    try {
-      setIsSubmitting(true);
-      await handleCreateWorkflow({ name: data.name, description: data.description });
-      toast({
-        title: "Workflow created",
-        description: "Your workflow has been created successfully.",
-      });
-      reset();
-      setDialogOpen(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create workflow. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const onUpdate = async (data: {name: string, description: string}, reset: () => void ) => {
-    console.log(data)
-    try {
-      setIsSubmitting(true);
-    //   await handleCreateWorkflow({ name: data.name, description: data.description });
-      toast({
-        title: "Workflow created",
-        description: "Your workflow has been created successfully.",
-      });
-      reset();
-      setDialogOpen(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create workflow. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleWorkflow = async (data: Partial<Workflow>) => {
+    return mode === "create" ? await createMutation.mutateAsync({...workflowDialog, ...data}) : await updateMutation.mutateAsync({...workflowDialog, ...data})
   };
 
   return (
@@ -132,7 +116,11 @@ const WorkflowsPage = () => {
                 <p className="text-muted-foreground mb-6">
                   Get started by creating your first workflow
                 </p>
-                <Button onClick={() => { setDialogOpen(true); setWorkflowDialog({name: "", description: ""}); setMode('create') }}>
+                <Button onClick={() => { 
+                  setDialogOpen(true); 
+                  setWorkflowDialog({name: "", description: ""}); 
+                  setMode('create')
+                }}>
                   <Plus className="h-4 w-4 mr-2" />
                   Create Your First Workflow
                 </Button>
@@ -145,8 +133,9 @@ const WorkflowsPage = () => {
                     workflow={workflow}
                     onClick={() => navigate(`/workflows/${workflow.id}`)}
                     setMode={setMode}
-                    setWorkflowDialog={() => setWorkflowDialog(workflow)}
+                    setWorkflowDialog={setWorkflowDialog}
                     setDialogOpen={() => setDialogOpen(true)}
+                    deleteWorkflow={deleteMutation.mutateAsync}
                   />
                 ))}
               </div>
@@ -156,9 +145,10 @@ const WorkflowsPage = () => {
             open={createDialogOpen}
             onOpenChange={setDialogOpen}
             mode={mode}
-            onSubmit={mode === 'create' ? onCreate : onUpdate}
             isSubmitting={isSubmitting}
-            card={workflowDialog}            
+            setIsSubmitting={setIsSubmitting}
+            card={workflowDialog}
+            onSuccess={handleWorkflow}
           />
         </div>
       </main>

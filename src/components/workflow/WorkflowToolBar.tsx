@@ -48,7 +48,6 @@ export const WorkflowToolBar = ({
   const onSave = async () => {
     const workflowJSON = getWorkflowJSON();
     const savedWorkflow = await workflowService.save(workflowJSON)
-    console.log(savedWorkflow)
     if(!savedWorkflow?.length && savedWorkflow?.status !== 200) throw Error("failed to save")
   }
 
