@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
+const AUTH_TOKEN_KEY = "node48_auth_token";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -27,6 +28,8 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
 
   const from = location.state?.from?.pathname || "/workflows";
+
+  useEffect(() => {localStorage.removeItem(AUTH_TOKEN_KEY)}, [])
 
   const {
     register,
@@ -47,8 +50,6 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
-    // For demo, simulate Google login
-    toast.info("Google OAuth would redirect to backend in production");
     loginWithGoogle();
   };
 
@@ -177,17 +178,17 @@ export default function Login() {
           </form>
 
           {/* Divider */}
-          <div className="relative my-6">
+          {/* <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-700"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-slate-900 px-2 text-slate-500">Or continue with</span>
             </div>
-          </div>
+          </div> */}
 
           {/* Google Login */}
-          <Button
+          {/* <Button
             type="button"
             variant="outline"
             className="w-full border-slate-700 bg-slate-800/50 hover:bg-slate-800 text-white"
@@ -213,7 +214,7 @@ export default function Login() {
               />
             </svg>
             Continue with Google
-          </Button>
+          </Button> */}
 
           {/* Register Link */}
           <p className="mt-6 text-center text-sm text-slate-400">

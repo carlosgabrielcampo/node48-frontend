@@ -1,4 +1,4 @@
-import { LayoutDashboard, User, FileText, ChevronLeft, ChevronRight, Workflow, Settings, PanelLeft } from "lucide-react";
+import { LayoutDashboard, Workflow, Settings, PanelLeft, LogOut } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   Sidebar,
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/favicon.ico";
+import { useAuth } from "@/contexts/AuthContext";
 
 
 const navItems = [
@@ -27,6 +28,7 @@ const navItems = [
 export const WorkflowSidebar = () => {
   const { open, toggleSidebar } = useSidebar();
   const navigate = useNavigate();
+  const { logout } = useAuth()
   // style={{objectFit: "contain", width: "100px", border: "rounded"}}
   return (
     <Sidebar collapsible="icon" className="transition-all duration-200 ease-in-out border-r border-sidebar-border">
@@ -45,10 +47,11 @@ export const WorkflowSidebar = () => {
                   <img src={logo} className="h-8 w-8 p-1" />
                 </Button>
                 <Button
+                  size="icon"
                   onClick={toggleSidebar}
                   className={`transition-all duration-700 ease-in-out transition-transform bg-sidebar-background  hover:bg-primary/20 ${!open ? "opacity-0 scale-105" : "opacity-100 scale-100"}`}
                 >
-                  <PanelLeft className="absolute w-10"/>
+                  <PanelLeft />
                 </Button>
               </div>
             : 
@@ -66,10 +69,9 @@ export const WorkflowSidebar = () => {
           }
         </div>
       </SidebarHeader>
-      <SidebarContent className="relative">
-        <SidebarGroup>
-          
-          <SidebarGroupContent>
+      <SidebarContent>
+        <SidebarGroup className=" h-full">
+          <SidebarGroupContent className=" h-full">
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
@@ -89,11 +91,23 @@ export const WorkflowSidebar = () => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-            </SidebarMenu>
+              </SidebarMenu>
           </SidebarGroupContent>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem key={"logout"}>
+                  <NavLink 
+                    className="flex justify-center w-full"
+                    to={"/"}
+                  >
+                    <Button variant="destructive" className="rounded-lg w-10" size="icon" >
+                      <LogOut />
+                    </Button>
+                  </NavLink>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </ SidebarGroupContent>
         </SidebarGroup>
-        
-        {/* Centered Toggle Button */}
       </SidebarContent>
     </Sidebar>
   );

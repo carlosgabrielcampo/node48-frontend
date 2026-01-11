@@ -1,17 +1,16 @@
+import { toast } from "sonner";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Save, Play, Download, Plus, Upload, Settings2, CircleAlert } from "lucide-react";
-import { toast } from "sonner";
-import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
 import { MarkerType, Edge, Node } from "reactflow";
-import { WorkflowData } from "@/types/panels";
+import { WorkflowData } from "@/types/configPanels";
 import { WorkflowToolBarProps } from "@/types/workflows";
 import { createNode } from "../nodes/NodeDataStructure";
 import { exportToWorkflowJSON } from "@/lib/workflowExporter";
-import { workflowService } from "@/services/workflowService";
+import { workflowService } from "@/services/workflow/workflowService";
 import { WorkflowEnvModal } from "@/components/env/WorkflowEnvModal";
+import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
+import { Save, Play, Download, Plus, Upload, Settings2, CircleAlert } from "lucide-react";
 export const WorkflowToolBar = ({
   setIsActive,
   isActive,
@@ -37,7 +36,7 @@ export const WorkflowToolBar = ({
     workflow.id,
     workflow.name,
     workflow.description,
-    workflow.createdAtUTC
+    workflow.createdAtUTC,
   );
 
   const onAddNode = useCallback(() => { 
@@ -45,9 +44,10 @@ export const WorkflowToolBar = ({
   }, []);
 
   const onSave = async () => {
-    const workflowJSON = getWorkflowJSON();    
-    const savedWorkflow = await workflowService.saveWorkflow(workflowJSON)
-    if(savedWorkflow.status !== 200) throw Error("failed to save")
+    const workflowJSON = getWorkflowJSON();
+    console.log({workflowJSON})
+    const savedWorkflow = await workflowService.save(workflowJSON)
+    if(savedWorkflow?.status !== 200) throw Error("failed to save")
   }
   const handleSave = async () => {
     setIsSaving(true);
@@ -63,11 +63,11 @@ export const WorkflowToolBar = ({
     }
   }
   const onRun = async () => {
-    // Simulating API call - replace with actual endpoint
+    toast.success("Running...");
     await new Promise((resolve) => setTimeout(resolve, 10000));
+    toast.success("Running...");
   };
   const onToggleActive = async (active: boolean) => {
-    // Simulating API call - replace with actual endpoint
     await new Promise((resolve) => setTimeout(resolve, 300));
     setIsActive(active);
   };
@@ -117,14 +117,12 @@ export const WorkflowToolBar = ({
       reader.onload = (e) => {
         try {
           const jsonData = JSON.parse(e.target?.result as string);
-          // Check if it's the new workflow JSON format
           if (isWorkflowJSON(jsonData)) {
             const { nodes: parsedNodes, edges: parsedEdges } = parseWorkflowJSON(jsonData, handleDeleteNode, handleNodeClick);
             setNodes(parsedNodes);
             setEdges(parsedEdges);
             toast.success(`Workflow "${jsonData.name}" imported with ${parsedNodes.length} nodes`);
           } else {
-            // Legacy format
             const workflowData: WorkflowData = jsonData;
             const importedNodes: Node[] = workflowData.nodes.map((node) => ( 
               createNode({id: node.id, position: node.data.position || {x: 0, y: 0}, connections: node.data.connections, type: node.data.type, onDelete: handleDeleteNode, onClick: handleNodeClick})
@@ -189,7 +187,6 @@ export const WorkflowToolBar = ({
         </div>
       </div>
       
-      {/* Workflow Environment Modal */}
       <WorkflowEnvModal open={envModalOpen} onOpenChange={setEnvModalOpen} workflowId={workflow.id} />
     </div>
   );

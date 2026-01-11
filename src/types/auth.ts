@@ -1,5 +1,5 @@
+import { UUID } from "node:crypto";
 export interface User {
-  id: string;
   email: string;
   name: string;
   avatar?: string;
@@ -7,6 +7,7 @@ export interface User {
 }
 
 export interface AuthResponse {
+  id: UUID;
   user: User;
   accessToken: string;
   refreshToken?: string;

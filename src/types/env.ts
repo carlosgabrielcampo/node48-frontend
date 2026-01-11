@@ -3,7 +3,6 @@ export type UUID = string;
 export interface EnvValues { 
   [key: string]: string;
 }
-
 export interface EnvProfile {
   id: UUID;
   name: string;

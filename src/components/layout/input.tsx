@@ -77,12 +77,12 @@ export const LabeledArrayInput = ({label, arrayValue, onChange, placeholder, cla
     )
 }
 
-const objectFromArray = (array) => { return Object.fromEntries(array.map((e) => [e.key, e.value])) }
+const objectFromArray = (array) => { return array?.length ? Object.fromEntries(array.map((e) => [e.key, e.value])) : {} }
 
 export const KeyValueInput = ({bind, value, commit, type }) => {
     const [inputValue, setValue] = useState([])
     const [newDraft, setNewDraft] = useState({key: "", value: ""})
-    const [unmaskedKeys, setUnmaskedKeys] = useState<Set<string>>(new Set(Object.keys(value)));
+    const [unmaskedKeys, setUnmaskedKeys] = useState<Set<string>>(value ? new Set(Object.keys(value)) : []);
     const keyvalues = value ? [...Object.entries(value ?? {}).map(([key, value]) => ({ id: uuid(), key, value }))]: []
     useEffect(() => setValue(keyvalues), [keyvalues.length])
     const keyRef = useRef<HTMLInputElement | null>(null);
@@ -130,9 +130,9 @@ export const KeyValueInput = ({bind, value, commit, type }) => {
                 value={newDraft.key}
                 onChange={e => setNewDraft({ ...newDraft, key: e.target.value })}
                 onKeyDown={e => {
-                    if(e.key === "Enter"){
-                        if(!newDraft.value) valueRef.current?.focus()
-                        if(newDraft.value) commitDraft()
+                    if(e?.key === "Enter"){
+                        if(!newDraft.value) valueRef?.current?.focus()
+                        if(newDraft?.value) commitDraft()
                     }
                 }}
                 placeholder="Key"
