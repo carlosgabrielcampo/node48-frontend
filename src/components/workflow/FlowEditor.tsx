@@ -151,7 +151,7 @@ export const FlowEditor = ({
       setNodes([]);
       setEdges([]);
     }
-  },[])
+  },[handleDeleteNode, handleNodeClick, workflow, setEdges, setNodes])
 
   const hideMinimap = () => {
     timerRef.current = window.setTimeout(() => {

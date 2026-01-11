@@ -32,14 +32,16 @@ export const WorkflowToolBar = ({
   const [isToggling, setIsToggling] = useState(false);
   const [envModalOpen, setEnvModalOpen] = useState(false);
 
-  const getWorkflowJSON = () => exportToWorkflowJSON(
-    nodes,
-    edges,
-    workflow.id,
-    workflow.name,
-    workflow.description,
-    workflow.createdAtUTC,
-  );
+  const getWorkflowJSON =  useCallback(() =>
+    exportToWorkflowJSON(
+      nodes,
+      edges,
+      workflow.id,
+      workflow.name,
+      workflow.description,
+      workflow.createdAtUTC,
+    ), 
+  [workflow.id, nodes.length, edges.length]);
 
   const onAddNode = useCallback(() => { 
     setIsDrawerOpen(true); 
