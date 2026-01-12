@@ -40,7 +40,6 @@ export const WorkflowEnvModal = ({
     createProjectEnv,
     updateProjectEnv,
     deleteWorkflowEnv,
-    activeProjectEnvId,
     setWorkflowActiveEnv,
     removeWorkflowActiveEnv,
   } = useEnv();
@@ -51,17 +50,17 @@ export const WorkflowEnvModal = ({
   const [editingProfile, setEditingProfile] = useState<EnvProfile | null>(null);
   const [localValues, setLocalValues] = useState<EnvValues>({});
   const [isDirty, setIsDirty] = useState(false);
+  const [newProfileName, setNewProfileName] = useState("");
+
   const [showConfirmDiscard, setShowConfirmDiscard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-  const [newProfileName, setNewProfileName] = useState("");
-  const [maskedKeys, setMaskedKeys] = useState<Set<string>>(new Set());
   
-  const getActiveEnv = async( ) =>{
+  const getActiveEnv = async() => {
     const activeArray = await getActiveEnvs({id: workflowId})
-    if(activeArray?.length){
-      activeArray.map((e) => e.scope === "global" ? setActiveGlobal({...e}) : setActiveLocal({...e}) )
-    }
-    loadWorkflowEnvs(workflowId)
+    if(activeArray?.length) activeArray.map((e) => e.scope === "global" 
+      ? setActiveGlobal({...e}) 
+      : setActiveLocal({...e}) 
+    )
   }
 
   useEffect(() => {
@@ -73,7 +72,6 @@ export const WorkflowEnvModal = ({
   useEffect(() => {
     if (editingProfile) {
       setLocalValues({ ...editingProfile.values });
-      setMaskedKeys(new Set(Object.keys(editingProfile.values)));
       setIsDirty(false);
     }
   }, [editingProfile?.id]);
@@ -112,6 +110,7 @@ export const WorkflowEnvModal = ({
     if (!editingProfile || !workflowId) return;
     try {
       await updateProjectEnv(workflowId, editingProfile.name, {...editingProfile, values: localValues})
+      await getActiveEnv()
       loadWorkflowEnvs(workflowId); 
       setIsDirty(false);
       toast.success("Environment saved");
@@ -124,18 +123,6 @@ export const WorkflowEnvModal = ({
     await handleSave();
     onOpenChange(false);
   };
-
-  // const handleDiscard = () => {
-  //   if (editingProfile) {
-  //     setLocalValues({ ...editingProfile.values });
-  //   }
-  //   setIsDirty(false);
-  //   setShowConfirmDiscard(false);
-  //   if (pendingAction) {
-  //     pendingAction();
-  //     setPendingAction(null);
-  //   }
-  // };
 
   const handleCreateProfile = async () => {
     if (!newProfileName.trim() || !workflowId) return;
@@ -165,10 +152,31 @@ export const WorkflowEnvModal = ({
     }
   };
 
+  const removeActiveEnv = async (profileId) => {
+    if (!workflowId || !profileId.id) return;
+    try {
+      await removeWorkflowActiveEnv(workflowId, profileId.id)
+      if(profileId.scope === "global") setActiveGlobal({}) 
+      else setActiveLocal({})
+      toast.success("Active environment profile removed");
+    } catch (error) {
+      toast.error("Failed to remove active profile");
+    }
+  }
+
+  // const handleDiscard = () => {
+  //   if (editingProfile) {
+  //     setLocalValues({ ...editingProfile.values });
+  //   }
+  //   setIsDirty(false);
+  //   setShowConfirmDiscard(false);
+  //   if (pendingAction) {
+  //     pendingAction();
+  //     setPendingAction(null);
+  //   }
+  // };
+
   const workflowProfiles = workflowEnvs?.profiles || {};
-  // const selectedProfile = selectedEnvId && workflowEnvs?.envProfiles 
-  //   ? workflowEnvs.envProfiles.find(p => p.id === selectedEnvId) 
-  //   : null;
 
   const WorkflowLabeledCard = ({ label, profile, envId }: { label: string; profile: EnvProfile | null; envId: string }) => (
     <div className="space-y-2">
@@ -185,7 +193,7 @@ export const WorkflowEnvModal = ({
           </p>  
         </div>
         {profile && (
-          <Button variant="outline" onClick={() => removeWorkflowActiveEnv(envId, profile.name)}>
+          <Button variant="outline" onClick={() => removeActiveEnv(profile)}>
             <X className="h-4 w-4" />
           </Button>
         )}
@@ -193,7 +201,6 @@ export const WorkflowEnvModal = ({
     </div>
   );
 
-  console.log({activeGlobal})
   const dropdownOptions = globalEnvs.profiles 
     ? Object.entries(globalEnvs.profiles).map(([name, env]) => ({ 
         itemProperties: { value: env.name }, 
@@ -205,7 +212,7 @@ export const WorkflowEnvModal = ({
     <DialogLayout 
       open={open} 
       handleClose={handleClose} 
-      classes={{contentClass: "max-w-4xl max-h-[85vh] flex flex-col"}}
+      classes={{contentClass: "max-w-4xl min-h-[65vh] max-h-[85vh] flex flex-col"}}
       dialogTitle={
         <div className="flex items-center gap-2">
           <Workflow className="h-5 w-5" />
@@ -252,7 +259,7 @@ export const WorkflowEnvModal = ({
           {
             value: "profiles",
             trigger: "Workflow Profiles",
-            class: "flex-1 flex flex-col min-h-full mt-4",
+            class: "flex-1 flex flex-col h-full mt-4",
             content: (
               <>
                 <div className="flex gap-2 mb-4">
@@ -278,7 +285,7 @@ export const WorkflowEnvModal = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="flex gap-4 flex-1 min-h-full">
+                  <div className="flex gap-4 flex-1 h-full ">
                     <div className="w-48 space-y-2">
                       <Label className="text-xs text-muted-foreground">Profiles</Label>
                       <ScrollArea className="h-full overflow-hidden">
@@ -289,7 +296,6 @@ export const WorkflowEnvModal = ({
                               className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${
                                 editingProfile?.id === profile.id ? "bg-primary/10 border border-primary/30" : "hover:bg-muted"
                               }`}
-                              
                               onClick={() => {
                                 setLocalValues(profile.values)
                                 setEditingProfile(profile)

@@ -40,4 +40,8 @@ export interface EnvStorageInterface {
     envId: UUID | null, 
     type: "workflow" | "global"
   ): Promise<void>;
+  removeActive(
+    id: UUID, 
+    envId: UUID | null, 
+  ): Promise<void>;
 }

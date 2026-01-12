@@ -89,7 +89,7 @@ export class LocalEnvStorage implements EnvStorageInterface {
     removeActive = async(id, envId) => {
         const current = await this.get({[id]: { profiles: {}, active: [] }});
         const workEnv = current[id];
-        workEnv.active = [...workEnv.active.filter((e) => e.name !== envId)]
+        workEnv.active = [...workEnv.active.filter((e) => e.id !== envId)]
         current[id] = workEnv
         localSet(current)
     }

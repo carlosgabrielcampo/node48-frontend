@@ -40,6 +40,9 @@ export const envService = {
   setActiveEnv: async ({id, envId, type}: {id: string; envId: string | null; type: "global" | "workflow"}): Promise<void> => {
     return await envStorageService.setActive(id, envId, type)
   },
+  removeActiveEnv: async({id, envId}: {id: string; envId: string | null}): Promise<void> => {
+    return await envStorageService.removeActive(id, envId)
+  },
   export: async (): Promise<string> => {
     const envs = await envService.getById({id: STORAGE_KEY_GLOBAL_ENVS});
     return JSON.stringify(envs.profiles, null, 2);

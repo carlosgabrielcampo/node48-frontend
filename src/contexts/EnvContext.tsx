@@ -14,8 +14,6 @@ interface EnvContextType {
   globalEnvs: GlobalEnvsData;
   setGlobalEnvs: React.Dispatch<React.SetStateAction<GlobalEnvsData>>;
   loadingProjectEnvs: boolean;
-  activeProjectEnv: UUID | null;
-  setActiveProjectEnv: (id: UUID | null) => void;
   createProjectEnv: ({id, profiles, active}) => Promise<void>;
   updateProjectEnv: (id: UUID, updates: Partial<EnvProfile>) => Promise<void>;
   deleteProjectEnv: (id: UUID) => Promise<void>;
@@ -41,7 +39,6 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   const [globalEnvs, setGlobalEnvs] = useState<GlobalEnvsData>({ profiles: {}, active: [] });
   const [workflowEnvs, setWorkflowEnvs] = useState<workflowEnvsdata | null>(null);
   const [loadingProjectEnvs, setLoadingProjectEnvs] = useState(true);
-  const [activeProjectEnv, setActiveProject] = useState<UUID | null>(null);
 
   const refreshProjectEnvs = useCallback(async ({id}) => {
     setLoadingProjectEnvs(true);
@@ -94,13 +91,13 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
     toast.success("Environment deleted");
   }, [loadWorkflowEnvs]);
 
-  const removeWorkflowActiveEnv = useCallback((id: UUID, envId: UUID | null) => {
-  }, [workflowEnvs, globalEnvs]);
+  const removeWorkflowActiveEnv = useCallback(async (workflowId: UUID, envId: UUID | null) => {
+    return await envService.removeActiveEnv({id: workflowId, envId});
+  }, []);
 
   const setWorkflowActiveEnv = useCallback(async (id: UUID, envId: UUID | null, type: "workflow" | "global") => {
-     const active = await envService.setActiveEnv({id, envId, type});
-     return active
-  }, [loadWorkflowEnvs]);
+     return await envService.setActiveEnv({id, envId, type});
+  }, []);
 
   const exportEnvs = useCallback(async () => {
     return JSON.stringify(globalEnvs.profiles, null, 2);
@@ -124,7 +121,6 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
         projectEnvs,
         setGlobalEnvs,
         getActiveEnvs,
-        activeProjectEnv,
         loadWorkflowEnvs,
         createProjectEnv,
         updateProjectEnv,
