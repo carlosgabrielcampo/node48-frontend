@@ -23,7 +23,6 @@ export const envService = {
     return (await envService.getById({id}))["profiles"];
   },
   getActive: async ({id}: {id: string}) => {
-    console.log("active", (await envService.getById({id})))
     return (await envService.getById({id}))?.["active"];
   },
   create: async ({id, profiles, active}: {id: string; profiles: any; active: any[]}): Promise<void> => {

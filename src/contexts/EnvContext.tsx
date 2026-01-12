@@ -58,7 +58,6 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {refreshProjectEnvs({id: "global"});}, [refreshProjectEnvs]);
 
   const getActiveEnvs = useCallback( async ({id}) => {
-    console.log({id})
     return await envService.getActive({id})
   }, [])
 
@@ -99,10 +98,9 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   }, [workflowEnvs, globalEnvs]);
 
   const setWorkflowActiveEnv = useCallback(async (id: UUID, envId: UUID | null, type: "workflow" | "global") => {
-    await envService.setActiveEnv({id, envId, type});
-    await loadWorkflowEnvs(id);
-    toast.success("Workflow environment switched");
-  }, []);
+     const active = await envService.setActiveEnv({id, envId, type});
+     return active
+  }, [loadWorkflowEnvs]);
 
   const exportEnvs = useCallback(async () => {
     return JSON.stringify(globalEnvs.profiles, null, 2);

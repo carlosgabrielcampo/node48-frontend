@@ -63,12 +63,12 @@ export class LocalEnvStorage implements EnvStorageInterface {
     setActive = async (id, envId, type) => {
         const current = await this.get({[id]: { profiles: {}, active: [] }});
         let workEnv = current[id];
+        let profileFound = {}
         if(!workEnv && type === "global"){
             current[id] = { profiles: {}, active: [] }
             workEnv = { profiles: {}, active: [] }
         }
         if(workEnv){
-            let profileFound = {}
             if(type === "workflow"){
                 profileFound = workEnv.profiles[envId]
                 profileFound.scope = type
@@ -80,12 +80,11 @@ export class LocalEnvStorage implements EnvStorageInterface {
                     profileFound.scope = type
                 }
             }
-            console.log({profileFound})
             workEnv.active = [...workEnv.active.filter((e) => e.scope !== type), profileFound]
             current[id] = workEnv
             localSet(current)
         } 
-        return current
+        return profileFound
     }
     removeActive = async(id, envId) => {
         const current = await this.get({[id]: { profiles: {}, active: [] }});
