@@ -89,12 +89,13 @@ const objectFromArray = (array: ObjectRow[]) => {
 }
 
 export const KeyValueInput = ({bind, value, commit, type }: { bind: string; value: any; commit: (bind: string, value: any) => void; type?: string }) => {
+    
     const [inputValue, setValue] = useState<ObjectRow[]>([])
     const [newDraft, setNewDraft] = useState({key: "", value: ""})
     const [unmaskedKeys, setUnmaskedKeys] = useState<Set<string>>(new Set(value ? Object.keys(value) : []));
     const keyvalues: ObjectRow[] = value ? [...Object.entries(value ?? {}).map(([key, val]) => ({ id: uuid(), key, value: val as string }))]: []
     
-    useEffect(() => setValue(keyvalues), [Object.keys(value || {}).length])
+    useEffect(() => setValue(keyvalues), [JSON.stringify(value)])
     
     const keyRef = useRef<HTMLInputElement | null>(null);
     const valueRef = useRef<HTMLInputElement | null>(null);

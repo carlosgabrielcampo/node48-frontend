@@ -29,13 +29,12 @@ export const envService = {
     return await envStorageService.save({id, profiles, active});
   },
   updateProfiles: async ({id, profileName, updates}: {id: string; profileName: string; updates: any}): Promise<any> => {
-    return await envStorageService.update({id, profiles: {[profileName]: {values: updates}}})
+    return await envStorageService.update({id, profiles: {[profileName]: updates}})
   },
   deleteProfile: async (env, profileName): Promise<void> => {
     return await envStorageService.deleteProfile(env, profileName)
   },
   setDefault: async ({env, profileName}): Promise<void> => {
-    console.log(env, profileName)
     return await envStorageService.setDefault(env, profileName)
     // Implementation depends on storage backend
   },

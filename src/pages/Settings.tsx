@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { KeyValueInput } from "@/components/layout/input";
+import { v4 as uuid } from "uuid";
 import { EnvProfile } from "@/types/env";
 
 export default function Settings() {
@@ -31,10 +32,11 @@ export default function Settings() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCreateEnv = async (id: string) => {
-    if (!newEnvName.trim()) return;
-    const profileObj = {values: {}}
+    if (!newEnvName.trim()) return
+    const profileName = newEnvName.trim()
+    const profileObj = {values: {}, id: uuid(), name: profileName}
     if(!Object.values(globalEnvs.profiles).length) profileObj.isDefault = true
-    await createProjectEnv({id, profiles: {[newEnvName.trim()]: profileObj}, active: [] });
+    await createProjectEnv({id, profiles: {[profileName]: profileObj}, active: [] });
     setNewEnvName("");
     setNewEnvDialogOpen(false);
   };
@@ -137,19 +139,19 @@ export default function Settings() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                { globalEnvs?.profiles && Object.entries(globalEnvs.profiles)?.map(([env, profile], i) => 
-                  <Card key={env} className="p-4">
+                { globalEnvs?.profiles && Object.values(globalEnvs.profiles)?.map((profile, i) => 
+                  <Card key={profile.name} className="p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{env}</span>
+                        <span className="font-medium">{profile.name}</span>
                         {profile.isDefault && <Badge>Default</Badge>}
                       </div>
                       <div className="flex gap-2">
-                        {!profile.isDefault && <Button variant="outline" size="sm" onClick={() => setProjectDefault("global", env)}><Star className="h-4 w-4" /></Button>}
-                        <Button variant="destructive" size="sm" onClick={() => deleteProjectProfile("global", env)}><Trash2 className="h-4 w-4" /></Button>
+                        {!profile.isDefault && <Button variant="outline" size="sm" onClick={() => setProjectDefault("global", profile.name)}><Star className="h-4 w-4" /></Button>}
+                        <Button variant="destructive" size="sm" onClick={() => deleteProjectProfile("global", profile.name)}><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </div>
-                      <KeyValueInput bind="" value={profile.values} commit={(bind, values) => handleValuesUpdate(env, values)} type="masked" /> 
+                      <KeyValueInput bind="" value={profile.values} commit={(bind, values) => handleValuesUpdate(profile.name, {...profile, values})} type="masked" /> 
                   </Card>
                 )}
               </CardContent>

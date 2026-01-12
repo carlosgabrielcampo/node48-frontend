@@ -90,7 +90,6 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const deleteProjectProfile = useCallback(async (env, profile: UUID) => {
-    console.log(env, profile)
     await envService.deleteProfile(env, profile);
     await refreshProjectEnvs({id: env});
     toast.success("Environment deleted");
@@ -104,23 +103,19 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
 
   // Workflow envs
   const loadWorkflowEnvs = useCallback(async (workflowId: UUID) => {
-    const meta = await envService.getById({id: workflowId});
-    setWorkflowEnvs({
-      workflowId,
-      envProfiles: meta?.profiles ? Object.values(meta.profiles) : [],
-      activeEnvId: meta?.active?.[0]?.id ?? null,
-    });
+    const envs = await envService.getById({id: workflowId});
+    setWorkflowEnvs(envs);
   }, []);
 
   const createWorkflowEnv = useCallback(async (workflowId: UUID, data: Omit<EnvProfile, "id" | "scope" | "workflowId" | "createdAtUTC">) => {
-    await envService.create({id: workflowId, profiles: [data as any], active: []});
-    await loadWorkflowEnvs(workflowId);
+    // await envService.create({id: workflowId, profiles: [data as any], active: []});
+    // await loadWorkflowEnvs(workflowId);
   }, [loadWorkflowEnvs]);
 
   const updateWorkflowEnv = useCallback(async (workflowId: UUID, envId: UUID, updates: Partial<EnvProfile>) => {
-    await envService.updateProfiles({id: workflowId, profileName: envId, updates});
-    await loadWorkflowEnvs(workflowId);
-    toast.success("Environment updated");
+    // await envService.updateProfiles({id: workflowId, profileName: envId, updates});
+    // await loadWorkflowEnvs(workflowId);
+    // toast.success("Environment updated");
   }, [loadWorkflowEnvs]);
 
   const deleteWorkflowEnv = useCallback(async (workflowId: UUID, envId: UUID) => {

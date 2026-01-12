@@ -52,6 +52,5 @@ export class RemoteEnvStorage implements EnvStorageInterface {
       }
     }
     deleteProfile = async(env, profileName) => {
-      console.log({env, profileName})
     }
 }

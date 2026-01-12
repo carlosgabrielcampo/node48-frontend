@@ -1,17 +1,17 @@
 import { EnvProfile, EnvStorageInterface } from "./EnvStorageTypes";
 
 
-const buildKey = (id: string) => {
+const buildKey = () => {
     const AUTH_TOKEN_KEY = "node48_auth_token";
     const auth_token = localStorage.getItem(AUTH_TOKEN_KEY)
-    if(auth_token) return `${auth_token}:env:${id}` 
+    if(auth_token) return `${auth_token}:env` 
     else return null
 };
 
 export class LocalEnvStorage implements EnvStorageInterface {
     async get(key?: string, defaultValue?: any): Promise<any> {
         try {
-            const raw = localStorage.getItem(buildKey(key || ""));
+            const raw = localStorage.getItem(buildKey());
             return raw ? JSON.parse(raw) : defaultValue;
         } catch (err) {
             console.error(err)
@@ -25,9 +25,9 @@ export class LocalEnvStorage implements EnvStorageInterface {
             profiles: profiles
                 ? { ...current?.[id]?.profiles, ...profiles }
                 : current.profiles,
-            active: active ?? current[id].active,
+            active: active ? active : current?.[id]?.active ?? [] ,
         }
-        localStorage.setItem(buildKey(id || ""), JSON.stringify(current));
+        localStorage.setItem(buildKey(), JSON.stringify(current));
         return current
     }
 
@@ -38,7 +38,7 @@ export class LocalEnvStorage implements EnvStorageInterface {
         const current = await this.get(id, {[id]: { profiles: {}, active: [] }});
         if(current?.[id]?.profiles?.[profileName]){
             delete current?.[id]?.profiles?.[profileName]
-            localStorage.setItem(buildKey(id || ""), JSON.stringify(current));
+            localStorage.setItem(buildKey(), JSON.stringify(current));
         }
         return current
     }
@@ -52,7 +52,7 @@ export class LocalEnvStorage implements EnvStorageInterface {
                     ? envProfile[env].isDefault = false
                     : envProfile[env].isDefault = true
                 )
-            localStorage.setItem(buildKey(id || ""), JSON.stringify(current));
+            localStorage.setItem(buildKey(), JSON.stringify(current));
         }
         return current
     }

@@ -19,6 +19,7 @@ import { KeyValueInput } from "../layout/input";
 import { DialogLayout } from "../layout/dialog";
 import { TabLayout } from "../layout/tabs";
 import { LabeledDropdown } from "../layout/dropdown";
+import { v4 as uuid } from "uuid";
 
 interface WorkflowEnvModalProps {
   open: boolean;
@@ -35,8 +36,8 @@ export const WorkflowEnvModal = ({
     globalEnvs,
     workflowEnvs,
     loadWorkflowEnvs,
-    createWorkflowEnv,
-    updateWorkflowEnv,
+    createProjectEnv,
+    updateProjectEnv,
     deleteWorkflowEnv,
     activeGlobalEnvId,
     setGlobalActiveEnv,
@@ -46,7 +47,7 @@ export const WorkflowEnvModal = ({
   } = useEnv();
 
   const [selectedEnvId, setSelectedEnvId] = useState<string | null>(null);
-  const [globalEnvId, setGlobalEnvId] = useState<string | null>(null);
+  const [globalEnv, setGlobalEnv] = useState<any>(null);
   const [editingProfile, setEditingProfile] = useState<EnvProfile | null>(null);
   const [localValues, setLocalValues] = useState<EnvValues>({});
   const [isDirty, setIsDirty] = useState(false);
@@ -54,11 +55,10 @@ export const WorkflowEnvModal = ({
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const [newProfileName, setNewProfileName] = useState("");
   const [maskedKeys, setMaskedKeys] = useState<Set<string>>(new Set());
+  
 
   useEffect(() => {
-    if (open && workflowId) {
-      loadWorkflowEnvs(workflowId);      
-    }
+    if (open && workflowId) loadWorkflowEnvs(workflowId);      
   }, [open, workflowId, loadWorkflowEnvs]);
 
   useEffect(() => {
@@ -68,12 +68,13 @@ export const WorkflowEnvModal = ({
   }, [workflowEnvs, activeProjectEnvId]);
 
   useEffect(() => {
+    console.log(editingProfile)
     if (editingProfile) {
       setLocalValues({ ...editingProfile.values });
       setMaskedKeys(new Set(Object.keys(editingProfile.values)));
       setIsDirty(false);
     }
-  }, [editingProfile]);
+  }, [editingProfile?.id]);
 
   const handleValuesChange = useCallback((_bind: string, newValues: EnvValues) => {
     setLocalValues(newValues);
@@ -94,19 +95,17 @@ export const WorkflowEnvModal = ({
     }
   }, [isDirty, workflowId, setWorkflowActiveEnv]);
 
-  const handleGlobalEnvSwitch = useCallback(({ value }: { value: string }) => {
+  const handleGlobalEnvSwitch = useCallback(({ value }: { value: string }) => {    
     if (isDirty) {
       setPendingAction(() => () => {
-        setGlobalEnvId(value);
-        setGlobalActiveEnv(workflowId, value);
+        setGlobalEnv(globalEnvs.profiles[value])
         setIsDirty(false);
       });
       setShowConfirmDiscard(true);
     } else {
-      setGlobalEnvId(value);
-      setGlobalActiveEnv(workflowId, value);
+      setGlobalEnv(globalEnvs.profiles[value])
     }
-  }, [isDirty, workflowId, setGlobalActiveEnv]);
+  }, [globalEnvs.profiles, isDirty]);
 
   const handleClose = useCallback(() => {
     if (isDirty) {
@@ -120,9 +119,8 @@ export const WorkflowEnvModal = ({
   const handleSave = async () => {
     if (!editingProfile || !workflowId) return;
     try {
-      await updateWorkflowEnv(workflowId, editingProfile.id, {
-        values: localValues,
-      });
+      await updateProjectEnv(workflowId, editingProfile.name, {...editingProfile, values: localValues})
+      loadWorkflowEnvs(workflowId); 
       setIsDirty(false);
       toast.success("Environment saved");
     } catch (error) {
@@ -135,25 +133,25 @@ export const WorkflowEnvModal = ({
     onOpenChange(false);
   };
 
-  const handleDiscard = () => {
-    if (editingProfile) {
-      setLocalValues({ ...editingProfile.values });
-    }
-    setIsDirty(false);
-    setShowConfirmDiscard(false);
-    if (pendingAction) {
-      pendingAction();
-      setPendingAction(null);
-    }
-  };
+  // const handleDiscard = () => {
+  //   if (editingProfile) {
+  //     setLocalValues({ ...editingProfile.values });
+  //   }
+  //   setIsDirty(false);
+  //   setShowConfirmDiscard(false);
+  //   if (pendingAction) {
+  //     pendingAction();
+  //     setPendingAction(null);
+  //   }
+  // };
 
   const handleCreateProfile = async () => {
     if (!newProfileName.trim() || !workflowId) return;
     try {
-      await createWorkflowEnv(workflowId, {
-        name: newProfileName.trim(),
-        values: {},
-      } as any);
+      const profileName = newProfileName.trim()
+      const profileObj = {values: {}, id: uuid(), name: profileName}
+      if(!Object.values(globalEnvs.profiles).length) profileObj.isDefault = true
+      await createProjectEnv({id: workflowId, profiles: {[profileName]: profileObj} });
       setNewProfileName("");
       toast.success("Environment profile created");
     } catch (error) {
@@ -184,11 +182,11 @@ export const WorkflowEnvModal = ({
     }
   };
 
-  const activeGlobalEnv = activeGlobalEnvId && globalEnvs.profiles ? globalEnvs.profiles[activeGlobalEnvId] : null;
-  const workflowProfiles = workflowEnvs?.envProfiles || [];
-  const selectedProfile = selectedEnvId && workflowEnvs?.envProfiles 
-    ? workflowEnvs.envProfiles.find(p => p.id === selectedEnvId) 
-    : null;
+  // const activeGlobalEnv = activeGlobalEnvId && globalEnvs.profiles ? globalEnvs.profiles[activeGlobalEnvId] : null;
+  const workflowProfiles = workflowEnvs?.profiles || {};
+  // const selectedProfile = selectedEnvId && workflowEnvs?.envProfiles 
+  //   ? workflowEnvs.envProfiles.find(p => p.id === selectedEnvId) 
+  //   : null;
 
   const WorkflowLabeledCard = ({ label, profile, envId }: { label: string; profile: EnvProfile | null; envId: string }) => (
     <div className="space-y-2">
@@ -205,7 +203,7 @@ export const WorkflowEnvModal = ({
           </p>  
         </div>
         {profile && (
-          <Button variant="outline" onClick={() => removeWorkflowActiveEnv(envId, profile.id)}>
+          <Button variant="outline" onClick={() => removeWorkflowActiveEnv(envId, profile.name)}>
             <X className="h-4 w-4" />
           </Button>
         )}
@@ -214,9 +212,9 @@ export const WorkflowEnvModal = ({
   );
 
   const dropdownOptions = globalEnvs.profiles 
-    ? Object.values(globalEnvs.profiles).map((env) => ({ 
-        itemProperties: { value: env.id }, 
-        display: env.name + (env.isDefault ? " (Default)" : "")
+    ? Object.entries(globalEnvs.profiles).map(([name, env]) => ({ 
+        itemProperties: { value: env.name }, 
+        display: name + (env.isDefault ? " (Default)" : "")
       }))
     : [];
 
@@ -249,9 +247,9 @@ export const WorkflowEnvModal = ({
               <div className="space-y-4 h-full">
                 <div className="space-y-2">
                   <LabeledDropdown 
-                    label="Select Active Global Environment"
+                    label="Select Global Environment"
                     onSelect={handleGlobalEnvSwitch}
-                    header={<span>{activeGlobalEnv?.name || "Select environment..."}</span>}
+                    header={<span className="text-sm">{ "Select environment..."}</span>}
                     options={dropdownOptions}
                   />
                 </div>
@@ -262,12 +260,12 @@ export const WorkflowEnvModal = ({
                 )}
                 <WorkflowLabeledCard 
                   label="Current Global Environment" 
-                  profile={activeGlobalEnv}
+                  profile={globalEnv}
                   envId="global"
                 />
                 <WorkflowLabeledCard 
                   label="Current Workflow Profile" 
-                  profile={selectedProfile}
+                  profile={editingProfile}
                   envId={workflowId}
                 />                  
               </div>
@@ -291,7 +289,7 @@ export const WorkflowEnvModal = ({
                     Create
                   </Button>
                 </div>
-                {workflowProfiles.length === 0 ? (
+                {Object.values(workflowProfiles).length === 0 ? (
                   <div className="flex-1 flex items-center justify-center text-center p-8">
                     <div className="space-y-2">
                       <Workflow className="h-12 w-12 mx-auto text-muted-foreground/50" />
@@ -307,13 +305,17 @@ export const WorkflowEnvModal = ({
                       <Label className="text-xs text-muted-foreground">Profiles</Label>
                       <ScrollArea className="h-full overflow-hidden">
                         <div className="space-y-1 pr-2">
-                          {workflowProfiles.map((profile) => (
+                          {Object.values(workflowProfiles).map((profile) => (
                             <div
                               key={profile.id}
                               className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${
                                 editingProfile?.id === profile.id ? "bg-primary/10 border border-primary/30" : "hover:bg-muted"
                               }`}
-                              onClick={() => setEditingProfile(profile)}
+                              
+                              onClick={() => {
+                                setLocalValues(profile.values)
+                                setEditingProfile(profile)
+                              }}
                             >
                               <span className="text-sm truncate">{profile.name}</span>
                               <div className="flex gap-1 items-center justify-center h-6">
@@ -323,10 +325,10 @@ export const WorkflowEnvModal = ({
                                   className="h-6 w-6"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleEnvSwitch(selectedEnvId === profile.id ? null : profile.id);
+                                    handleEnvSwitch(selectedEnvId === profile.name ? null : profile.name);
                                   }}
                                 >
-                                  {selectedEnvId === profile.id
+                                  {selectedEnvId === profile.name
                                     ? <Circle className="bg-green-500 rounded-full text-green-500 h-3 w-3" />
                                     : <Circle className="border-green-500 text-green-500 rounded-full h-3 w-3" />
                                   }
