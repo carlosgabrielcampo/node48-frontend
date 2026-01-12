@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { stats, workflows, activities, systemStatus } from '../lib/mockOverviewData';
 import { LabeledDropdown } from '@/components/layout/dropdown';
 
@@ -81,6 +81,7 @@ const StatCard = ({ title, value, trendPct, trendUp, icon }: any) => (
 );
 
 const Overview: React.FC = () => {
+  const [dateDropdown, setDateDropdown] = useState("Last 7 days")
   return (
     <div>
       <main className="min-h-screen bg-background/60 px-4 py-8 text-sm text-foreground">
@@ -90,7 +91,7 @@ const Overview: React.FC = () => {
             <p className="text-muted-foreground">Summary of your workflows and activity</p>
           </div>
           <div className="mt-3 md:mt-0 flex items-center gap-3">
-            <LabeledDropdown id={"range"} header={"Last 7 days"} options={[{display: "Last 24 hours", itemProperties: {value: "1d"}}, {display: "Last 7 days", itemProperties: {value: "7d"}}, {display: "Last 30 days", itemProperties: {value: "30d"}} ]} /> 
+            <LabeledDropdown onSelect={({value}) => setDateDropdown(value)} header={dateDropdown} options={[{display: "Last 24 hours", itemProperties: {value: "Last 24 hours"}}, {display: "Last 7 days", itemProperties: {value: "Last 7 days"}}, {display: "Last 30 days", itemProperties: {value: "Last 30 days"}} ]} /> 
           </div>
         </header>
 
@@ -130,7 +131,7 @@ const Overview: React.FC = () => {
                         <td className="py-3 pr-4">
                           <span
                             className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                              w.status === 'Active' ? 'bg-success text-primary-foreground' : 'bg-warning text-primary-foreground'
+                              w.status === 'Active' ? 'bg-success text-primary-text-color' : 'bg-warning text-primary-text-color'
                             }`}
                           >
                             {w.status}

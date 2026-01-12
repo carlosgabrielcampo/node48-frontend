@@ -5,7 +5,6 @@ import { LabeledCard } from "@/components/layout/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
-import { UUID } from "crypto";
 import { LabeledCheckbox } from "@/components/layout/checkbox";
 import React from "react";
 

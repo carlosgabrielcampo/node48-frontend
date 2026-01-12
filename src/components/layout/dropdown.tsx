@@ -34,11 +34,8 @@ const Item = ({itemProperties, onSelect, display}: {itemProperties: ItemProperti
 const MenuItems = ({options, onSelect}: {options: ListStructure[]; onSelect: (props: ItemProperties) => void}) => {
     return (
         <>
-            {options?.length && options.map(({itemProperties, display}) => {
-                {console.log({itemProperties, display, options})}
-                
+            {options?.length && options.map(({itemProperties, display}) => {                
                 return (<Item key={display} itemProperties={itemProperties} onSelect={onSelect} display={display} />)
-
             })}
         </>
     )
