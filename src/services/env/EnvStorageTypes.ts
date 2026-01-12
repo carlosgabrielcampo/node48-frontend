@@ -35,4 +35,9 @@ export interface EnvStorageInterface {
     env: string,
     profileName: string
   ): Promise<void>;
+  setActive(
+    id: UUID, 
+    envId: UUID | null, 
+    type: "workflow" | "global"
+  ): Promise<void>;
 }

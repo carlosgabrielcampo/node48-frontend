@@ -35,12 +35,11 @@ export const WorkflowEnvModal = ({
   const {
     globalEnvs,
     workflowEnvs,
+    getActiveEnvs,
     loadWorkflowEnvs,
     createProjectEnv,
     updateProjectEnv,
     deleteWorkflowEnv,
-    activeGlobalEnvId,
-    setGlobalActiveEnv,
     activeProjectEnvId,
     setWorkflowActiveEnv,
     removeWorkflowActiveEnv,
@@ -48,6 +47,10 @@ export const WorkflowEnvModal = ({
 
   const [selectedEnvId, setSelectedEnvId] = useState<string | null>(null);
   const [globalEnv, setGlobalEnv] = useState<any>(null);
+
+  const [activeGlobal, setActiveGlobal] = useState({})
+  const [activeLocal, setActiveLocal] = useState({})
+
   const [editingProfile, setEditingProfile] = useState<EnvProfile | null>(null);
   const [localValues, setLocalValues] = useState<EnvValues>({});
   const [isDirty, setIsDirty] = useState(false);
@@ -56,19 +59,21 @@ export const WorkflowEnvModal = ({
   const [newProfileName, setNewProfileName] = useState("");
   const [maskedKeys, setMaskedKeys] = useState<Set<string>>(new Set());
   
+  const getActiveEnv = async( ) =>{
+    const activeArray = await getActiveEnvs({id: workflowId})
+    if(activeArray?.length){
+      activeArray.map((e) => e.scope === "global" ? setActiveGlobal({...e}) : setActiveLocal({...e}) )
+    }
+    loadWorkflowEnvs(workflowId)
+  }
 
   useEffect(() => {
     if (open && workflowId) loadWorkflowEnvs(workflowId);      
   }, [open, workflowId, loadWorkflowEnvs]);
 
-  useEffect(() => {
-    if (workflowEnvs?.activeEnvId) {
-      setSelectedEnvId(workflowEnvs.activeEnvId);
-    }
-  }, [workflowEnvs, activeProjectEnvId]);
+  useEffect(() => {getActiveEnv()}, []);
 
   useEffect(() => {
-    console.log(editingProfile)
     if (editingProfile) {
       setLocalValues({ ...editingProfile.values });
       setMaskedKeys(new Set(Object.keys(editingProfile.values)));
@@ -81,31 +86,31 @@ export const WorkflowEnvModal = ({
     setIsDirty(true);
   }, []);
 
-  const handleEnvSwitch = useCallback((envId: string | null) => {
+  const handleEnvSwitch = useCallback((envId: string | null, type: "workflow" | "global") => {
     if (isDirty) {
       setPendingAction(() => () => {
         setSelectedEnvId(envId);
-        setWorkflowActiveEnv(workflowId, envId);
+        setWorkflowActiveEnv(workflowId, envId, type);
         setIsDirty(false);
       });
       setShowConfirmDiscard(true);
     } else {
       setSelectedEnvId(envId);
-      setWorkflowActiveEnv(workflowId, envId);
+      setWorkflowActiveEnv(workflowId, envId, type);
     }
   }, [isDirty, workflowId, setWorkflowActiveEnv]);
 
-  const handleGlobalEnvSwitch = useCallback(({ value }: { value: string }) => {    
-    if (isDirty) {
-      setPendingAction(() => () => {
-        setGlobalEnv(globalEnvs.profiles[value])
-        setIsDirty(false);
-      });
-      setShowConfirmDiscard(true);
-    } else {
-      setGlobalEnv(globalEnvs.profiles[value])
-    }
-  }, [globalEnvs.profiles, isDirty]);
+  // const handleGlobalEnvSwitch = useCallback(({ value }: { value: string }) => {    
+  //   if (isDirty) {
+  //     setPendingAction(() => () => {
+  //       setGlobalEnv(globalEnvs.profiles[value])
+  //       setIsDirty(false);
+  //     });
+  //     setShowConfirmDiscard(true);
+  //   } else {
+  //     setGlobalEnv(globalEnvs.profiles[value])
+  //   }
+  // }, [globalEnvs.profiles, isDirty]);
 
   const handleClose = useCallback(() => {
     if (isDirty) {
@@ -153,6 +158,7 @@ export const WorkflowEnvModal = ({
       if(!Object.values(globalEnvs.profiles).length) profileObj.isDefault = true
       await createProjectEnv({id: workflowId, profiles: {[profileName]: profileObj} });
       setNewProfileName("");
+      loadWorkflowEnvs(workflowId); 
       toast.success("Environment profile created");
     } catch (error) {
       toast.error("Failed to create profile");
@@ -172,17 +178,6 @@ export const WorkflowEnvModal = ({
     }
   };
 
-  const handleSetActive = async (id: string) => {
-    if (!workflowId) return;
-    try {
-      await setGlobalActiveEnv(id, selectedEnvId);
-      toast.success("Active environment updated");
-    } catch (error) {
-      toast.error("Failed to set active environment");
-    }
-  };
-
-  // const activeGlobalEnv = activeGlobalEnvId && globalEnvs.profiles ? globalEnvs.profiles[activeGlobalEnvId] : null;
   const workflowProfiles = workflowEnvs?.profiles || {};
   // const selectedProfile = selectedEnvId && workflowEnvs?.envProfiles 
   //   ? workflowEnvs.envProfiles.find(p => p.id === selectedEnvId) 
@@ -211,6 +206,7 @@ export const WorkflowEnvModal = ({
     </div>
   );
 
+  console.log({globalEnvs})
   const dropdownOptions = globalEnvs.profiles 
     ? Object.entries(globalEnvs.profiles).map(([name, env]) => ({ 
         itemProperties: { value: env.name }, 
@@ -248,24 +244,24 @@ export const WorkflowEnvModal = ({
                 <div className="space-y-2">
                   <LabeledDropdown 
                     label="Select Global Environment"
-                    onSelect={handleGlobalEnvSwitch}
+                    onSelect={(e) => handleEnvSwitch(e.value, "global")}
                     header={<span className="text-sm">{ "Select environment..."}</span>}
                     options={dropdownOptions}
                   />
                 </div>
                 {selectedEnvId !== workflowEnvs?.activeEnvId && (
-                  <Button onClick={() => handleSetActive(workflowId)} className="w-full">
+                  <Button className="w-full">
                     Set as Active for Workflow
                   </Button>
                 )}
                 <WorkflowLabeledCard 
                   label="Current Global Environment" 
-                  profile={globalEnv}
+                  profile={activeGlobal}
                   envId="global"
                 />
                 <WorkflowLabeledCard 
                   label="Current Workflow Profile" 
-                  profile={editingProfile}
+                  profile={activeLocal}
                   envId={workflowId}
                 />                  
               </div>
@@ -325,10 +321,10 @@ export const WorkflowEnvModal = ({
                                   className="h-6 w-6"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleEnvSwitch(selectedEnvId === profile.name ? null : profile.name);
+                                    handleEnvSwitch(activeLocal.name === profile.name ? null : profile.name, "workflow");
                                   }}
                                 >
-                                  {selectedEnvId === profile.name
+                                  {activeLocal.name === profile.name
                                     ? <Circle className="bg-green-500 rounded-full text-green-500 h-3 w-3" />
                                     : <Circle className="border-green-500 text-green-500 rounded-full h-3 w-3" />
                                   }

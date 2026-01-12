@@ -23,6 +23,7 @@ export const envService = {
     return (await envService.getById({id}))["profiles"];
   },
   getActive: async ({id}: {id: string}) => {
+    console.log("active", (await envService.getById({id})))
     return (await envService.getById({id}))?.["active"];
   },
   create: async ({id, profiles, active}: {id: string; profiles: any; active: any[]}): Promise<void> => {
@@ -36,25 +37,9 @@ export const envService = {
   },
   setDefault: async ({env, profileName}): Promise<void> => {
     return await envStorageService.setDefault(env, profileName)
-    // Implementation depends on storage backend
   },
-  setActiveEnv: async ({id, envId}: {id: string; envId: string | null}): Promise<void> => {
-    const workflowEnv = await envService.getById({id});
-    const activeEnv = (workflowEnv.active || []).filter((e: any) => e?.scope !== "workflow");
-    const saved = envId 
-      ? await envStorageService.update({id, active: [...activeEnv, envId]})
-      : await envStorageService.update({id, active: [...activeEnv]});
-  },
-  setWorkflowActiveGlobalEnv: async ({id, envId}: {id: string; envId: string | null}): Promise<void> => {
-    const get = await envService.getById({id: "global"});
-    const workflowEnv = await envService.getById({id});
-    const activeEnv = (workflowEnv?.active || []).filter((e: any) => e?.scope !== "global");
-  
-    if (envId && get.profiles[envId]) {
-      await envStorageService.update({id, active: [...activeEnv, get.profiles[envId]]});
-    } else {
-      await envStorageService.update({id, active: [...activeEnv]});
-    }
+  setActiveEnv: async ({id, envId, type}: {id: string; envId: string | null; type: "global" | "workflow"}): Promise<void> => {
+    return await envStorageService.setActive(id, envId, type)
   },
   export: async (): Promise<string> => {
     const envs = await envService.getById({id: STORAGE_KEY_GLOBAL_ENVS});
