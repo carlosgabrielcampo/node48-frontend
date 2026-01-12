@@ -27,4 +27,12 @@ export interface EnvStorageInterface {
     profiles?: EnvProfile[];
     active?: string[];
   }): Promise<void>;
+  deleteProfile(
+    env: string,
+    profileName: string
+  ): Promise<void>;
+  setDefault(
+    env: string,
+    profileName: string
+  ): Promise<void>;
 }

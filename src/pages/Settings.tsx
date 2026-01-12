@@ -23,7 +23,7 @@ import { EnvProfile } from "@/types/env";
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
-  const { createProjectEnv, updateProjectEnv, deleteProjectEnv, setProjectDefault, exportEnvs, importEnvs, globalEnvs } = useEnv();
+  const { createProjectEnv, updateProjectEnv, deleteProjectProfile, setProjectDefault, exportEnvs, importEnvs, globalEnvs } = useEnv();
   const { autosaveEnabled, setAutosaveEnabled } = useWorkflowEditor();
   
   const [newEnvName, setNewEnvName] = useState("");
@@ -32,7 +32,9 @@ export default function Settings() {
 
   const handleCreateEnv = async (id: string) => {
     if (!newEnvName.trim()) return;
-    await createProjectEnv(id, { name: newEnvName.trim(), values: {} } as any);
+    const profileObj = {values: {}}
+    if(!Object.values(globalEnvs.profiles).length) profileObj.isDefault = true
+    await createProjectEnv({id, profiles: {[newEnvName.trim()]: profileObj}, active: [] });
     setNewEnvName("");
     setNewEnvDialogOpen(false);
   };
@@ -61,8 +63,8 @@ export default function Settings() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleValuesUpdate = async (envId: string, _bind: string, values: Record<string, string>) => {
-    await updateProjectEnv(envId, { values });
+  const handleValuesUpdate = async (envId, values: Record<string, string>) => {
+    await updateProjectEnv("global", envId, values);
   };
 
   return (
@@ -75,7 +77,6 @@ export default function Settings() {
           </div>
 
           <div className="space-y-6">
-            {/* Appearance Section */}
             <Card>
               <CardHeader>
                 <CardTitle>Appearance</CardTitle>
@@ -99,7 +100,6 @@ export default function Settings() {
               </CardContent>
             </Card>
 
-            {/* Environment Management */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
@@ -111,9 +111,19 @@ export default function Settings() {
                   <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}><Upload className="h-4 w-4 mr-1" />Import</Button>
                   <input type="file" ref={fileInputRef} accept=".json" className="hidden" onChange={handleImport} />
                   <Dialog open={newEnvDialogOpen} onOpenChange={setNewEnvDialogOpen}>
-                    <DialogTrigger asChild><Button size="sm"><Plus className="h-4 w-4 mr-1" />New</Button></DialogTrigger>
+                    <DialogTrigger asChild>
+                      <Button size="sm">
+                        <Plus className="h-4 w-4 mr-1" />
+                        New
+                      </Button>
+                    </DialogTrigger>
+                    
                     <DialogContent>
-                      <DialogHeader><DialogTitle>Create Environment</DialogTitle></DialogHeader>
+                      <DialogHeader>
+                        <DialogTitle>
+                          Create Environment
+                        </DialogTitle>
+                      </DialogHeader>
                       <div className="py-4">
                         <Label>Name</Label>
                         <Input value={newEnvName} onChange={(e) => setNewEnvName(e.target.value)} placeholder="e.g., Production" className="mt-1" />
@@ -127,21 +137,21 @@ export default function Settings() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {globalEnvs?.profiles && Object.values(globalEnvs?.profiles)?.map((env: EnvProfile) => (
-                  <Card key={env.id} className="p-4">
+                { globalEnvs?.profiles && Object.entries(globalEnvs.profiles)?.map(([env, profile], i) => 
+                  <Card key={env} className="p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{env.name}</span>
-                        {env.isDefault && <Badge>Default</Badge>}
+                        <span className="font-medium">{env}</span>
+                        {profile.isDefault && <Badge>Default</Badge>}
                       </div>
                       <div className="flex gap-2">
-                        {!env.isDefault && <Button variant="outline" size="sm" onClick={() => setProjectDefault(env.id)}><Star className="h-4 w-4" /></Button>}
-                        <Button variant="destructive" size="sm" onClick={() => deleteProjectEnv(env.id)}><Trash2 className="h-4 w-4" /></Button>
+                        {!profile.isDefault && <Button variant="outline" size="sm" onClick={() => setProjectDefault("global", env)}><Star className="h-4 w-4" /></Button>}
+                        <Button variant="destructive" size="sm" onClick={() => deleteProjectProfile("global", env)}><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </div>
-                    <KeyValueInput bind="" value={env.values} commit={(bind, values) => handleValuesUpdate(env.id, bind, values)} type="masked" />
+                      <KeyValueInput bind="" value={profile.values} commit={(bind, values) => handleValuesUpdate(env, values)} type="masked" /> 
                   </Card>
-                ))}
+                )}
               </CardContent>
             </Card>
 

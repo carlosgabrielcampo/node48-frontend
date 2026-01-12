@@ -16,30 +16,27 @@ export const envService = {
     return await envStorageService.get();
   },
   getById: async ({id}: {id: string}): Promise<any> => {
-    return await envStorageService.get(id, {profiles: {}, active: []});
+    const getById = await envStorageService.get(id, {profiles: {}, active: []});
+    return getById[id]
   },
   getProfiles: async ({id}: {id: string}) => {
     return (await envService.getById({id}))["profiles"];
   },
   getActive: async ({id}: {id: string}) => {
-    return (await envService.getById({id}))["active"];
+    return (await envService.getById({id}))?.["active"];
   },
-  create: async ({id, profiles}: {id: string; profiles: any[]}): Promise<void> => {
-    return await envStorageService.save({id, profiles: profiles});
+  create: async ({id, profiles, active}: {id: string; profiles: any; active: any[]}): Promise<void> => {
+    return await envStorageService.save({id, profiles, active});
   },
   updateProfiles: async ({id, profileName, updates}: {id: string; profileName: string; updates: any}): Promise<any> => {
-    const existingEnv = await envService.getProfiles({id});
-    if (existingEnv[profileName]) {
-      existingEnv[profileName].values = updates.values;
-    }
-    await envStorageService.update({id, profiles: Object.values(existingEnv)});
-    return existingEnv;
+    return await envStorageService.update({id, profiles: {[profileName]: {values: updates}}})
   },
-  delete: async (id: string): Promise<void> => {
-    await new Promise((r) => setTimeout(r, 100));
-    // Implementation depends on storage backend
+  deleteProfile: async (env, profileName): Promise<void> => {
+    return await envStorageService.deleteProfile(env, profileName)
   },
-  setDefault: async (): Promise<void> => {
+  setDefault: async ({env, profileName}): Promise<void> => {
+    console.log(env, profileName)
+    return await envStorageService.setDefault(env, profileName)
     // Implementation depends on storage backend
   },
   setActiveEnv: async ({id, envId}: {id: string; envId: string | null}): Promise<void> => {

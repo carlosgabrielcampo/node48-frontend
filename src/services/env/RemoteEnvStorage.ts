@@ -13,7 +13,6 @@ export class RemoteEnvStorage implements EnvStorageInterface {
         return defaultValue;
       }
     };
-
     update = async ({id, profiles, active}: any): Promise<void> => {
       try {
         const requestBody: any = {}
@@ -33,7 +32,6 @@ export class RemoteEnvStorage implements EnvStorageInterface {
         console.error("Failed to save");
       }
     };
-
     save = async ({id, profiles, active }: any): Promise<void> => {
       try {
         const requestBody: any = {}
@@ -52,5 +50,8 @@ export class RemoteEnvStorage implements EnvStorageInterface {
       } catch (e) {
         console.error("Failed to save");
       }
+    }
+    deleteProfile = async(env, profileName) => {
+      console.log({env, profileName})
     }
 }
