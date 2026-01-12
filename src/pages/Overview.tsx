@@ -130,7 +130,7 @@ const Overview: React.FC = () => {
                         <td className="py-3 pr-4">
                           <span
                             className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                              w.status === 'Active' ? 'bg-success text-success-foreground' : 'bg-warning text-warning-foreground'
+                              w.status === 'Active' ? 'bg-success text-primary-foreground' : 'bg-warning text-primary-foreground'
                             }`}
                           >
                             {w.status}
