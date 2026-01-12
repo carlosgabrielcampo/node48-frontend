@@ -216,7 +216,7 @@ export const WorkflowEnvModal = ({
   const dropdownOptions = globalEnvs.profiles 
     ? Object.values(globalEnvs.profiles).map((env) => ({ 
         itemProperties: { value: env.id }, 
-        itemDisplay: env.name + (env.isDefault ? " (Default)" : "")
+        display: env.name + (env.isDefault ? " (Default)" : "")
       }))
     : [];
 

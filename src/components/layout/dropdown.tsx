@@ -10,7 +10,7 @@ interface ItemProperties {
 
 interface ListStructure {
     itemProperties: ItemProperties;
-    itemDisplay: string;
+    display: string;
 }
 
 interface DropdownInterface {
@@ -23,10 +23,10 @@ interface DropdownInterface {
     dropdownExtra?: ListStructure[];
 }
 
-const Item = ({itemProperties, onSelect, itemDisplay}: {itemProperties: ItemProperties; onSelect: (props: ItemProperties) => void; itemDisplay: string}) => {
+const Item = ({itemProperties, onSelect, display}: {itemProperties: ItemProperties; onSelect: (props: ItemProperties) => void; display: string}) => {
     return (
         <DropdownMenuItem onSelect={() => onSelect(itemProperties)} className={"w-30"}>
-            { itemDisplay }
+            { display }
         </DropdownMenuItem>
     )
 }
@@ -34,9 +34,12 @@ const Item = ({itemProperties, onSelect, itemDisplay}: {itemProperties: ItemProp
 const MenuItems = ({options, onSelect}: {options: ListStructure[]; onSelect: (props: ItemProperties) => void}) => {
     return (
         <>
-            {options?.length && options.map(({itemProperties, itemDisplay}) => (
-                <Item key={itemDisplay} itemProperties={itemProperties} onSelect={onSelect} itemDisplay={itemDisplay} />
-            ))}
+            {options?.length && options.map(({itemProperties, display}) => {
+                {console.log({itemProperties, display, options})}
+                
+                return (<Item key={display} itemProperties={itemProperties} onSelect={onSelect} display={display} />)
+
+            })}
         </>
     )
 }
@@ -44,8 +47,9 @@ const MenuItems = ({options, onSelect}: {options: ListStructure[]; onSelect: (pr
 const MenuContent = ({menuLabel, options, onSelect}: {menuLabel?: string; options: ListStructure[]; onSelect: (props: ItemProperties) => void}) => {
     return (
         <>
+
             {menuLabel && (
-                <DropdownMenuLabel className="flex w-full items-center gap-2">
+                <DropdownMenuLabel className="flex w-full items-center gap-2 border">
                     { menuLabel }
                 </DropdownMenuLabel>
             )} 

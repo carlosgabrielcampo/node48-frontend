@@ -49,9 +49,9 @@ export const WorkflowSidebar = () => {
                 <Button
                   size="icon"
                   onClick={toggleSidebar}
-                  className={`transition-all duration-700 ease-in-out transition-transform bg-sidebar-background  hover:bg-primary/20 ${!open ? "opacity-0 scale-105" : "opacity-100 scale-100"}`}
+                  className={`transition-all duration-700 ease-in-out transition-transform bg-sidebar-background  text-sidebar-accent-foreground hover:bg-primary/20 ${!open ? "opacity-0 scale-105" : "opacity-100 scale-100"}`}
                 >
-                  <PanelLeft />
+                  <PanelLeft style={{height: '18px', width: '218px'}}/>
                 </Button>
               </div>
             : 

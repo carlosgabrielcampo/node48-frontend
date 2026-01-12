@@ -36,9 +36,14 @@ All colors MUST be HSL.
 
     --success:160 84% 39%;
     --success-foreground: 0 0% 96%;
+    --success-muted: 160 84% 39%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 96%;
+    --warning-muted: 38 92% 35%;
+
+    --border: 214 32% 86%;
+    --input: 214 32% 86%;
     --ring: 339 91% 60%;
 
     --radius: 0.5rem;
@@ -49,14 +54,13 @@ All colors MUST be HSL.
     --sidebar-primary-foreground: 0 0% 96%;
     --sidebar-accent: 210 40% 96%;
     --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 214 32% 91%;
+    --sidebar-border: 214 32% 86%;
     --sidebar-ring: 339 91% 60%;
 
-    /* Custom workflow tokens */
     --canvas-background: 0 0% 98%;
-    --canvas-grid: 220 13% 91%;
+    --canvas-grid: 220 13% 86%;
     --node-background: 0 0% 96%;
-    --node-border: 214 32% 91%;
+    --node-border: 214 32% 86%;
     --node-hover: 210 40% 98%;
     --connection-line: 339 91% 60%;
   }
