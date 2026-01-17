@@ -51,6 +51,6 @@ export class RemoteEnvStorage implements EnvStorageInterface {
         console.error("Failed to save");
       }
     }
-    deleteProfile = async(env, profileName) => {
+    deleteProfile = async(env, profileId) => {
     }
 }

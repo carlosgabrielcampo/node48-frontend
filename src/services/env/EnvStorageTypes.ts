@@ -13,6 +13,7 @@ export interface EnvProfile {
   scope: "project" | "workflow";
   workflowId?: UUID;
   isDefault?: boolean;
+  isActive?: boolean
 }
 
 export interface EnvStorageInterface {
@@ -29,11 +30,11 @@ export interface EnvStorageInterface {
   }): Promise<void>;
   deleteProfile(
     env: string,
-    profileName: string
+    profileId: string
   ): Promise<void>;
   setDefault(
     env: string,
-    profileName: string
+    profileId: string
   ): Promise<void>;
   setActive(
     id: UUID, 
@@ -43,5 +44,6 @@ export interface EnvStorageInterface {
   removeActive(
     id: UUID, 
     envId: UUID | null, 
+    type: "workflow" | "global"
   ): Promise<void>;
 }

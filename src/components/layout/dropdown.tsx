@@ -21,6 +21,7 @@ interface DropdownInterface {
     menuLabel?: string;
     header: React.ReactElement | string;
     dropdownExtra?: ListStructure[];
+    disabled: boolean;
 }
 
 const Item = ({itemProperties, onSelect, display}: {itemProperties: ItemProperties; onSelect: (props: ItemProperties) => void; display: string}) => {
@@ -73,7 +74,7 @@ export const LabeledDropdown = ({...props}: DropdownInterface) => (
     <div className={"h-full w-full flex flex-col gap-2"} key={props.label}>
         {props.label && <Label className="text-xs">{props.label}</Label>}
         <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild disabled={props.disabled}>
                 <Button variant="outline" size="sm" className="justify-between gap-2 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
                     <div className="flex w-full justify-between items-center">
                         <span className="overflow-hidden">

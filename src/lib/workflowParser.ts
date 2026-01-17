@@ -1,5 +1,4 @@
 import { Node, Edge, MarkerType } from "reactflow";
-import { v4 as uuidv4 } from 'uuid';
 import { createNode } from "@/components/nodes/NodeDataStructure";
 // Workflow JSON format (from backend)
 import { WorkflowJSON } from "@/types/workflows";

@@ -1,29 +1,30 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
-import { EnvProfile, EnvValues, EnvDiff, UUID, workflowEnvsdata } from "@/types/env";
+import { EnvProfile, UUID, workflowEnvsdata } from "@/types/env";
 import { envService } from "@/services/env/envService";
 import { toast } from "sonner";
-import { profile } from "console";
+import { v4 as uuid } from "uuid";
 
 interface GlobalEnvsData {
   profiles: Record<string, EnvProfile>;
-  active: EnvProfile[];
+  global: Record<string, EnvProfile>;
 }
 
 interface EnvContextType {
-  projectEnvs: EnvProfile[];
-  globalEnvs: GlobalEnvsData;
-  setGlobalEnvs: React.Dispatch<React.SetStateAction<GlobalEnvsData>>;
+  allEnvs: Record<string, GlobalEnvsData[]>;
+  workflowEnvs: workflowEnvsdata | null;
   loadingProjectEnvs: boolean;
+
+  setAllEnvs: React.Dispatch<React.SetStateAction<EnvProfile[]>>;
+  getActiveEnvs: ({ id }: { id: string }) => Promise<EnvProfile>;
   createProjectEnv: ({id, profiles, active}) => Promise<void>;
   updateProjectEnv: (id: UUID, updates: Partial<EnvProfile>) => Promise<void>;
   deleteProjectEnv: (id: UUID) => Promise<void>;
   setProjectDefault: (id: UUID) => Promise<void>;
   
-  workflowEnvs: workflowEnvsdata | null;
   loadWorkflowEnvs: (workflowId: UUID) => Promise<void>;
   deleteWorkflowEnv: (workflowId: UUID, envId: UUID) => Promise<void>;
   setWorkflowActiveEnv: (workflowId: UUID, envId: UUID | null, type: "workflow" | "global") => Promise<void>;
-  removeWorkflowActiveEnv: (id: UUID, envId: UUID | null) => void;
+  removeWorkflowActiveEnv: (id: UUID, envId: UUID | null, type: "global" | "local") => void;
   
   // Import/Export
   exportEnvs: () => Promise<string>;
@@ -36,15 +37,15 @@ interface EnvContextType {
 const EnvContext = createContext<EnvContextType | undefined>(undefined);
 
 export const EnvProvider = ({ children }: { children: ReactNode }) => {
-  const [globalEnvs, setGlobalEnvs] = useState<GlobalEnvsData>({ profiles: {}, active: [] });
+  const [allEnvs, setAllEnvs] = useState<EnvProfile[]>({'global': {'profiles': {},  }});
   const [workflowEnvs, setWorkflowEnvs] = useState<workflowEnvsdata | null>(null);
   const [loadingProjectEnvs, setLoadingProjectEnvs] = useState(true);
 
   const refreshProjectEnvs = useCallback(async ({id}) => {
     setLoadingProjectEnvs(true);
     try {
-      const global = await envService.getById({id}) ?? { profiles: {}, active: [] };
-      setGlobalEnvs(global);
+      const envs = await envService.get() ?? {};
+      setAllEnvs(envs);
     } catch (e) {
       toast.error("Failed to load environments");
     } finally {
@@ -52,20 +53,30 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  useEffect(() => {refreshProjectEnvs({id: "global"});}, [refreshProjectEnvs]);
-
-  const getActiveEnvs = useCallback( async ({id}) => {
-    return await envService.getActive({id})
-  }, [])
-
-  const createProjectEnv = useCallback(async ({id, profiles, active}) => {
-    await envService.create({id, profiles, active});
-    await refreshProjectEnvs({id});
-    toast.success("Environment created");
+  useEffect(() => {
+    refreshProjectEnvs({id: "global"});
   }, [refreshProjectEnvs]);
 
+  const getActiveEnvs = useCallback( async ({id}) => {
+    return {"global": await envService.getById({id: "global"}), [id]: await envService.getById({id})}
+  }, [])
+
+  const create = useCallback(async ({id, profiles}) => {
+    await envService.create({id, profiles});
+    await refreshProjectEnvs({id});
+    toast.success("Environment created");
+  }, [refreshProjectEnvs])
+
+  const createProjectEnv = useCallback(async ({id, profileName}) => {
+    const profileId = uuid()
+    const profileObj = { values: {}, id: profileId, name: profileName, scope: "workflow", createdAt: new Date(), updatedAt: new Date() }
+    create({id, profiles: { [profileId]: profileObj }});
+  }, [create]);
+
   const updateProjectEnv = useCallback(async (env: string, id: UUID, updates: Partial<EnvProfile>) => {
-    await envService.updateProfiles({id: env, profileName: id, updates});
+    await envService.updateProfiles({id: env, profileId: id, updates});
+    await refreshProjectEnvs({id});
+    toast.success("Environment updated");
   }, []);
 
   const deleteProjectProfile = useCallback(async (env, profile: UUID) => {
@@ -74,25 +85,26 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
     toast.success("Environment deleted");
   }, [refreshProjectEnvs]);
 
-  const setProjectDefault = useCallback(async (env: UUID, profileName: UUID) => {
-    await envService.setDefault({env, profileName});
+  const setProjectDefault = useCallback(async (env: UUID, profileId: UUID) => {
+    await envService.setDefault({env, profileId});
     await refreshProjectEnvs({id: env});
     toast.success("Default environment set");
   }, [refreshProjectEnvs]);
 
   const loadWorkflowEnvs = useCallback(async (workflowId: UUID) => {
-    const envs = await envService.getById({id: workflowId});
+    let envs = await envService.getById({id: workflowId});
+    if(!envs){ envs = await create({id: workflowId, profiles: {}}) }
     setWorkflowEnvs(envs);
   }, []);
 
   const deleteWorkflowEnv = useCallback(async (workflowId: UUID, envId: UUID) => {
-    await envService.delete(envId);
+    await envService.deleteProfile(envId);
     await loadWorkflowEnvs(workflowId);
     toast.success("Environment deleted");
   }, [loadWorkflowEnvs]);
 
-  const removeWorkflowActiveEnv = useCallback(async (workflowId: UUID, envId: UUID | null) => {
-    return await envService.removeActiveEnv({id: workflowId, envId});
+  const removeWorkflowActiveEnv = useCallback(async (workflowId: UUID, envId: UUID | null, type: "global" | "local") => {
+    return await envService.removeActiveEnv({id: workflowId, envId, type});
   }, []);
 
   const setWorkflowActiveEnv = useCallback(async (id: UUID, envId: UUID | null, type: "workflow" | "global") => {
@@ -100,8 +112,8 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const exportEnvs = useCallback(async () => {
-    return JSON.stringify(globalEnvs.profiles, null, 2);
-  }, [globalEnvs]);
+    return JSON.stringify(allEnvs.profiles, null, 2);
+  }, [allEnvs]);
 
   const importEnvs = useCallback(async (json: string) => {
     await envService.import(json);
@@ -109,17 +121,17 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
     toast.success("Environments imported");
   }, [refreshProjectEnvs]);
 
-  const projectEnvs = globalEnvs.profiles ? Object.values(globalEnvs.profiles) : [];
+  const projectEnvs = allEnvs.profiles ? Object.values(allEnvs.profiles) : [];
 
   return (
     <EnvContext.Provider
       value={{
+        allEnvs,
         exportEnvs,
         importEnvs,
-        globalEnvs,
         workflowEnvs,
         projectEnvs,
-        setGlobalEnvs,
+        setAllEnvs,
         getActiveEnvs,
         loadWorkflowEnvs,
         createProjectEnv,

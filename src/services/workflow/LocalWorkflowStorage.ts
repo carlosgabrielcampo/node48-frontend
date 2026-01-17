@@ -30,7 +30,6 @@ export class LocalWorkflowStorage implements WorkflowStorageInterface {
     const now = new Date().toISOString();
 
     const workflow: WorkflowInterface = {
-      
       name: '',
       description: '',
       steps: [],
@@ -51,7 +50,8 @@ export class LocalWorkflowStorage implements WorkflowStorageInterface {
     const allWorkflows = readAll()
     const foundWorkflowData = allWorkflows.find(w => w.id === data.id) ?? null
     if(!foundWorkflowData) return null
-    const all = allWorkflows.map((w) =>{
+    
+    const all = allWorkflows.map((w) => {
       return  w.id === foundWorkflowData.id ? { ...foundWorkflowData, ...data, updatedAtUTC: new Date().toISOString()} : w 
     })
     return writeAll(all);

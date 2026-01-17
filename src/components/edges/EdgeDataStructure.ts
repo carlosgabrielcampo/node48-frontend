@@ -1,8 +1,6 @@
-import { v4 as uuidv4 } from 'uuid';
 import { Edge, MarkerType } from 'reactflow';
 
-
-export function createEdge({ id, source, sourceHandle, target, label }: Edge){
+export function createEdge({ id, source, sourceHandle, target }: Edge){
     return {
         id,
         source,

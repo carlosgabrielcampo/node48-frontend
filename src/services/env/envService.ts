@@ -1,6 +1,5 @@
 import { EnvProfile } from "@/types/env";
 import { v4 as uuidv4 } from "uuid";
-import { RemoteEnvStorage } from "./RemoteEnvStorage";
 import { LocalEnvStorage } from "./LocalEnvStorage";
 import { EnvStorageInterface } from "./EnvStorageTypes";
 
@@ -28,20 +27,20 @@ export const envService = {
   create: async ({id, profiles, active}: {id: string; profiles: any; active: any[]}): Promise<void> => {
     return await envStorageService.save({id, profiles, active});
   },
-  updateProfiles: async ({id, profileName, updates}: {id: string; profileName: string; updates: any}): Promise<any> => {
-    return await envStorageService.update({id, profiles: {[profileName]: updates}})
+  updateProfiles: async ({id, profileId, updates}: {id: string; profileId: string; updates: any}): Promise<any> => {
+    return await envStorageService.update({id, profiles: {[profileId]: updates}})
   },
-  deleteProfile: async (env, profileName): Promise<void> => {
-    return await envStorageService.deleteProfile(env, profileName)
+  deleteProfile: async (env, profileId): Promise<void> => {
+    return await envStorageService.deleteProfile(env, profileId)
   },
-  setDefault: async ({env, profileName}): Promise<void> => {
-    return await envStorageService.setDefault(env, profileName)
+  setDefault: async ({env, profileId}): Promise<void> => {
+    return await envStorageService.setDefault(env, profileId)
   },
   setActiveEnv: async ({id, envId, type}: {id: string; envId: string | null; type: "global" | "workflow"}): Promise<void> => {
     return await envStorageService.setActive(id, envId, type)
   },
-  removeActiveEnv: async({id, envId}: {id: string; envId: string | null}): Promise<void> => {
-    return await envStorageService.removeActive(id, envId)
+  removeActiveEnv: async({id, envId, type}: {id: string; envId: string | null; type: string}): Promise<void> => {
+    return await envStorageService.removeActive(id, envId, type)
   },
   export: async (): Promise<string> => {
     const envs = await envService.getById({id: STORAGE_KEY_GLOBAL_ENVS});

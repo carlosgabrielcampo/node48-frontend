@@ -20,25 +20,26 @@ import {
 import { toast } from "sonner";
 import { KeyValueInput } from "@/components/layout/input";
 import { v4 as uuid } from "uuid";
-import { EnvProfile } from "@/types/env";
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
-  const { createProjectEnv, updateProjectEnv, deleteProjectProfile, setProjectDefault, exportEnvs, importEnvs, globalEnvs } = useEnv();
+  const { createProjectEnv, updateProjectEnv, deleteProjectProfile, setProjectDefault, exportEnvs, importEnvs, allEnvs } = useEnv();
   const { autosaveEnabled, setAutosaveEnabled } = useWorkflowEditor();
   
-  const [newEnvName, setNewEnvName] = useState("");
+  const [newProfileName, setNewProfileName] = useState("");
   const [newEnvDialogOpen, setNewEnvDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCreateEnv = async (id: string) => {
-    if (!newEnvName.trim()) return
-    const profileName = newEnvName.trim()
-    const profileObj = {values: {}, id: uuid(), name: profileName}
-    if(!Object.values(globalEnvs.profiles).length) profileObj.isDefault = true
-    await createProjectEnv({id, profiles: {[profileName]: profileObj}, active: [] });
-    setNewEnvName("");
-    setNewEnvDialogOpen(false);
+    if (!newProfileName.trim()) return
+    try {
+      const profileName = newProfileName.trim()
+      await createProjectEnv({id, profileName });
+      setNewProfileName("");
+      setNewEnvDialogOpen(false);
+    } catch (error) {
+      toast.error("Failed to create profile");
+    }
   };
 
   const handleExport = async () => {
@@ -128,32 +129,34 @@ export default function Settings() {
                       </DialogHeader>
                       <div className="py-4">
                         <Label>Name</Label>
-                        <Input value={newEnvName} onChange={(e) => setNewEnvName(e.target.value)} placeholder="e.g., Production" className="mt-1" />
+                        <Input value={newProfileName} onChange={(e) => setNewProfileName(e.target.value)} placeholder="e.g., Production" className="mt-1" />
                       </div>
                       <DialogFooter>
                         <Button variant="outline" onClick={() => setNewEnvDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={() => handleCreateEnv('global')} disabled={!newEnvName.trim()}>Create</Button>
+                        <Button onClick={() => handleCreateEnv('global')} disabled={!newProfileName.trim()}>Create</Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                { globalEnvs?.profiles && Object.values(globalEnvs.profiles)?.map((profile, i) => 
-                  <Card key={profile.name} className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{profile.name}</span>
-                        {profile.isDefault && <Badge>Default</Badge>}
+                { 
+                  allEnvs?.['global']?.profiles && Object.values(allEnvs?.['global'].profiles)?.map((profile, i) => 
+                    <Card key={profile.name} className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{profile.name}</span>
+                          {profile.isDefault && <Badge>Default</Badge>}
+                        </div>
+                        <div className="flex gap-2">
+                          {!profile.isDefault && <Button variant="outline" size="sm" onClick={() => setProjectDefault("global", profile.id)}><Star className="h-4 w-4" /></Button>}
+                          <Button variant="destructive" size="sm" onClick={() => deleteProjectProfile("global", profile.id)}><Trash2 className="h-4 w-4" /></Button>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        {!profile.isDefault && <Button variant="outline" size="sm" onClick={() => setProjectDefault("global", profile.name)}><Star className="h-4 w-4" /></Button>}
-                        <Button variant="destructive" size="sm" onClick={() => deleteProjectProfile("global", profile.name)}><Trash2 className="h-4 w-4" /></Button>
-                      </div>
-                    </div>
-                      <KeyValueInput bind="" value={profile.values} commit={(bind, values) => handleValuesUpdate(profile.name, {...profile, values})} type="masked" /> 
-                  </Card>
-                )}
+                        <KeyValueInput bind="" value={profile.values} commit={(bind, values) => handleValuesUpdate(profile.id, {...profile, values})} type="masked" /> 
+                    </Card>
+                  )
+                }
               </CardContent>
             </Card>
 
