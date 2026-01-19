@@ -25,7 +25,6 @@ export interface FlowEditorProps {
   configPanelOpen: any;
   handleNodeClick: any;
   handleDeleteNode: any;
-  setPendingChanges: Dispatch<SetStateAction<boolean>>,
 }
 
 export interface CreateWorkflowDialogProps {
@@ -60,8 +59,6 @@ export interface WorkflowToolBarProps {
   selectedNode: any;
   setConfigPanelOpen: any;
   configPanelOpen: any;
-  pendingChanges: boolean,
-  setPendingChanges: Dispatch<SetStateAction<boolean>>,
   setIsActive: Dispatch<SetStateAction<boolean>>;
   setIsDrawerOpen: Dispatch<SetStateAction<boolean>>;
   handleNodeClick: any;

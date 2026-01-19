@@ -18,12 +18,6 @@ export const envService = {
     const getById = await envStorageService.get(id, {profiles: {}});
     return getById[id]
   },
-  getProfiles: async ({id}: {id: string}) => {
-    return (await envService.getById({id}))["profiles"];
-  },
-  getActive: async ({id}: {id: string}) => {
-    return (await envService.getById({id}))?.["active"];
-  },
   create: async ({id, profiles}: {id: string; profiles: any;}): Promise<void> => {
     return await envStorageService.save({id, profiles});
   },

@@ -11,23 +11,23 @@ import { workflowService } from "@/services/workflow/WorkflowService";
 import { WorkflowEnvModal } from "@/components/env/WorkflowEnvModal";
 import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
 import { Save, Play, Download, Plus, Upload, Settings2 } from "lucide-react";
+import { RunningModal } from "../panels/RunningPanel";
 
 export const WorkflowToolBar = ({
-  setIsActive,
-  isActive,
   nodes,
+  edges,
+  isDirty,
+  isActive,
   workflow,
   setNodes,
-  edges,
   setEdges,
-  pendingChanges,
-  setPendingChanges,
+  setIsDirty,
+  setIsActive,
   handleNodeClick,
   setIsDrawerOpen,
   handleDeleteNode
 }: WorkflowToolBarProps) => {
 
-  const [isSaving, setIsSaving] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
   const [envModalOpen, setEnvModalOpen] = useState(false);
@@ -54,16 +54,14 @@ export const WorkflowToolBar = ({
   }
 
   const handleSave = async () => {
-    setIsSaving(true);
+    setIsDirty(true);
     try {
       await onSave();
-      setPendingChanges(false)
+      setIsDirty(false)
       toast.success("Workflow saved successfully");
     } catch (error) {
       toast.error("Failed to save workflow");
       console.error(error);
-    } finally {
-      setIsSaving(false);
     }
   }
 
@@ -87,7 +85,7 @@ export const WorkflowToolBar = ({
       toast.error("Failed to execute workflow");
       console.error(error);
     } finally {
-      setIsRunning(false);
+      // setIsRunning(false);
     }
   };
 
@@ -159,7 +157,7 @@ export const WorkflowToolBar = ({
     },
     [setNodes, setEdges, handleDeleteNode, handleNodeClick]
   );
-
+  console.log({isDirty})
   return (
     <div className="w-full flex items-center justify-between h-16 gap-2 p-4 border-b bg-background overflow-hidden">
       <div className="flex items-center gap-2">
@@ -190,12 +188,12 @@ export const WorkflowToolBar = ({
           <Button variant="outline" size="sm" onClick={handleRun} disabled={isRunning} aria-label="Execute workflow" className={`${isRunning ? "text-muted bg-green-500 disabled:opacity-100" : "" }`}>
             <Play className="h-4 w-4"/>
           </Button>
-          <Button variant="outline" size="sm" onClick={handleSave} disabled={isSaving} aria-label="Save workflow" className={`${pendingChanges && "bg-primary hover:bg-primary/90 "}`}>
+          <Button variant="outline" size="sm" onClick={handleSave} disabled={!isDirty} aria-label="Save workflow" className={`${isDirty && "bg-primary hover:bg-primary/90 "}`}>
               <Save className="h-4 w-4"/>
           </Button>
         </div>
       </div>
-      
+      <RunningModal open={isRunning} onOpenChange={setIsRunning} workflowId={workflow.id}/>
       <WorkflowEnvModal open={envModalOpen} onOpenChange={setEnvModalOpen} workflowId={workflow.id} />
     </div>
   );

@@ -58,7 +58,12 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
   }, [refreshProjectEnvs]);
 
   const getActiveEnvs = useCallback( async ({id}) => {
-    return {"global": await envService.getById({id: "global"}), [id]: await envService.getById({id})}
+    const current = {"global": await envService.getById({id: "global"}), [id]: await envService.getById({id})}
+    const activeName = current?.[id]?.activeLocal 
+    const globalName = current?.[id]?.global 
+    const profileActive = current?.[id]?.profiles?.[activeName] ?? {}
+    const profileGlobal = current?.global?.profiles?.[globalName] ?? {}
+    return {profileActive, profileGlobal}
   }, [])
 
   const create = useCallback(async ({id, profiles}) => {

@@ -31,11 +31,8 @@ export const WorkflowEnvModal = ({ open, onOpenChange, workflowId }: WorkflowEnv
   const handleClose = useCallback(() => onOpenChange(false), [onOpenChange]);
 
   const updateActiveEnvs = () => {
-    getActiveEnvs({id: workflowId}).then((current) => {
-      const activeName = current?.[workflowId]?.activeLocal 
-      const globalName = current?.[workflowId]?.global 
-      const profileActive = current?.[workflowId]?.profiles?.[activeName] ?? {}
-      const profileGlobal = current?.global?.profiles?.[globalName] ?? {}
+    getActiveEnvs({id: workflowId}).then(({profileGlobal, profileActive}) => {
+      console.log({profileGlobal, profileActive})
       setActiveGlobal({ ...profileGlobal, scope: "global" })
       setActiveLocal({ ...profileActive, scope: "workflow" })
     })

@@ -2,7 +2,7 @@ import { Label } from "../ui/label"
 import { Input } from "../ui/input"
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
-import { Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Trash2, Eye, EyeOff, Save } from "lucide-react";
 import { v4 as uuid } from "uuid";
 
 interface LabeledInputInterface {
@@ -218,7 +218,6 @@ export const KeyValueInput = ({bind, value, commit, type }: { bind: string; valu
     return inputValue?.length 
         ? (
             <>
-                {console.log({inputValue})}
                 {
                     inputValue?.map(({key, value: val, id, isDirty}, i) => (
                         <div key={id} className="flex gap-2 p-1 w-full">
@@ -255,8 +254,8 @@ export const KeyValueInput = ({bind, value, commit, type }: { bind: string; valu
                                 isDirty
                                     ? <Button 
                                             type="button" 
-                                            variant="outline" 
-                                            className="h-10 w-10" 
+                                            variant="default" 
+                                            className="h-10 w-10 bg-primary hover:bg-primary/90" 
                                             onClick={() => {
                                                 updateParam(i, { isDirty: false })
                                                 commit(bind, objectFromArray(inputValue))
