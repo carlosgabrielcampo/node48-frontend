@@ -93,8 +93,10 @@ export const KeyValueInput = ({bind, value, commit, type }: { bind: string; valu
     const [inputValue, setValue] = useState<ObjectRow[]>([])
     const [newDraft, setNewDraft] = useState({key: "", value: ""})
     const [unmaskedKeys, setUnmaskedKeys] = useState<Set<string>>(new Set(value ? Object.keys(value) : []));
-    const keyvalues: ObjectRow[] = value ? [...Object.entries(value ?? {}).map(([key, val]) => ({ id: uuid(), key, value: val as string }))]: []
-    
+
+    const keyvalues: ObjectRow[] = value ? [...Object.entries(value ?? {}).map(([key, value]) => ({id: uuid(), key, value, isDirty: false}))]: []
+    console.log({keyvalues})
+
     useEffect(() => setValue(keyvalues), [JSON.stringify(value)])
     
     const keyRef = useRef<HTMLInputElement | null>(null);
@@ -113,15 +115,16 @@ export const KeyValueInput = ({bind, value, commit, type }: { bind: string; valu
     };
     
     const commitDraft = () => {
-        if (!newDraft.key || !newDraft.value) return;
+        if (!newDraft.key) return;
+
         setValue(prev => {
-            const updatedDraft = [...prev, { id: uuid(), key: newDraft.key, value: newDraft.value } ]
+            const updatedDraft = [...prev, { id: uuid(), key: newDraft.key, value: newDraft?.value } ]
             commit(bind, objectFromArray(updatedDraft))
             return updatedDraft
         });
 
         setNewDraft({ key: "", value: "" });
-        requestAnimationFrame(() => { keyRef.current?.focus() });
+        requestAnimationFrame(() => keyRef.current?.focus());
     };
     
     const removeParams = (id: string) => {
@@ -131,11 +134,9 @@ export const KeyValueInput = ({bind, value, commit, type }: { bind: string; valu
     }
     
     const updateParam = (index: number, patch: Partial<ObjectRow>) => {
-        setValue(prev => {
-            const updatedInput = prev.map((p, i) => i === index ? { ...p, ...patch } : p )
-            commit(bind, objectFromArray(updatedInput))
-            return updatedInput
-        })
+        const updatedInput = inputValue.map((p, i) => i === index ? { ...p, ...patch } : p )
+        setValue(prev => [...updatedInput])
+        return updatedInput
     }
 
     const newInputGroup = (
@@ -162,7 +163,7 @@ export const KeyValueInput = ({bind, value, commit, type }: { bind: string; valu
                         if(e.key === "Enter" && newDraft.key) commitDraft()
                         else if(e.key === "Enter" && !newDraft.key) keyRef.current?.focus()
                     }}
-                    onBlur={commitDraft}
+                    onBlur={updateParam}
                     placeholder="Value"
                     className="w-full"
                 />
@@ -179,7 +180,7 @@ export const KeyValueInput = ({bind, value, commit, type }: { bind: string; valu
         </div>
     );
     
-    const inputType = ({value: val, key, onChange, type: inputType}: {value: string; key: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; type?: string}) => {
+    const inputType = ({value: val, key, onChange, type: inputType, onKeyDown}: {value: string; key: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; type?: string}) => {
         switch (inputType) {
             case "masked": {
                 return (
@@ -188,6 +189,7 @@ export const KeyValueInput = ({bind, value, commit, type }: { bind: string; valu
                           type={unmaskedKeys?.has(key) ? "text" : "password" }
                           value={val}
                           onChange={onChange}
+                          onKeyDown={onKeyDown}
                           placeholder="value"
                           className="font-mono text-sm w-full"
                           readOnly={!unmaskedKeys?.has(key)}
@@ -216,13 +218,65 @@ export const KeyValueInput = ({bind, value, commit, type }: { bind: string; valu
     return inputValue?.length 
         ? (
             <>
-                {inputValue?.map(({key, value: val, id}, i) => (
-                    <div key={id} className="flex gap-2 p-1 w-full">
-                        <Input value={key || ""} onChange={e => updateParam(i, { key: e.target.value })} placeholder="Key" className="w-full" />
-                        { inputType({ value: val, key: `value${id}`, onChange: (e) => updateParam(i, { value: e.target.value }), type })}
-                        <Button onClick={() => removeParams(id)} className="h-10 w-10" variant="outline"><Trash2 className="h-4 w-4 text-destructive"/></Button>
-                    </div>
-                ))}
+                {console.log({inputValue})}
+                {
+                    inputValue?.map(({key, value: val, id, isDirty}, i) => (
+                        <div key={id} className="flex gap-2 p-1 w-full">
+                            <Input
+                                key={`key${id}`}
+                                value={key || ""} 
+                                onChange={e => {
+                                    updateParam(i, { key: e.target.value, isDirty: true })
+                                }} 
+                                onKeyDown={e => {
+                                    if(e.key === "Enter" && newDraft.key) commit(bind, objectFromArray(inputValue))
+                                    else if(e.key === "Enter" && !newDraft.key) keyRef.current?.focus()
+                                }}
+                                onBlur={() => commit(bind, objectFromArray(inputValue))}
+                                placeholder="Key" 
+                                className="w-full" 
+                            />
+                            { 
+                                inputType({ 
+                                    value: val, 
+                                    key: `value${id}`, 
+                                    onChange: (e) => {
+                                        updateParam(i, { value: e.target.value, isDirty: true })
+                                    }, 
+                                    type,
+                                    onKeyDown: (e) => {
+                                        if(e.key === "Enter" && newDraft.key) commit(bind, objectFromArray(inputValue))
+                                        else if(e.key === "Enter" && !newDraft.key) keyRef.current?.focus()
+                                    }
+
+                                })
+                            }
+                            {
+                                isDirty
+                                    ? <Button 
+                                            type="button" 
+                                            variant="outline" 
+                                            className="h-10 w-10" 
+                                            onClick={() => {
+                                                updateParam(i, { isDirty: false })
+                                                commit(bind, objectFromArray(inputValue))
+                                            }}
+                                        >
+                                            <Plus />
+                                        </Button>
+                                    : <Button 
+                                        onClick={() => {
+                                            removeParams(id)
+                                        }} 
+                                        className="h-10 w-10" 
+                                        variant="outline"
+                                    >
+                                        <Trash2 className="h-4 w-4 text-destructive"/>
+                                    </Button>
+                            }
+                        </div>
+                    ))
+                }
                 {newInputGroup}
             </>
         )

@@ -11,11 +11,11 @@ export const envStorageService: EnvStorageInterface = new LocalEnvStorage()
   // : new LocalEnvStorage();
 
 export const envService = {
-  get: async () => {
-    return await envStorageService.get();
+  get: async (id) => {
+    return await envStorageService.get(id);
   },
   getById: async ({id}: {id: string}): Promise<any> => {
-    const getById = await envStorageService.get(id, {profiles: {}, active: []});
+    const getById = await envStorageService.get(id, {profiles: {}});
     return getById[id]
   },
   getProfiles: async ({id}: {id: string}) => {
@@ -24,11 +24,11 @@ export const envService = {
   getActive: async ({id}: {id: string}) => {
     return (await envService.getById({id}))?.["active"];
   },
-  create: async ({id, profiles, active}: {id: string; profiles: any; active: any[]}): Promise<void> => {
-    return await envStorageService.save({id, profiles, active});
+  create: async ({id, profiles}: {id: string; profiles: any;}): Promise<void> => {
+    return await envStorageService.save({id, profiles});
   },
   updateProfiles: async ({id, profileId, updates}: {id: string; profileId: string; updates: any}): Promise<any> => {
-    return await envStorageService.update({id, profiles: {[profileId]: updates}})
+    return await envStorageService.update({id, profiles: {[profileId]: {...updates, updatedAt: new Date()}}})
   },
   deleteProfile: async (env, profileId): Promise<void> => {
     return await envStorageService.deleteProfile(env, profileId)
@@ -42,18 +42,16 @@ export const envService = {
   removeActiveEnv: async({id, envId, type}: {id: string; envId: string | null; type: string}): Promise<void> => {
     return await envStorageService.removeActive(id, envId, type)
   },
-  export: async (): Promise<string> => {
-    const envs = await envService.getById({id: STORAGE_KEY_GLOBAL_ENVS});
+  export: async ({id}): Promise<string> => {
+    const envs = await envService.getById({id});
     return JSON.stringify(envs.profiles, null, 2);
   },
-  import: async (json: string): Promise<EnvProfile[]> => {
+  import: async (json: string, id: string ): Promise<void> => {
     try {
-      const envs = JSON.parse(json) as Record<string, EnvProfile>;
-      const withNewIds = Object.values(envs).map((e) => ({ ...e, id: uuidv4(), createdAtUTC: new Date().toISOString() }));
-      const existingEnvs = await envService.getById({id: STORAGE_KEY_GLOBAL_ENVS});
-      await envStorageService.update({id: STORAGE_KEY_GLOBAL_ENVS, profiles: [...Object.values(existingEnvs.profiles || {}), ...withNewIds]});
-      return withNewIds;
+      const envs = JSON.parse(json) as Record<string, EnvProfile>;      
+      return await envStorageService.save({id, profiles: envs});
     } catch (e) {
+      console.error(e)
       throw new Error("Invalid JSON format");
     }
   },

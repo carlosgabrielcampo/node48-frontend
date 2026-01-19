@@ -112,7 +112,9 @@ const ConfigPanel = ({draft, setDraft, defaultPanel, panelFormat, open, connecti
       children && Array.isArray(draft) ? draft?.map((value: Partial<Record<string, string>>, index: number) => {
             value.render_id = uuidv4()
             const setState = (patch: Partial<Record<string, string>>) => setDraft(draft.map((p: any, i: number) => i === index ? { ...p, ...patch } : p ))
-            const commit = (bind: string, value: Partial<Record<string, string>>) => setDraft(draft.map((p: any, i: number) => i === index ? { ...p, [bind]: value } : p))
+            const commit = (bind: string, value: Partial<Record<string, string>>) => {
+              setDraft(draft.map((p: any, i: number) => i === index ? { ...p, [bind]: value } : p))
+            }
             return ChildrenRender({ open, connections, removeState, defaultPanel, draft: value, position: [index], setDraft: setState, commit, schema: children })
         })
         : <div className="text-sm text-muted-foreground">No configuration available.</div>

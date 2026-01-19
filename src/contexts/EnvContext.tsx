@@ -71,7 +71,7 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
     const profileId = uuid()
     const profileObj = { values: {}, id: profileId, name: profileName, scope: "workflow", createdAt: new Date(), updatedAt: new Date() }
     create({id, profiles: { [profileId]: profileObj }});
-  }, [create]);
+  }, [create, allEnvs]);
 
   const updateProjectEnv = useCallback(async (env: string, id: UUID, updates: Partial<EnvProfile>) => {
     await envService.updateProfiles({id: env, profileId: id, updates});
@@ -111,13 +111,16 @@ export const EnvProvider = ({ children }: { children: ReactNode }) => {
      return await envService.setActiveEnv({id, envId, type});
   }, []);
 
-  const exportEnvs = useCallback(async () => {
-    return JSON.stringify(allEnvs.profiles, null, 2);
+  const exportEnvs = useCallback(async ({id}) => {
+    Object.entries(allEnvs[id].profiles).map(([key, value]) => {
+      delete allEnvs[id].profiles[key].isDefault
+    })
+    return JSON.stringify(allEnvs[id].profiles, null, 2);
   }, [allEnvs]);
 
-  const importEnvs = useCallback(async (json: string) => {
-    await envService.import(json);
-    await refreshProjectEnvs();
+  const importEnvs = useCallback(async (json: string, id: string) => {
+    await envService.import(json, id);
+    await refreshProjectEnvs({id});
     toast.success("Environments imported");
   }, [refreshProjectEnvs]);
 

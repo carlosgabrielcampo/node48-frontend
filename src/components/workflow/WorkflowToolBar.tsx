@@ -41,7 +41,7 @@ export const WorkflowToolBar = ({
       workflow.description,
       workflow.createdAtUTC,
     ), 
-  [workflow.id, nodes.length, edges.length]);
+  [workflow.id, nodes.length, edges.length, nodes]);
 
   const onAddNode = useCallback(() => { 
     setIsDrawerOpen(true); 
@@ -190,7 +190,7 @@ export const WorkflowToolBar = ({
           <Button variant="outline" size="sm" onClick={handleRun} disabled={isRunning} aria-label="Execute workflow" className={`${isRunning ? "text-muted bg-green-500 disabled:opacity-100" : "" }`}>
             <Play className="h-4 w-4"/>
           </Button>
-          <Button variant="default" size="sm" onClick={handleSave} disabled={isSaving} aria-label="Save workflow" className={`${pendingChanges ? "text-muted bg-yellow-500 hover:bg-yellow-500/90" : "bg-primary" }`}>
+          <Button variant="outline" size="sm" onClick={handleSave} disabled={isSaving} aria-label="Save workflow" className={`${pendingChanges && "bg-primary hover:bg-primary/90 "}`}>
               <Save className="h-4 w-4"/>
           </Button>
         </div>

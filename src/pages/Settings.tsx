@@ -43,7 +43,7 @@ export default function Settings() {
   };
 
   const handleExport = async () => {
-    const json = await exportEnvs();
+    const json = await exportEnvs({id: "global"});
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -59,7 +59,7 @@ export default function Settings() {
     if (!file) return;
     const text = await file.text();
     try {
-      await importEnvs(text);
+      await importEnvs(text, "global");
     } catch {
       toast.error("Invalid JSON file");
     }
@@ -78,7 +78,6 @@ export default function Settings() {
             <h1 className="text-4xl font-bold text-foreground mb-2">Settings</h1>
             <p className="text-muted-foreground">Manage your application preferences</p>
           </div>
-
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -117,7 +116,7 @@ export default function Settings() {
                     <DialogTrigger asChild>
                       <Button size="sm">
                         <Plus className="h-4 w-4 mr-1" />
-                        New
+                        Create
                       </Button>
                     </DialogTrigger>
                     

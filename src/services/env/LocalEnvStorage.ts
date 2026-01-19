@@ -28,10 +28,15 @@ export class LocalEnvStorage implements EnvStorageInterface {
             return {};
         }
     }
-
-    async save({ id, profiles }: any): Promise<void> {
+    async save({ id, profiles}: any): Promise<void> {
         const current = await this.get();
         const currentProfiles = current?.[id]?.profiles
+        const allProfiles = currentProfiles ? Object.values(currentProfiles).filter((e) => e?.isDefault) : []
+        
+        if(id === "global" && !(currentProfiles && allProfiles?.length)){
+            const key = Object.keys(profiles)[0]
+            profiles[key].isDefault = true 
+        }   
         current[id] = {
             ...current[id], profiles: profiles
                 ? { ...currentProfiles, ...profiles }
@@ -40,7 +45,6 @@ export class LocalEnvStorage implements EnvStorageInterface {
         localSet(current)
         return current
     }
-
     async update(options: any): Promise<void> {
         return this.save(options);
     }
@@ -67,7 +71,6 @@ export class LocalEnvStorage implements EnvStorageInterface {
         return current
     }
     setActive = async (id, envId, type) => {
-        console.log({id, envId, type})
         const current = await this.get();
         const workEnv = current[id] ?? { profiles: {}, global: "" };
         if(type === "workflow") workEnv.activeLocal = envId

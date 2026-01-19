@@ -42,7 +42,6 @@ export const WorkflowEnvModal = ({ open, onOpenChange, workflowId }: WorkflowEnv
   }
 
   const handleEnvSwitch = useCallback(async (envId: string | null, type: "workflow" | "global") => {
-    console.log({handleEnvSwitch: envId, type})
     if(!envId || !type) return null
     await setWorkflowActiveEnv(workflowId, envId, type);
     updateActiveEnvs();

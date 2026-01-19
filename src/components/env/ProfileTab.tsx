@@ -1,11 +1,10 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Input } from "../ui/input"
 import { toast } from "sonner";
 import { Button } from "../ui/button";
-import { Workflow, Star, Trash2, Plus, Badge } from "lucide-react";
+import { Workflow, Trash2, Plus, CirclePower, Upload, Download, SquarePen, X, Save, Check } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { KeyValueInput } from "../layout/input";
-import { v4 as uuid } from "uuid";
 import { Label } from "../ui/label";
 import { useEnv } from "@/contexts/EnvContext";
 import { EnvProfile } from "@/types/env";
@@ -30,6 +29,8 @@ export const ProfileTab = ({
 }: ProfileInterface): React.ReactElement => {
     const {
         allEnvs,
+        importEnvs,
+        exportEnvs,
         updateProjectEnv,
         loadWorkflowEnvs,
         createProjectEnv,
@@ -37,9 +38,35 @@ export const ProfileTab = ({
     } = useEnv();
     const [isDirty, setIsDirty] = useState(false);
     const [newProfileName, setNewProfileName] = useState("");
+    const [profileName, setProfileName] = useState("");
     const [editingProfile, setEditingProfile] = useState<Partial<EnvProfile>>({});
     const workflowProfiles = allEnvs?.[workflowId]?.profiles;
-    console.log(allEnvs?.[workflowId]?.profiles)
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleExport = async () => {
+        const json = await exportEnvs({id: workflowId});
+        const blob = new Blob([json], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "environments.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success("Environments exported");
+    };
+
+    const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const text = await file.text();
+        try {
+            await importEnvs(text, workflowId);
+        } catch {
+            toast.error("Invalid JSON file");
+        }
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    };
+    
     const handleSave = async () => {
         if (!editingProfile || !workflowId) return;
         try {
@@ -75,17 +102,19 @@ export const ProfileTab = ({
             await deleteWorkflowEnv(workflowId, envId);
             toast.success("Environment profile deleted");
         } catch (error) {
-            console.log(error)
             toast.error("Failed to delete profile");
         }
     };
 
     const SelectorItem = ({profileItem}) => <div
             key={profileItem.id}
-            className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${editingProfile.id === profileItem.id ?  'bg-primary/10  border-primary/30' : '' } border`}
-            onClick={() => setEditingProfile({ ...profileItem })}
+            className={`flex items-center my-2 w-48 justify-between p-2 rounded-md cursor-pointer transition-colors ${editingProfile.id === profileItem.id ?  'bg-primary/10  border-primary/30' : '' } border`}
+            onClick={() => {
+                setEditingProfile({ ...profileItem })
+                setIsDirty(false)
+            }}
         >
-        <span className="text-sm truncate">{profileItem.name}</span>
+        <span className="text-sm truncate overflow-x-hidden w-24">{profileItem.name}</span>
         <div className="flex items-center justify-end h-6">
             <Button
                 variant="ghost"
@@ -99,7 +128,7 @@ export const ProfileTab = ({
                             className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-primary text-primary-text-color mr-8`}>
                             Active
                         </span>
-                        : <Star className="h-3 w-3" />
+                        : <CirclePower className="h-3 w-3" />
                 }
             </Button>
             <Button
@@ -112,12 +141,12 @@ export const ProfileTab = ({
             </Button>
         </div>
     </div>
-
+    
     const profileSelector = () => workflowProfiles && Object.values(workflowProfiles).map((profileItem: EnvProfile) => <SelectorItem profileItem={profileItem} />)
-    console.log({workflowProfiles})
     return (
         <>
             <div className="flex gap-2 mb-4">
+                <input type="file" ref={fileInputRef} accept=".json" className="hidden" onChange={handleImport} />
                 <Input
                     placeholder="New profile name..."
                     value={newProfileName}
@@ -125,9 +154,10 @@ export const ProfileTab = ({
                     onKeyDown={(e) => e.key === "Enter" && handleCreateProfile()}
                 />
                 <Button onClick={handleCreateProfile} disabled={!newProfileName.trim()}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create
+                    <Plus className="h-4 w-4" />
                 </Button>
+                <Button variant="outline" size="sm" onClick={handleExport}><Download className="h-4 w-4" /></Button>
+                <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}><Upload className="h-4 w-4" /></Button>
             </div>
             {
                 workflowProfiles && Object.values(workflowProfiles).length === 0 ? (
@@ -142,35 +172,64 @@ export const ProfileTab = ({
                     </div>
                 ) : (
                     <div className="flex gap-4 flex-1 h-full ">
-                        <div className="w-48 space-y-2">
+                        <ScrollArea className="max-h-[45vh]">
                             <Label className="text-xs text-muted-foreground">Profiles</Label>
-                            <ScrollArea className="h-full overflow-hidden">
-                                <div className="space-y-1 pr-2">{
-                                profileSelector({ workflows: workflowProfiles, setEditingProfile })}</div>
-                            </ScrollArea>
-                        </div>
-                        <div className="flex-1 border rounded-lg p-4 min-h-full">
+                            {profileSelector({ workflows: workflowProfiles, setEditingProfile })}
+                        </ScrollArea>
+                        <div className="flex-1 rounded-lg p-4 min-h-full">
                             {
                                 editingProfile.id
                                     ? (
                                         <div className="h-full flex flex-col">
                                             <div className="flex items-center justify-between mb-4">
-                                                <div>
-                                                    <h4 className="font-medium">{editingProfile.name}</h4>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {editingProfile?.values && Object.keys(editingProfile.values).length} variables
-                                                    </p>
+                                                <div> 
+                                                    {
+                                                        profileName
+                                                        ?<div className="flex items-center gap-3 ml-1">
+                                                            <Input
+                                                                className="font-bold w-auto"
+                                                                value={profileName}
+                                                                onChange={(e) => setProfileName(e.target.value)}
+                                                            />
+                                                            <Button 
+                                                                variant={profileName !== editingProfile.name ? "default" : "outline"} 
+                                                                size="sm" 
+                                                                onClick={() => {
+                                                                    setProfileName("")
+                                                                    setEditingProfile({...editingProfile, name: profileName})
+                                                                    setIsDirty(true)
+                                                                }}
+                                                            >
+                                                                <Check className="cursor-pointer" />
+                                                            </Button>
+                                                            <Button 
+                                                                variant="outline" 
+                                                                size="sm"
+                                                                onClick={() => setProfileName("")}
+                                                            >
+                                                                <X className="cursor-pointer" />
+                                                            </Button>
+                                                        </div>
+                                                        :<div className="flex items-center gap-3 ml-1">
+                                                            <h4 className="text-sm font-bold px-3 py-2"onDoubleClick={() => setProfileName(editingProfile.name)}>{editingProfile.name}</h4>
+                                                            <Button variant="outline" size="sm" onClick={() => setProfileName(editingProfile.name)}>
+                                                                <SquarePen className="cursor-pointer" />
+                                                            </Button>
+                                                        </div>
+                                                    }
                                                 </div>
                                                 <Button onClick={handleSave} disabled={!isDirty} size="sm">
-                                                    Save
+                                                    <Save />
                                                 </Button>
                                             </div>
-                                            <KeyValueInput
-                                                bind="values"
-                                                value={editingProfile.values}
-                                                commit={handleValuesChange}
-                                                type="masked"
-                                            />
+                                            <ScrollArea className="max-h-[40vh]">
+                                                <KeyValueInput
+                                                    bind="values"
+                                                    value={editingProfile.values}
+                                                    commit={handleValuesChange}
+                                                    type="masked"
+                                                />
+                                            </ScrollArea>
                                         </div>
                                     )
                                     : (
