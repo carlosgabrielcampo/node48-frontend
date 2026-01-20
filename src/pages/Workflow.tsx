@@ -7,10 +7,7 @@ import { WorkflowNode } from "@/types/configPanels";
 import { toast } from "sonner";
 
 interface Window {
-  __addWorkflowNode?: (args: {
-    type: string;
-    connections: any;
-  }) => void;
+  __addWorkflowNode?: (args: WorkflowNode) => void;
 }
 
 const Workflow = ({workflow}: {workflow: any}) => {
@@ -22,7 +19,7 @@ const Workflow = ({workflow}: {workflow: any}) => {
   const [configPanelOpen, setConfigPanelOpen] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
-  const handleNodeClick = useCallback((node: any) => {
+  const handleNodeClick = useCallback((node: WorkflowNode) => {
     const workflowNode: WorkflowNode = {
       id: node.id,
       name: node?.name,
@@ -38,8 +35,8 @@ const Workflow = ({workflow}: {workflow: any}) => {
     setConfigPanelOpen(true);
   }, [setConfigPanelOpen, setSelectedNode]);
   
-  const handleNodeAdded = useCallback((node: any) => {
-    if ((window as any).__addWorkflowNode) (window as any).__addWorkflowNode(node);
+  const handleNodeAdded = useCallback((node: WorkflowNode) => {
+    if ((window as Window).__addWorkflowNode) (window as Window).__addWorkflowNode(node);
     setIsDrawerOpen(false);
   }, []);
 

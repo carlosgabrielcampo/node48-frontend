@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { WorkflowNode } from "./configPanels";
+import { Edge, Node } from "reactflow";
 
 export interface Workflow {
   id: string;
@@ -51,14 +52,14 @@ export interface WorkflowToolBarProps {
   workflowId?: string;
   workflowName?: string;
   isActive: boolean;
-  nodes: any;
-  setNodes: any;
-  edges: any;
-  setEdges: any;
-  setSelectedNode: any;
-  selectedNode: any;
-  setConfigPanelOpen: any;
-  configPanelOpen: any;
+  nodes: Node[];
+  setNodes: Dispatch<SetStateAction<Node[]>>;
+  edges: Edge;
+  setEdges: Dispatch<SetStateAction<Edge[]>>;
+  setSelectedNode: Dispatch<SetStateAction<WorkflowNode | null>>;
+  selectedNode: WorkflowNode | null;
+  setConfigPanelOpen: Dispatch<SetStateAction<boolean>>;
+  configPanelOpen: boolean;
   setIsActive: Dispatch<SetStateAction<boolean>>;
   setIsDrawerOpen: Dispatch<SetStateAction<boolean>>;
   handleNodeClick: any;
@@ -89,6 +90,6 @@ export interface WorkflowJSON {
   createdAtUTC?: string;
   updatedAtUTC?: string;
   startStep: string;
-  settings?: any;
+  settings?: Record<string, string>;
   steps: Record<string, WorkflowStep>;
 }
