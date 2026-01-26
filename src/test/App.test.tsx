@@ -10,7 +10,9 @@ class ResizeObserverMock {
   disconnect() {}
 }
 
-(globalThis as any).ResizeObserver = ResizeObserverMock;
+(globalThis as unknown as {
+  ResizeObserver: typeof ResizeObserver;
+}).ResizeObserver = ResizeObserverMock;
 
 // Mock all the providers and components to avoid complex setup
 vi.mock('@/contexts/ThemeContext', () => ({
