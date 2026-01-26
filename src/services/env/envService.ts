@@ -14,14 +14,14 @@ export const envService = {
   get: async (id) => {
     return await envStorageService.get(id);
   },
-  getById: async ({id}: {id: string}): Promise<any> => {
-    const getById = await envStorageService.get(id, {profiles: {}});
+  getById: async ({id}: {id: string}): Promise<void> => {
+    const getById = await envStorageService.get(id);
     return getById[id]
   },
-  create: async ({id, profiles}: {id: string; profiles: any;}): Promise<void> => {
+  create: async ({id, profiles}: {id: string; profiles: EnvProfile[];}): Promise<void> => {
     return await envStorageService.save({id, profiles});
   },
-  updateProfiles: async ({id, profileId, updates}: {id: string; profileId: string; updates: any}): Promise<any> => {
+  updateProfiles: async ({id, profileId, updates}: {id: string; profileId: string; updates: EnvProfile}): Promise<void> => {
     return await envStorageService.update({id, profiles: {[profileId]: {...updates, updatedAt: new Date()}}})
   },
   deleteProfile: async (env, profileId): Promise<void> => {

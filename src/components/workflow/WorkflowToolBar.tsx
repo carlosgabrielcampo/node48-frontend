@@ -12,22 +12,22 @@ import { WorkflowEnvModal } from "@/components/env/WorkflowEnvModal";
 import { isWorkflowJSON, parseWorkflowJSON } from "@/lib/workflowParser";
 import { Save, Play, Download, Plus, Upload, Settings2 } from "lucide-react";
 import { RunningModal } from "../panels/RunningPanel";
+import { useWorkflowEditor } from "@/contexts/WorkflowEditorContext";
 
 export const WorkflowToolBar = ({
   nodes,
   edges,
-  isDirty,
   isActive,
   workflow,
   setNodes,
   setEdges,
-  setIsDirty,
   setIsActive,
   handleNodeClick,
   setIsDrawerOpen,
   handleDeleteNode
 }: WorkflowToolBarProps) => {
-
+  const { setDirty, isDirty } = useWorkflowEditor()
+  
   const [isRunning, setIsRunning] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
   const [envModalOpen, setEnvModalOpen] = useState(false);
@@ -54,10 +54,10 @@ export const WorkflowToolBar = ({
   }
 
   const handleSave = async () => {
-    setIsDirty(true);
+    setDirty(true);
     try {
       await onSave();
-      setIsDirty(false)
+      setDirty(false)
       toast.success("Workflow saved successfully");
     } catch (error) {
       toast.error("Failed to save workflow");

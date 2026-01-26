@@ -1,6 +1,6 @@
 import { Node, Edge } from "reactflow";
-import { WorkflowJSON, WorkflowStep } from "@/types/workflows";
-
+import { WorkflowJSON } from "@/types/workflows";
+import { WorkflowStep } from "@/types/workflows";
 /**
  * Export React Flow nodes and edges back to WorkflowJSON format
  */
@@ -11,7 +11,7 @@ export const exportToWorkflowJSON = (
   workflowName: string,
   workflowDescription?: string,
   createdAtUTC?: string,
-  workflowSteps?: any
+  workflowSteps?: Record<string, string>
 ): WorkflowJSON => {
   const steps: Record<string, WorkflowStep> = workflowSteps || {};
   

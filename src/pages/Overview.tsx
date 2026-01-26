@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { stats, workflows, activities, systemStatus } from '../lib/mockOverviewData';
 import { LabeledDropdown } from '@/components/layout/dropdown';
+interface StatCardInterface {
+  title: string;
+  value: string;
+  trendPct: number;
+  trendUp: boolean;
+  icon: string;
+}
 
 const Icon = ({ name }: { name: string }) => {
   switch (name) {
@@ -54,7 +61,7 @@ function timeAgo(d: Date) {
   return `${days}d ago`;
 }
 
-const StatCard = ({ title, value, trendPct, trendUp, icon }: any) => (
+const StatCard = ({ title, value, trendPct, trendUp, icon }: StatCardInterface) => (
   <article
     role="group"
     aria-label={title}

@@ -2,6 +2,7 @@ import { memo, useState, useCallback, useEffect } from "react";
 import { Handle, Position, NodeProps, useUpdateNodeInternals } from "reactflow";
 import { ChevronDown, ChevronRight, Cog, Trash2 } from "lucide-react";
 import { nodeTemplates } from "./Templates";
+import { StepParameters } from "@/types/parameters";
 
 interface OutputHandle {
   source: string;
@@ -12,9 +13,9 @@ interface UnifiedNodeData {
   name: string;
   type: string;
   onDelete: (id: string) => void;
-  onClick?: (data: any) => void;
+  onClick?: (e: React.ReactElement) => void;
   connections: Record<string, string>;
-  parameters?: any[];
+  parameters?: StepParameters[];
   collapsed?: boolean;
 }
 

@@ -1,10 +1,11 @@
+import { StepParameters } from "@/types/parameters";
 export interface WorkflowInterface {
   id: string;
   name: string;
   description?: string;
   createdAtUTC?: string;
   updatedAtUTC?: string;
-  steps: Record<string, any>;
+  steps: Record<string, StepParameters>;
 }
 
 export interface WorkflowStorageInterface {

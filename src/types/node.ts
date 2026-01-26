@@ -1,3 +1,4 @@
+import { StepParameters } from "./parameters";
 export interface NodeType {
     id: string;
     position: { x: number; y: number };
@@ -6,6 +7,6 @@ export interface NodeType {
     onDelete: (id: string) => void;
     onClick: (id: string) => void;
     collapsed?: boolean;
-    parameters?: any[];
+    parameters?: StepParameters[];
     name?: string;
 }

@@ -21,7 +21,9 @@ import { NodeConfigPanel } from "../panels/NodePanel";
 import { createEdge } from "../edges/EdgeDataStructure";
 import { Button } from "@/components/ui/button";
 import { Maximize, ZoomIn, ZoomOut, Shrink, Expand } from "lucide-react";
-
+import { StepParameters } from "@/types/parameters";
+import { WorkflowConnection } from "@/types/configPanels";
+import { useWorkflowEditor } from "@/contexts/WorkflowEditorContext";
 const nodeTypes = { custom: UnifiedNode };
 
 export const FlowEditor = ({
@@ -30,7 +32,6 @@ export const FlowEditor = ({
   setEdges, 
   workflow, 
   setNodes,
-  setIsDirty,
   onNodeAdded, 
   selectedNode,
   onNodesChange, 
@@ -41,14 +42,14 @@ export const FlowEditor = ({
   handleDeleteNode,
   setConfigPanelOpen,
 }: FlowEditorProps) => {
-
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
-  const [collapsed, setCollapsed] = useState(null)
-  const [pendingNode, setPendingNode] = useState<any>(null);
+  const [pendingNode, setPendingNode] = useState<WorkflowJSON | null>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [isScreenMoving, setIsScreenMoving] = useState(false);
   const timerRef = useRef<number | null>(null);
   const minimapDelay = 400
+  const { setDirty } = useWorkflowEditor()
+  
 
   useEffect(() => {
     if (onNodeAdded) { globalThis.__addWorkflowNode = (node) => setPendingNode(node) }
@@ -75,7 +76,7 @@ export const FlowEditor = ({
           toast.error("Double connection");
           return eds
         }
-        setIsDirty(true)
+        setDirty(true)
         toast.success("Connection created");
         return addEdge(newEdge, eds)
       });
@@ -92,17 +93,17 @@ export const FlowEditor = ({
     ({type}) => {
       const newNode: Node = createEmptyNode({ type, onDelete: handleDeleteNode, onClick: handleNodeClick });
       setNodes((nds) => [...nds, newNode]);
-      setIsDirty(true)
+      setDirty(true)
       toast.success(`Added ${type}`);
     },
-    [setNodes, handleDeleteNode, handleNodeClick, setIsDirty ]
+    [setNodes, handleDeleteNode, handleNodeClick, setDirty ]
   );
 
-  const handleUpdateNode = useCallback((nodeId: string, parameters: any[], connections: any[]) => {
+  const handleUpdateNode = useCallback((nodeId: string, parameters: StepParameters[], connections: WorkflowConnection[]) => {
     setNodes((nds) =>
       nds.map((node: Node) => {
         if(node.id === nodeId) {
-          if(JSON.stringify(node.data.parameters) != JSON.stringify(parameters)) setIsDirty(true)
+          if(JSON.stringify(node.data.parameters) != JSON.stringify(parameters)) setDirty(true)
           return ({ ...node, data: { ...node.data, parameters, connections } })
         } else { return node }
       })
@@ -112,7 +113,7 @@ export const FlowEditor = ({
     if (selectedNode?.id === nodeId) {
       setSelectedNode((prev) => prev ? { ...prev, parameters } : null);
     }
-  }, [setNodes, selectedNode, setSelectedNode, setIsDirty]);
+  }, [setNodes, selectedNode, setSelectedNode, setDirty]);
 
   // Handle pending node addition
   useEffect(() => {
@@ -141,10 +142,10 @@ export const FlowEditor = ({
           toast.success(`Deleted ${selectedEdges.length} connection(s)`);
         }
         console.log("handleKeyDown") 
-        setIsDirty(true)
+        setDirty(true)
       }
     },
-    [selectedElements, nodes, edges, setNodes, setEdges, setIsDirty]
+    [selectedElements, nodes, edges, setNodes, setEdges, setDirty]
   );
 
   useEffect(() => {
@@ -198,7 +199,7 @@ export const FlowEditor = ({
           onMoveEnd={hideMinimap}
           onMoveStart={showMinimap}
           onNodesChange={onNodesChange}
-          onNodeDrag={() => setIsDirty(true)}
+          onNodeDrag={() => setDirty(true)}
           onEdgesChange={onEdgesChange}
           attributionPosition="bottom-left"
           onSelectionChange={onSelectionChange}

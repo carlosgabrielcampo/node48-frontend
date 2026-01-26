@@ -1,3 +1,6 @@
+import { Edge } from "reactflow";
+import { StepParameters } from "./parameters";
+
 // Condition node types
 export interface ConditionRule {
   field: string;
@@ -66,11 +69,11 @@ export interface WorkflowNode {
   createdAtUTC?: string;
 
   type: string,
-  data: Record<string, any>
+  data: Record<string, string>
   connections?: Record<string, string>;
   
   // Config can be different types based on node type
-  parameters?: ApiConfig[] | CsvConfig[] | LoopConfigEntry[] | ConditionBlock[];
+  parameters?: StepParameters[];
   list?: {
     timeoutMs: number;
     keys: string[];
@@ -109,8 +112,8 @@ export interface NodeConfigPanelProps {
   node: WorkflowNode | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpdate: (nodeId: string, updates: any[], connections?: any) => void;
-  setEdges?: (v: any) => void;
+  onUpdate: (nodeId: string, parameters: StepParameters[], connections?: WorkflowConnection[]) => void;
+  setEdges?: (v: Edge) => void;
 }
 
 export interface CsvConfigPanelProps {

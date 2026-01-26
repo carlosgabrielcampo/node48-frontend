@@ -10,14 +10,13 @@ interface Window {
   __addWorkflowNode?: (args: WorkflowNode) => void;
 }
 
-const Workflow = ({workflow}: {workflow: any}) => {
+const Workflow = ({workflow}: {workflow: WorkflowNode}) => {
   const [isActive, setIsActive] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
   const [configPanelOpen, setConfigPanelOpen] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
 
   const handleNodeClick = useCallback((node: WorkflowNode) => {
     const workflowNode: WorkflowNode = {
@@ -55,12 +54,10 @@ const Workflow = ({workflow}: {workflow: any}) => {
         <WorkflowToolBar
           nodes={nodes} 
           edges={edges}
-          isDirty={isDirty}
           workflow={workflow}
           isActive={isActive}
           setNodes={setNodes}
           setEdges={setEdges}
-          setIsDirty={setIsDirty}
           setIsActive={setIsActive}
           selectedNode={selectedNode}
           configPanelOpen={configPanelOpen}
@@ -76,7 +73,6 @@ const Workflow = ({workflow}: {workflow: any}) => {
           workflow={workflow}
           setNodes={setNodes}
           setEdges={setEdges}
-          setIsDirty={setIsDirty}
           selectedNode={selectedNode}
           onNodeAdded={handleNodeAdded}
           onNodesChange={onNodesChange}
