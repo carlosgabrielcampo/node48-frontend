@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { RunningModal } from '../../../../components/panels/RunningPanel'
+import { PropsWithChildren, ReactPortal } from 'react'
 
 // Mock the useEnv hook
 vi.mock('@/contexts/EnvContext', () => ({
@@ -10,7 +11,7 @@ vi.mock('@/contexts/EnvContext', () => ({
       profileActive: { values: { activeVar: 'activeValue' } }
     })
   }),
-  EnvProvider: ({ children }: any) => <div>{children}</div>
+  EnvProvider: ({ children }: PropsWithChildren) => <div>{children}</div>
 }))
 
 // Mock the services
@@ -26,7 +27,7 @@ vi.mock('@/services/env/envService', () => ({
 
 // Mock the layout components
 vi.mock('../layout/dialog', () => ({
-  DialogLayout: ({ children, open, dialogTitle, dialogDescription }: any) =>
+  DialogLayout: ({ children, open, dialogTitle, dialogDescription }: {children: ReactPortal, open: boolean, dialogTitle: ReactPortal, dialogDescription: ReactPortal }) =>
     open ? (
       <div data-testid="dialog">
         <h2>{dialogTitle}</h2>
@@ -37,7 +38,7 @@ vi.mock('../layout/dialog', () => ({
 }))
 
 vi.mock('../layout/textArea', () => ({
-  CodeTextarea: ({ value, label, disabled }: any) => (
+  CodeTextarea: ({ value, label, disabled }: {value: string, label: string, disabled: boolean}) => (
     <div data-testid="code-textarea">
       <label>{label}</label>
       <pre>{JSON.stringify(value, null, 2)}</pre>
@@ -46,7 +47,7 @@ vi.mock('../layout/textArea', () => ({
 }))
 
 vi.mock('@/components/ui/scroll-area', () => ({
-  ScrollArea: ({ children }: any) => <div data-testid="scroll-area">{children}</div>
+  ScrollArea: ({ children }: PropsWithChildren) => <div data-testid="scroll-area">{children}</div>
 }))
 
 describe('RunningModal', () => {
@@ -76,11 +77,12 @@ describe('RunningModal', () => {
     render(<RunningModal open={true} workflowId="test-id" onOpenChange={() => {}} />)
 
     await waitFor(() => {
-      expect(screen.getByTestId('dialog')).toBeInTheDocument()
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
     expect(screen.getByText('Running...')).toBeInTheDocument()
     expect(screen.getByText('Project Running with the following configurations')).toBeInTheDocument()
+    console.log('code-textarea', screen.getAllByTestId('code-textarea'))
     expect(screen.getAllByTestId('code-textarea')).toHaveLength(2)
   })
 })

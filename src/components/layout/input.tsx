@@ -4,33 +4,59 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Plus, Trash2, Eye, EyeOff, Save } from "lucide-react";
 import { v4 as uuid } from "uuid";
+import { isDirty } from "zod";
+interface ArrayValueInterface {
+    item: string; 
+    index: number;
+}
 
 interface LabeledInputInterface {
     label: string; 
-    value: any;
-    onChange?: (value: any) => void
+    value: Record<string, string>;
+    onChange?: (value: Record<string, string>) => void
     placeholder?: string;
     className?: string;
     children?: ReactNode;
     type?: string;
-    [key: string]: any;
 }
 
 interface LabeledArrayInputInterface {
     label: string; 
-    arrayValue: any;
-    onChange?: (value: any) => void
+    arrayValue: ArrayValueInterface[];
+    onChange?: (value: HTMLBodyElement) => void
     placeholder?: string;
     className?: string;
     children?: ReactNode;
     type?: string;
-    [key: string]: any;
 }
 
 interface ObjectRow {
     id: string;
     key: string;
     value: string;
+    isDirty: boolean;
+}
+
+interface KeyValueInterface {
+    bind: string; 
+    value: Record<string, string>; 
+    commit: (bind: string, value: Record<string, string>) => void; 
+    type?: string
+}
+
+interface InputType {
+    value: string; 
+    key: string; 
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; 
+    type?: string;
+    onKeyDown: (e: React.ChangeEvent<HTMLInputElement>) => void; 
+}
+
+interface InputValues {
+    key: string;
+    value: string;
+    id: string;
+    isDirty: boolean;
 }
 
 export const LabeledInput = ({label, value, onChange, placeholder, className, children, ...props}: LabeledInputInterface) => {
@@ -54,7 +80,7 @@ export const LabeledArrayInput = ({label, arrayValue, onChange, placeholder, cla
         <div key={label} className="gap-2 flex flex-col">
             <Label className="text-xs h-full">{label}</Label>
             {
-                arrayValue?.length ? arrayValue.map((item: string, index: number) => {
+                arrayValue?.length ? arrayValue.map((item, index) => {
                     const itemChange = (value: string, idx: number) => {
                         const newArray = [...arrayValue];
                         newArray[idx] = value;
@@ -88,14 +114,12 @@ const objectFromArray = (array: ObjectRow[]) => {
     return array?.length ? Object.fromEntries(array.map((e) => [e.key, e.value])) : {} 
 }
 
-export const KeyValueInput = ({bind, value, commit, type }: { bind: string; value: any; commit: (bind: string, value: any) => void; type?: string }) => {
-    
+export const KeyValueInput = ({bind, value, commit, type }: KeyValueInterface) => {
     const [inputValue, setValue] = useState<ObjectRow[]>([])
     const [newDraft, setNewDraft] = useState({key: "", value: ""})
     const [unmaskedKeys, setUnmaskedKeys] = useState<Set<string>>(new Set(value ? Object.keys(value) : []));
 
-    const keyvalues: ObjectRow[] = value ? [...Object.entries(value ?? {}).map(([key, value]) => ({id: uuid(), key, value, isDirty: false}))]: []
-    console.log({keyvalues})
+    const keyvalues = value ? [...Object.entries(value ?? {}).map(([key, value]) => ({id: uuid(), key, value, isDirty: false}))]: []
 
     useEffect(() => setValue(keyvalues), [JSON.stringify(value)])
     
@@ -180,7 +204,7 @@ export const KeyValueInput = ({bind, value, commit, type }: { bind: string; valu
         </div>
     );
     
-    const inputType = ({value: val, key, onChange, type: inputType, onKeyDown}: {value: string; key: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; type?: string}) => {
+    const inputType = ({value: val, key, onChange, type: inputType, onKeyDown}: InputType) => {
         switch (inputType) {
             case "masked": {
                 return (
@@ -219,7 +243,7 @@ export const KeyValueInput = ({bind, value, commit, type }: { bind: string; valu
         ? (
             <>
                 {
-                    inputValue?.map(({key, value: val, id, isDirty}, i) => (
+                    inputValue?.map(({key, value: val, id, isDirty}: InputValues, i) => (
                         <div key={id} className="flex gap-2 p-1 w-full">
                             <Input
                                 key={`key${id}`}

@@ -1,13 +1,14 @@
 import { ForwardRefExoticComponent } from "react";
 import { LucideProps, Zap, Cog, Network, FileSpreadsheet, Repeat, Timer, Mail, Code, RectangleEllipsis, DatabaseZap, Bot } from "lucide-react";
+import { PanelInfo, PanelFormat } from "@/types/panels";
 
-interface NodeTypeOption {
-    type: string,
-    name: string;
-    description: string;
-    icon?: ForwardRefExoticComponent<Omit<LucideProps, "ref">>
-    panelInfo: any;
-    panelFormat: any;
+export interface NodeTypeOption {
+  type: string;
+  name: string;
+  description: string;
+  icon?: ForwardRefExoticComponent<Omit<LucideProps, "ref">>;
+  panelInfo: PanelInfo;
+  panelFormat: PanelFormat;
 }
 
 export const nodeTemplates: Record<string, NodeTypeOption>= {

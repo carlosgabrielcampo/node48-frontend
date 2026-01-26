@@ -11,11 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Cog, Search } from "lucide-react";
 import { v4 as uuidv4} from 'uuid'
 import { nodeTemplates } from "./Templates";
+import { NodeAdded } from "@/types/workflows";
 
 interface NodeTypeDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSelectNodeType: ({mainType, type, name}) => void;
+  onSelectNodeType: ({mainType, type, name}: NodeAdded) => void;
 }
 
 export const NodeTypeDrawer = ({
@@ -31,7 +32,7 @@ export const NodeTypeDrawer = ({
       template.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSelectNode = (node: any) => {
+  const handleSelectNode = (node: NodeAdded) => {
     onSelectNodeType(node);
     onOpenChange(false);
     setSearchQuery("");

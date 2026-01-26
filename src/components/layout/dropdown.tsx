@@ -3,12 +3,17 @@ import { Button } from "../ui/button";
 import { ChevronDown } from "lucide-react";
 import React from "react";
 import { Label } from "../ui/label";
-
-interface ItemProperties {
-    value: any;
+export interface DropdownExtraInterface {
+    label: string;
+    options: ListStructure[];
+    onSelect: (props: ItemProperties) => void;
 }
 
-interface ListStructure {
+interface ItemProperties {
+    value: string;
+}
+
+export interface ListStructure {
     itemProperties: ItemProperties;
     display: string;
 }
@@ -20,8 +25,8 @@ interface DropdownInterface {
     options: ListStructure[];
     menuLabel?: string;
     header: React.ReactElement | string;
-    dropdownExtra?: ListStructure[];
-    disabled: boolean;
+    dropdownExtra?: DropdownExtraInterface[];
+    disabled?: boolean;
 }
 
 const Item = ({itemProperties, onSelect, display}: {itemProperties: ItemProperties; onSelect: (props: ItemProperties) => void; display: string}) => {
@@ -56,7 +61,7 @@ const MenuContent = ({menuLabel, options, onSelect}: {menuLabel?: string; option
     )
 }
 
-const ExtraContent = ({ dropdownExtra }: { dropdownExtra?: any[] }) => {
+const ExtraContent = ({ dropdownExtra }: { dropdownExtra?: DropdownExtraInterface[] }) => {
     if (!dropdownExtra?.length) return null;
     return (
         <>

@@ -1,22 +1,49 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import App from '../App'
+import { ReactPortal } from 'react'
+import '@testing-library/jest-dom';
+
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+(globalThis as unknown as {
+  ResizeObserver: typeof ResizeObserver;
+}).ResizeObserver = ResizeObserverMock;
 
 // Mock all the providers and components to avoid complex setup
 vi.mock('@/contexts/ThemeContext', () => ({
-  ThemeProvider: ({ children }: any) => <div data-testid="theme-provider">{children}</div>
+  ThemeProvider: ({ children }: ReactPortal) => <div data-testid="theme-provider">{children}</div>
 }))
 
-vi.mock('@/contexts/AuthContext', () => ({
-  AuthProvider: ({ children }: any) => <div data-testid="auth-provider">{children}</div>
-}))
+vi.mock('@/contexts/AuthContext', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/contexts/AuthContext')>();
+
+  return {
+    ...actual,
+    AuthProvider: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="auth-provider">{children}</div>
+    ),
+    useAuth: () => ({
+      login: vi.fn(),
+      loginWithGoogle: vi.fn(),
+      isLoading: false,
+      error: null,
+      user: null,
+      logout: vi.fn(),
+    }),
+  };
+});
 
 vi.mock('@/contexts/EnvContext', () => ({
-  EnvProvider: ({ children }: any) => <div data-testid="env-provider">{children}</div>
+  EnvProvider: ({ children }: ReactPortal) => <div data-testid="env-provider">{children}</div>
 }))
 
 vi.mock('@/contexts/WorkflowEditorContext', () => ({
-  WorkflowEditorProvider: ({ children }: any) => <div data-testid="workflow-provider">{children}</div>
+  WorkflowEditorProvider: ({ children }: ReactPortal) => <div data-testid="workflow-provider">{children}</div>
 }))
 
 vi.mock('@/components/ui/toaster', () => ({
@@ -28,15 +55,15 @@ vi.mock('@/components/ui/sonner', () => ({
 }))
 
 vi.mock('@/components/ui/tooltip', () => ({
-  TooltipProvider: ({ children }: any) => <div data-testid="tooltip-provider">{children}</div>
+  TooltipProvider: ({ children }: ReactPortal) => <div data-testid="tooltip-provider">{children}</div>
 }))
 
 vi.mock('@/components/ui/sidebar', () => ({
-  SidebarProvider: ({ children }: any) => <div data-testid="sidebar-provider">{children}</div>
+  SidebarProvider: ({ children }: ReactPortal) => <div data-testid="sidebar-provider">{children}</div>
 }))
 
 vi.mock('@/components/auth/ProtectedRoute', () => ({
-  ProtectedRoute: ({ children }: any) => <div data-testid="protected-route">{children}</div>
+  ProtectedRoute: ({ children }: ReactPortal) => <div data-testid="protected-route">{children}</div>
 }))
 
 // Mock pages

@@ -10,7 +10,7 @@ interface DialogLayoutInterface {
     dialogFooter?: React.ReactNode;
     children?: React.ReactNode;
     open: boolean;
-    handleClose: () => void;
+    handleClose: (e: boolean) => void;
     classes: ClassInterface;
 }
 

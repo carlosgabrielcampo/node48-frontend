@@ -26,7 +26,7 @@ export const parseWorkflowJSON = (
   }
 };
 
-export const isWorkflowJSON = (data: any): data is WorkflowJSON => {
+export const isWorkflowJSON = (data: WorkflowJSON) => {
   return (
     data &&
     typeof data === "object" &&

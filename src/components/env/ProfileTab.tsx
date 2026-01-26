@@ -8,13 +8,13 @@ import { KeyValueInput } from "../layout/input";
 import { Label } from "../ui/label";
 import { useEnv } from "@/contexts/EnvContext";
 import { EnvProfile } from "@/types/env";
+import { useWorkflowEditor } from "@/contexts/WorkflowEditorContext";
 
 interface ProfileInterface {
     active: { activeLocal: EnvProfile };
     isDirty: boolean;
     handleSave: () => Promise<void>;
     workflowId: string;
-    setIsDirty: React.ReactEventHandler;
     localValues: string;
     editingProfile: string;
     handleEnvSwitch: (envId: string | null, type: "workflow" | "global") => Promise<void>;
@@ -36,7 +36,7 @@ export const ProfileTab = ({
         createProjectEnv,
         deleteWorkflowEnv,
     } = useEnv();
-    const [isDirty, setIsDirty] = useState(false);
+    const { setDirty, isDirty } = useWorkflowEditor()
     const [newProfileName, setNewProfileName] = useState("");
     const [profileName, setProfileName] = useState("");
     const [editingProfile, setEditingProfile] = useState<Partial<EnvProfile>>({});
@@ -72,7 +72,7 @@ export const ProfileTab = ({
         try {
             await updateProjectEnv(workflowId, editingProfile.id, { ...editingProfile })
             loadWorkflowEnvs(workflowId);
-            setIsDirty(false);
+            setDirty(false);
             updateActiveEnvs()
         } catch (error) {
             toast.error("Failed to save environment");
@@ -81,7 +81,7 @@ export const ProfileTab = ({
 
     const handleValuesChange = useCallback((_bind: string, newValues: EnvValues) => {
         setEditingProfile({ ...editingProfile, values: newValues });
-        setIsDirty(true)
+        setDirty(true)
     }, [editingProfile]);
 
     const handleCreateProfile = async () => {
@@ -111,7 +111,7 @@ export const ProfileTab = ({
             className={`flex items-center my-2 w-48 justify-between p-2 rounded-md cursor-pointer transition-colors ${editingProfile.id === profileItem.id ?  'bg-primary/10  border-primary/30' : '' } border`}
             onClick={() => {
                 setEditingProfile({ ...profileItem })
-                setIsDirty(false)
+                setDirty(false)
             }}
         >
         <span className="text-sm truncate overflow-x-hidden w-24">{profileItem.name}</span>
@@ -197,7 +197,7 @@ export const ProfileTab = ({
                                                                 onClick={() => {
                                                                     setProfileName("")
                                                                     setEditingProfile({...editingProfile, name: profileName})
-                                                                    setIsDirty(true)
+                                                                    setDirty(true)
                                                                 }}
                                                             >
                                                                 <Check className="cursor-pointer" />

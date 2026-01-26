@@ -17,23 +17,22 @@ export interface EnvProfile {
 }
 
 export interface EnvStorageInterface {
-  get(key?: string, defaultValue?: any): Promise<any>;
+  get(key?: string): Promise<void>;
   save(options: {
     id: string;
     profiles?: EnvProfile[];
-    active?: string[];
   }): Promise<void>;
   update(options: {
     id: string;
-    profiles?: EnvProfile[];
+    profiles?: EnvProfile;
     active?: string[];
   }): Promise<void>;
   deleteProfile(
-    env: string,
+    id: string,
     profileId: string
   ): Promise<void>;
   setDefault(
-    env: string,
+    id: string,
     profileId: string
   ): Promise<void>;
   setActive(

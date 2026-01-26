@@ -1,9 +1,21 @@
 
-import { Textarea, TextareaProps } from "@/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
+type DraftState = Record<string, Record<string, string> | null>;
+type SetDraft = React.Dispatch<React.SetStateAction<DraftState>>;
+
+interface CodeTextArea {
+  className: string;
+  value: string;
+  bind: string;
+  state: DraftState;
+  setDraft: SetDraft;
+  label?: string;
+  disabled?: boolean;
+}
 
 const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
   if(e.key === "Tab") {
@@ -17,13 +29,13 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
   }
 };
 
-export const CodeTextarea = ({ className, value, bind, state, setDraft, label, disabled }) => {
+export const CodeTextarea = ({ className, value, bind, state, setDraft, label, disabled }: CodeTextArea) => {
   const [raw, setRaw] = useState(() => JSON.stringify(value, null, 2));
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
     setRaw(text);
     try {
-      const parsed = JSON.parse(text);
+      const parsed = JSON.parse(text) as Record<string, string> | null;
       setDraft({ ...state, [bind]: parsed })
     } catch (_) {
       //
@@ -31,7 +43,7 @@ export const CodeTextarea = ({ className, value, bind, state, setDraft, label, d
   };
 
   return (
-    <div className="flex min-h-[100%] flex-col">
+    <div data-testid="code-textarea" className="flex min-h-[100%] flex-col">
       {label && <Label className="text-xs font-bold py-4">{label}</Label>}
 
       <ScrollArea>

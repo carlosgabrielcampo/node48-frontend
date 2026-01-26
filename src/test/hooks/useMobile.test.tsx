@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useIsMobile } from '../../hooks/useMobile'
+import { MockedFunction } from 'vitest'
 
 describe('useIsMobile', () => {
   let originalInnerWidth: number
-  let mockMatchMedia: any
+  let mockMatchMedia: MockedFunction<typeof window.matchMedia>;
 
   beforeEach(() => {
     originalInnerWidth = window.innerWidth

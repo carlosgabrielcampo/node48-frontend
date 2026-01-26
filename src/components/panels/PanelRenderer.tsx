@@ -1,48 +1,62 @@
 import { KeyValueInput, LabeledArrayInput, LabeledInput } from "@/components/layout/input";
 import { CodeTextarea, LabeledTextArea } from "@/components/layout/textArea";
-import { LabeledDropdown } from "../layout/dropdown";
+import { DropdownExtraInterface, LabeledDropdown, ListStructure } from "../layout/dropdown";
 import { LabeledCard } from "@/components/layout/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { LabeledCheckbox } from "@/components/layout/checkbox";
 import React from "react";
+import { WorkflowConnection } from "@/types/configPanels";
+import { PanelComponent } from "@/types/panels";
+type PositionPath = Array<string | number>;
+type DraftValue =
+  | string
+  | number
+  | boolean
+  | null
+  | DraftValue[]
+  | Record<string, string>;
 
+type DraftState = Record<string, DraftValue>;
 type SchemaProps = {
   type: string;
   bind: string;
   label: string;
   header: string;
   format: string;
-  switch: any;
-  options: any;
-  children: any[];
-  component: React.ReactElement;
+  position?: number;
+  switch: PanelComponent;
+  options: ListStructure;
+  children: PanelComponent[];
+  component: PanelComponent["component"];
   menuLabel: string;
   placeholder: string;
-  dropdownExtra: any;
+  dropdownExtra: DropdownExtraInterface[];
+  disabled: boolean;
 }
 type RendererProps = {
   open: boolean;
-  position?: any[];
-  draft: Record<string, any>;
-  schema?: SchemaProps;
-  defaultPanel: Record<string, any>;
-  setDraft?: (v: Record<string, any>) => void;
-  removeState: (position: any[] ) => void;
-  commit?: (bind: string, v: Record<string, any>) => void;
-  connections?: any;
+  position?: PositionPath;
+  draft: DraftState;
+  schema?: PanelComponent;
+  defaultPanel: PanelComponent;
+  setDraft?: React.Dispatch<React.SetStateAction<Record<string, DraftState>>>;
+  removeState: (position: PositionPath) => void;
+  commit?: (bind: string, v: Record<string, DraftState>) => void;
+  connections?: WorkflowConnection;
 };
+
 type ChildrenProps = {
   open: boolean;
-  position?: any[];
-  draft: Record<string, any>;
-  schema?: SchemaProps[];
-  defaultPanel: Record<string, any>;
-  setDraft?: (v: Record<string, any>) => void;
-  removeState: (position: any[] ) => void;
-  commit?: (bind: string, v: Record<string, any>) => void;
-  connections?: any;
+  position?: PositionPath;
+  draft: Record<string, DraftState>;
+  schema?: PanelComponent[];
+  defaultPanel: PanelComponent;
+  setDraft?: React.Dispatch<React.SetStateAction<Record<string, DraftState>>>;
+  removeState: (position: PositionPath) => void;
+  commit?: (bind: string, v: Record<string, DraftState>) => void;
+  connections?: WorkflowConnection;
 };
 
 export function RenderSchema({ schema, draft, setDraft, position, commit, connections, ...props  }: RendererProps) {
@@ -75,7 +89,7 @@ export function RenderSchema({ schema, draft, setDraft, position, commit, connec
   }
 }
 
-export const ChildrenRender = ({schema, ...props}: ChildrenProps) => schema?.length ? schema.map((child: any, i: number) => RenderSchema({schema: child, ...props})) : <></>
+export const ChildrenRender = ({schema, ...props}: ChildrenProps) => schema?.length ? schema.map((child: PanelComponent, i: number) => RenderSchema({schema: child, ...props})) : <></>
 
 const ComponentRender = ({schema, draft, setDraft, commit, position, defaultPanel, open, removeState, connections }) => {
   const { bind, label, placeholder, component, options, menuLabel, dropdownExtra, switch: switcher, type, children, header } = schema

@@ -1,6 +1,4 @@
-import { object } from "zod";
 import { EnvProfile, EnvStorageInterface } from "./EnvStorageTypes";
-
 
 const buildKey = (): string | null => {
     const AUTH_TOKEN_KEY = "node48_auth_token";
@@ -23,14 +21,14 @@ export class LocalEnvStorage implements EnvStorageInterface {
     async get(): Promise<EnvProfile> {
         try {
             const raw = localStorage.getItem(buildKey());
-            return raw ? JSON.parse(raw) : {};
+            return raw ? JSON.parse(raw) : null;
         } catch (err) {
-            return {};
+            return null;
         }
     }
-    async save({ id, profiles}: any): Promise<void> {
+    async save({ id, profiles }: {id: string, profiles: EnvProfile[]}): Promise<void> {
         const current = await this.get();
-        const currentProfiles = current?.[id]?.profiles
+        const currentProfiles = current?.[id]?.profiles as EnvProfile
         const allProfiles = currentProfiles ? Object.values(currentProfiles).filter((e) => e?.isDefault) : []
         
         if(id === "global" && !(currentProfiles && allProfiles?.length)){
@@ -45,10 +43,10 @@ export class LocalEnvStorage implements EnvStorageInterface {
         localSet(current)
         return current
     }
-    async update(options: any): Promise<void> {
+    async update(options): Promise<void> {
         return this.save(options);
     }
-    deleteProfile = async(id, profileId) => {
+    async deleteProfile(id, profileId) {
         const current = await this.get();
         if(current?.[id]?.profiles?.[profileId]){
             delete current?.[id]?.profiles?.[profileId]
@@ -56,7 +54,7 @@ export class LocalEnvStorage implements EnvStorageInterface {
         }
         return current
     }
-    setDefault = async(id, profileId) => {
+    async setDefault(id, profileId) {
         const current = await this.get();
         const env = current?.[id]
         if(env?.profiles){
@@ -70,7 +68,7 @@ export class LocalEnvStorage implements EnvStorageInterface {
         }
         return current
     }
-    setActive = async (id, envId, type) => {
+    async setActive(id, envId, type) {
         const current = await this.get();
         const workEnv = current[id] ?? { profiles: {}, global: "" };
         if(type === "workflow") workEnv.activeLocal = envId
@@ -78,7 +76,7 @@ export class LocalEnvStorage implements EnvStorageInterface {
         current[id] = workEnv
         return localSet(current)
     }
-    removeActive = async(id, envId, type) => {
+    async removeActive(id, envId, type) {
         const current = await this.get();
         const workEnv = current[id] ?? { profiles: {}, global: "" };
         if(type === "workflow") delete workEnv.activeLocal

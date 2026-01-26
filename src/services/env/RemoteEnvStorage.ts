@@ -1,28 +1,22 @@
-import { EnvStorageInterface, EnvProfile } from "./EnvStorageTypes";
-
-const toProfileMap = (envs: EnvProfile[]) => Object.fromEntries(envs.map(e => [e.id, e]));
+import { EnvStorageInterface } from "./EnvStorageTypes";
 
 export class RemoteEnvStorage implements EnvStorageInterface {
-    get = async (key?: string, defaultValue?: any): Promise<any> => {
+    get = async (key?: string): Promise<void> => {
       try {
         const response = await (await fetch(`${process.env.origin}/v1/envs/profiles/${key || ""}`)).json();
-        if (!response) return defaultValue;
+        if (!response) return null;
         return response;
       
       } catch (error) {
-        return defaultValue;
+        return null;
       }
     };
-    update = async ({id, profiles, active}: any): Promise<void> => {
+    update = async ({id, profiles}): Promise<void> => {
       try {
-        const requestBody: any = {}
-        if(profiles) requestBody["profiles"] = toProfileMap(profiles) 
-        if(active) requestBody["active"] = active
-    
         const response = await (await fetch(`${process.env.origin}/v1/envs/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestBody),
+          body: JSON.stringify(profiles),
         })).json();
     
         if(response.status === 200){ console.info("Env saved") }
@@ -32,16 +26,13 @@ export class RemoteEnvStorage implements EnvStorageInterface {
         console.error("Failed to save");
       }
     };
-    save = async ({id, profiles, active }: any): Promise<void> => {
+    save = async ({id, profiles}): Promise<void> => {
       try {
-        const requestBody: any = {}
-        if(profiles) requestBody["profiles"] = toProfileMap(profiles) 
-        if(active) requestBody["active"] = [active]
     
         const response = await (await fetch(`${process.env.origin}/v1/envs/profiles/${id}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestBody),
+          body: JSON.stringify(profiles),
         })).json();
     
         if(response.status === 201){ console.info("Env saved") }
@@ -52,5 +43,11 @@ export class RemoteEnvStorage implements EnvStorageInterface {
       }
     }
     deleteProfile = async(env, profileId) => {
+    }
+    setDefault = async(id, profileId) => {
+    }
+    setActive = async (id, envId, type) => {
+    }
+    removeActive = async(id, envId, type) => {
     }
 }

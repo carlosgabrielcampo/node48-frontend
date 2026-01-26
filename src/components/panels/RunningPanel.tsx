@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { DialogLayout } from "../layout/dialog"
 import { workflowService } from "@/services/workflow/WorkflowService"
 import { CodeTextarea } from "../layout/textArea"
 import { ScrollArea } from "../ui/scroll-area"
 import { envService } from "@/services/env/envService"
 import { useEnv } from "@/contexts/EnvContext"
+import { Workflow } from "@/types/workflows"
 
 export const RunningModal = ({onOpenChange, open, workflowId}) => {
     const { getActiveEnvs } = useEnv()
@@ -23,7 +24,6 @@ export const RunningModal = ({onOpenChange, open, workflowId}) => {
         if(open){ getWorkflow(); getEnvs(); }
     }, [open])
     
-    console.log(runningWorkflow, workflowEnvs, open)
     return (
         <DialogLayout 
             handleClose={(e) => {onOpenChange(e); setRunningWorkflow([]); setWorkflowEnvs([])}} 

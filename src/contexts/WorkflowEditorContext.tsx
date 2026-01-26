@@ -22,8 +22,8 @@ interface WorkflowEditorContextType {
   // Conflict detection
   hasConflict: boolean;
   setHasConflict: (conflict: boolean) => void;
-  conflictData: { local: any; remote: any } | null;
-  setConflictData: (data: { local: any; remote: any } | null) => void;
+  // conflictData: { local: any; remote: any } | null;
+  // setConflictData: (data: { local: any; remote: any } | null) => void;
 }
 
 const WorkflowEditorContext = createContext<WorkflowEditorContextType | undefined>(undefined);
@@ -36,7 +36,7 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
   const [showUnsavedModal, setShowUnsavedModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const [hasConflict, setHasConflict] = useState(false);
-  const [conflictData, setConflictData] = useState<{ local: any; remote: any } | null>(null);
+  // const [conflictData, setConflictData] = useState<{ local: any; remote: any } | null>(null);
   const [autosaveEnabled, setAutosaveEnabledState] = useState(() => {
     try { return localStorage.getItem(AUTOSAVE_KEY) === "true" }
     catch { return false }
@@ -76,10 +76,10 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
         clearDirty,
         lastSavedAt,
         hasConflict,
-        conflictData,
+        // conflictData,
         setHasConflict,
         setLastSavedAt,
-        setConflictData,
+        // setConflictData,
         autosaveEnabled,
         showUnsavedModal,
         pendingNavigation,
