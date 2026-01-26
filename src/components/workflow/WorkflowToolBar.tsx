@@ -157,7 +157,6 @@ export const WorkflowToolBar = ({
     },
     [setNodes, setEdges, handleDeleteNode, handleNodeClick]
   );
-  console.log({isDirty})
   return (
     <div className="w-full flex items-center justify-between h-16 gap-2 p-4 border-b bg-background overflow-hidden">
       <div className="flex items-center gap-2">

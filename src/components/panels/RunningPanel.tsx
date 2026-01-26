@@ -23,7 +23,6 @@ export const RunningModal = ({onOpenChange, open, workflowId}) => {
         if(open){ getWorkflow(); getEnvs(); }
     }, [open])
     
-    console.log(runningWorkflow, workflowEnvs, open)
     return (
         <DialogLayout 
             handleClose={(e) => {onOpenChange(e); setRunningWorkflow([]); setWorkflowEnvs([])}} 

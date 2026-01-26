@@ -141,7 +141,6 @@ export const FlowEditor = ({
           setEdges((eds) => eds.filter((edge) => !selectedEdges.includes(edge.id)));
           toast.success(`Deleted ${selectedEdges.length} connection(s)`);
         }
-        console.log("handleKeyDown") 
         setDirty(true)
       }
     },
@@ -194,7 +193,7 @@ export const FlowEditor = ({
           minZoom={0.1}
           maxZoom={1.5}
           onClick={hideMinimap}
-          onConnect={(e) => {onConnect(e); console.log(e)}}
+          onConnect={(e) => onConnect(e)}
           nodeTypes={nodeTypes}
           onMoveEnd={hideMinimap}
           onMoveStart={showMinimap}

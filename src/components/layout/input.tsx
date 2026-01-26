@@ -120,7 +120,6 @@ export const KeyValueInput = ({bind, value, commit, type }: KeyValueInterface) =
     const [unmaskedKeys, setUnmaskedKeys] = useState<Set<string>>(new Set(value ? Object.keys(value) : []));
 
     const keyvalues = value ? [...Object.entries(value ?? {}).map(([key, value]) => ({id: uuid(), key, value, isDirty: false}))]: []
-    console.log({keyvalues})
 
     useEffect(() => setValue(keyvalues), [JSON.stringify(value)])
     
