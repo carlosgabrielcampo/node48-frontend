@@ -77,11 +77,12 @@ describe('RunningModal', () => {
     render(<RunningModal open={true} workflowId="test-id" onOpenChange={() => {}} />)
 
     await waitFor(() => {
-      expect(screen.getByTestId('dialog')).toBeInTheDocument()
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
     expect(screen.getByText('Running...')).toBeInTheDocument()
     expect(screen.getByText('Project Running with the following configurations')).toBeInTheDocument()
+    console.log('code-textarea', screen.getAllByTestId('code-textarea'))
     expect(screen.getAllByTestId('code-textarea')).toHaveLength(2)
   })
 })

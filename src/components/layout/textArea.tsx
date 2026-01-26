@@ -43,7 +43,7 @@ export const CodeTextarea = ({ className, value, bind, state, setDraft, label, d
   };
 
   return (
-    <div className="flex min-h-[100%] flex-col">
+    <div data-testid="code-textarea" className="flex min-h-[100%] flex-col">
       {label && <Label className="text-xs font-bold py-4">{label}</Label>}
 
       <ScrollArea>

@@ -2,15 +2,39 @@ import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import App from '../App'
 import { ReactPortal } from 'react'
+import '@testing-library/jest-dom';
+
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+(globalThis as any).ResizeObserver = ResizeObserverMock;
 
 // Mock all the providers and components to avoid complex setup
 vi.mock('@/contexts/ThemeContext', () => ({
   ThemeProvider: ({ children }: ReactPortal) => <div data-testid="theme-provider">{children}</div>
 }))
 
-vi.mock('@/contexts/AuthContext', () => ({
-  AuthProvider: ({ children }: ReactPortal) => <div data-testid="auth-provider">{children}</div>
-}))
+vi.mock('@/contexts/AuthContext', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/contexts/AuthContext')>();
+
+  return {
+    ...actual,
+    AuthProvider: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="auth-provider">{children}</div>
+    ),
+    useAuth: () => ({
+      login: vi.fn(),
+      loginWithGoogle: vi.fn(),
+      isLoading: false,
+      error: null,
+      user: null,
+      logout: vi.fn(),
+    }),
+  };
+});
 
 vi.mock('@/contexts/EnvContext', () => ({
   EnvProvider: ({ children }: ReactPortal) => <div data-testid="env-provider">{children}</div>
