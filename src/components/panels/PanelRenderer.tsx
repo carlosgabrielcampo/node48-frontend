@@ -47,8 +47,6 @@ export function RenderSchema({ schema, draft, setDraft, position, commit, connec
   const renderProps = { schema, draft, setDraft, position, open, ...props }
   const {bind, children, format } = schema
   const draftValue = draft[bind] ?? ""
-  
-  console.log({draft, draftValue})
 
   switch(format){
     case "array": {
@@ -82,8 +80,6 @@ const ComponentRender = ({schema, draft, setDraft, commit, position, defaultPane
   const childRender = ChildrenRender({...renderProps, schema: children })
   const headRender = ChildrenRender({...renderProps, schema: header })
   const draftValue = draft[bind] ?? ""
-
-  console.log({draftValue, draft})
 
   switch (component) {
     case "AddButton": return <Button size="sm" variant="outline" onClick={() => AddOnClick({type, defaultPanel, draft, connections, setDraft, bind})}><Plus className="h-4 w-4" />{label}</Button>
