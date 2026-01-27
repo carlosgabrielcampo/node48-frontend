@@ -82,7 +82,6 @@ describe('RunningModal', () => {
 
     expect(screen.getByText('Running...')).toBeInTheDocument()
     expect(screen.getByText('Project Running with the following configurations')).toBeInTheDocument()
-    console.log('code-textarea', screen.getAllByTestId('code-textarea'))
     expect(screen.getAllByTestId('code-textarea')).toHaveLength(2)
   })
 })
