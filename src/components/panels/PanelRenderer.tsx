@@ -19,22 +19,6 @@ type DraftValue =
   | Record<string, string>;
 
 type DraftState = Record<string, DraftValue>;
-type SchemaProps = {
-  type: string;
-  bind: string;
-  label: string;
-  header: string;
-  format: string;
-  position?: number;
-  switch: PanelComponent;
-  options: ListStructure;
-  children: PanelComponent[];
-  component: PanelComponent["component"];
-  menuLabel: string;
-  placeholder: string;
-  dropdownExtra: DropdownExtraInterface[];
-  disabled: boolean;
-}
 type RendererProps = {
   open: boolean;
   position?: PositionPath;
@@ -46,7 +30,6 @@ type RendererProps = {
   commit?: (bind: string, v: Record<string, DraftState>) => void;
   connections?: WorkflowConnection;
 };
-
 type ChildrenProps = {
   open: boolean;
   position?: PositionPath;
@@ -64,6 +47,8 @@ export function RenderSchema({ schema, draft, setDraft, position, commit, connec
   const renderProps = { schema, draft, setDraft, position, open, ...props }
   const {bind, children, format } = schema
   const draftValue = draft[bind] ?? ""
+  
+  console.log({draft, draftValue})
 
   switch(format){
     case "array": {
@@ -73,7 +58,7 @@ export function RenderSchema({ schema, draft, setDraft, position, commit, connec
             draft[bind] = draftValue.map((p, i) => i === index ? { ...p, ...patch } : p); 
             setDraft(draft)
           }
-          draft.render_id = uuidv4()
+          draftI.render_id = uuidv4()
           return ChildrenRender({...props, draft: draftI, commit, schema: children, setDraft: updateDraft, position: [...position, bind, index]})
         })
         : <></>
@@ -97,6 +82,8 @@ const ComponentRender = ({schema, draft, setDraft, commit, position, defaultPane
   const childRender = ChildrenRender({...renderProps, schema: children })
   const headRender = ChildrenRender({...renderProps, schema: header })
   const draftValue = draft[bind] ?? ""
+
+  console.log({draftValue, draft})
 
   switch (component) {
     case "AddButton": return <Button size="sm" variant="outline" onClick={() => AddOnClick({type, defaultPanel, draft, connections, setDraft, bind})}><Plus className="h-4 w-4" />{label}</Button>
@@ -122,7 +109,7 @@ const AddOnClick = ({type, defaultPanel, draft, connections, setDraft, bind}) =>
       const id = uuidv4()
       cloned.nextStepId = id
       connections[id] = ""
-      return draft ? setDraft([...draft, cloned]) : setDraft([cloned])
+      return draft?.length ? setDraft([...draft, cloned]) : setDraft([cloned])
     }
     case "new_array": return setDraft(draft[bind].push(structuredClone(draftValue.at(-1))))
     default: return

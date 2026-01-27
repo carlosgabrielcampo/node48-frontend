@@ -18,25 +18,12 @@ import { StepParameters } from "@/types/parameters";
 type DraftState = StepParameters[];
 type PositionPath = Array<string | number>;
 
-type ChildrenRenderProps = {
-  open: boolean;
-  connections: Record<string, string>;
-  removeState: (position: PositionPath) => void;
-  defaultPanel: PanelInfo;
-  draft: StepParameters;
-  position?: PositionPath;
-  setDraft: (patch: Partial<Record<string, unknown>>) => void;
-  commit?: (bind: string, value: Partial<Record<string, unknown>>) => void;
-  schema?: import("@/types/panels").PanelComponent[];
-};
-
 export const NodeConfigPanel = ({ node, open, onOpenChange, onUpdate, setEdges }: NodeConfigPanelProps) => {
   const [draft, setDraft] = useState<DraftState>([]);
 
   const type = node?.type;
   const nodeType = type ? nodeTemplates[type as keyof typeof nodeTemplates] : undefined;
   const connections = node?.connections || {};
-
   useEffect(() => {
     if (node?.parameters?.length) {
       setDraft(node.parameters);
@@ -70,10 +57,11 @@ export const NodeConfigPanel = ({ node, open, onOpenChange, onUpdate, setEdges }
       open={open}
       dialogTitle={dialogTitle}
       classes={{ contentClass: "max-w-[600px] h-[95%]" }}
-      handleClose={() => {
-        onUpdate(node.id, draft, []);
-        onOpenChange(false);
-      }}
+      handleClose={() => { 
+        onUpdate(node.id, draft, connections); 
+        onOpenChange(false) 
+      }} 
+
     >
       <ScrollArea className="h-[calc(100%)]">
         <div className="space-y-4">
@@ -92,46 +80,33 @@ export const NodeConfigPanel = ({ node, open, onOpenChange, onUpdate, setEdges }
   );
 };
 
-const removeAtPath = (
-  root: DraftState,
-  path: PositionPath,
-  connections: Record<string, string>,
-  setEdges: (edge: Edge) => void
-): DraftState => {
+const removeAtPath = (root: DraftState, path: PositionPath, connections: Record<string, string>, setEdges: (edge: Edge) => void) => {
   const cloned = structuredClone(root);
-  let parent: unknown = cloned;
-
-  for (let i = 0; i < path.length - 1; i++) {
-    parent = (parent as Record<string | number, unknown>)[path[i]];
-  }
-
+  let parent = cloned;
+  for (let i = 0; i < path.length - 1; i++) parent = parent[path[i]];
   const last = path[path.length - 1];
-
-  if (path.length === 1) {
-    const connectionKeys = Object.keys(connections);
-    const id = connectionKeys?.[path[0] as number];
-    if (connectionKeys.length > 1) {
-      setEdges({ id } as Edge);
-      delete connections?.[id];
+  if(path.length === 1){
+    const connection = Object.keys(connections)
+    const id = connection?.[path[0] as number]
+    if(connection.length > 1){
+      setEdges((prev: Edges[]) => prev.filter((e) => e.id !== id))
+      delete connections?.[id]
     }
-  }
-
-  if (Array.isArray(parent)) {
-    if (parent.length <= 1) {
-      toast.error("Options cannot be empty");
+  }  
+  if(Array.isArray(parent)){
+    if(parent.length <= 1){
+      toast.error("Options cannot be empty")
       return cloned;
     }
     parent.splice(last as number, 1);
     return cloned;
   }
-
-  if (Array.isArray((parent as Record<string | number, unknown>)[last])) {
-    const targetArray = (parent as Record<string | number, unknown>)[last] as unknown[];
-    if (targetArray.length <= 1) {
-      toast.error("Options cannot be empty");
+  if (Array.isArray(parent[last])){
+    if(parent[last].length <= 1){
+      toast.error("Options cannot be empty")
       return cloned;
     }
-    targetArray.splice(last as number, 1);
+    parent[last].splice(last as number, 1);
     return cloned;
   }
 
@@ -167,15 +142,14 @@ const ConfigPanel = ({
     // Cast to match the expected interface from PanelRenderer
     return (ChildrenRender as (props: typeof props) => React.ReactNode)(props);
   };
-
   return (
     <LabeledCard
       label={title}
       header={
         header ?
           renderChildren({
-            draft: (draft[0] as Record<string, unknown>) || {},
-            setDraft: (updatedDraft: Record<string, unknown>) => setDraft([updatedDraft as StepParameters]),
+            draft,
+            setDraft,
             defaultPanel,
             schema: header,
             open,
@@ -185,31 +159,16 @@ const ConfigPanel = ({
           undefined
       }
     >
-      {
-        children && Array.isArray(draft) ? draft?.map((value: StepParameters, index: number) => {
-          const renderId = uuidv4();
-          (value as Record<string, unknown>).render_id = renderId;
-
-          const setState = (patch: Record<string, unknown>) =>
-            setDraft(draft.map((p: StepParameters, i: number) => i === index ? { ...p, ...patch } : p));
-
-          const commit = (bind: string, patch: Record<string, unknown>) => {
-            setDraft(draft.map((p: StepParameters, i: number) => i === index ? { ...p, [bind]: patch } : p));
-          };
-
-          return renderChildren({
-            open,
-            connections,
-            removeState,
-            defaultPanel,
-            draft: value as Record<string, unknown>,
-            position: [index],
-            setDraft: setState,
-            commit,
-            schema: children
-          });
-        }) :
-        <div className="text-sm text-muted-foreground">No configuration available.</div>
+    {
+      children && Array.isArray(draft) ? draft?.map((value: Partial<Record<string, string>>, index: number) => {
+            value.render_id = uuidv4()
+            const setState = (patch: Partial<Record<string, string>>) => setDraft(draft.map((p: DraftState, i: number) => i === index ? { ...p, ...patch } : p ))
+            const commit = (bind: string, value: Partial<Record<string, string>>) => {
+              setDraft(draft.map((p: DraftState, i: number) => i === index ? { ...p, [bind]: value } : p))
+            }
+            return ChildrenRender({ open, connections, removeState, defaultPanel, draft: value, position: [index], setDraft: setState, commit, schema: children })
+        })
+        : <div className="text-sm text-muted-foreground">No configuration available.</div>
       }
     </LabeledCard>
   );
